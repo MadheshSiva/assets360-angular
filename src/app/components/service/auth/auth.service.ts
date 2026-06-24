@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { environment } from '../../../../environments/environment';
 import { RegisterData, LoginData, AuthResponse, RegisterResponse } from '../../../models/auth.model';
@@ -12,21 +12,29 @@ export class AuthService {
 
   constructor(private http: HttpClient, private router: Router) {}
 
-    register(data: RegisterData): Observable<RegisterResponse> {
-    console.log('Register service called with data:', data);
-    return this.http.post<RegisterResponse>(`${this.apiUrl}api/auth/register`, data).pipe(
-      tap(response => console.log('Register response:', response))
-    );
+  register(data: RegisterData): Observable<RegisterResponse> {
+    // DEMO MODE: Backend registration is disabled
+    // return this.http.post<RegisterResponse>(`${this.apiUrl}api/auth/register`, data).pipe(
+    //   tap(response => console.log('Register response:', response))
+    // );
+    console.log('DEMO MODE: Registration bypassed for data:', data);
+    const mockResponse: RegisterResponse = { message: 'Demo account created!', email: data.email };
+    return of(mockResponse);
   }
 
   login(data: LoginData): Observable<AuthResponse> {
-    return this.http.post<AuthResponse>(`${this.apiUrl}api/auth/login`, data).pipe(
-      tap((response: AuthResponse) => {
-        if (response?.token) {
-          localStorage.setItem('token', response.token);
-        }
-      })
-    );
+    // DEMO MODE: Backend login authentication is disabled
+    // return this.http.post<AuthResponse>(`${this.apiUrl}api/auth/login`, data).pipe(
+    //   tap((response: AuthResponse) => {
+    //     if (response?.token) {
+    //       localStorage.setItem('token', response.token);
+    //     }
+    //   })
+    // );
+    console.log('DEMO MODE: Login bypassed for data:', data);
+    const fakeToken = 'demo-token-' + btoa(data.email + ':' + data.password);
+    const mockResponse: AuthResponse = { token: fakeToken, message: 'Demo login successful' };
+    return of(mockResponse);
   }
 
   logout(): void {

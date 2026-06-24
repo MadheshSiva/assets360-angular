@@ -8,7 +8,8 @@ import { Reports } from './components/pages/reports/reports/reports';
 import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
 import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
 import { Layout } from './components/shared/layout/layout';
-import { authGuard } from './components/guard/auth-guard';
+// DEMO MODE: Auth guard import kept for reference
+// import { authGuard } from './components/guard/auth-guard';
 import { Administration } from './components/pages/administration/administration/administration';
 import { Configuration } from './components/pages/administration/configuration/configuration';
 import { License } from './components/pages/administration/license/license';
@@ -22,7 +23,8 @@ export const routes: Routes = [
   {
     path: '',
     component: Layout,
-    canActivate: [authGuard],
+    // DEMO MODE: Auth guard is disabled
+    // canActivate: [authGuard],
     children: [
       { path: 'dashboard', component: Dashboard },
       { path: 'locating', component: Locating },

@@ -41,20 +41,28 @@ export class Login {
     this.popupVisible = false;
     this.isLoading = true;
 
-    this.auth.login(this.credentials).subscribe({
-      next: (res) => {
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('token', res.token);
-        }
-        this.isLoading = false;
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        const errorText = err?.error?.message || 'Invalid email or password';
-        this.errorMsg = errorText;
-        this.showPopup(errorText, 'Login Failed', 'error');
-        this.isLoading = false;
-      }
-    });
+    // DEMO MODE: Backend login authentication is disabled
+    // this.auth.login(this.credentials).subscribe({
+    //   next: (res) => {
+    //     if (typeof window !== 'undefined') {
+    //       localStorage.setItem('token', res.token);
+    //     }
+    //     this.isLoading = false;
+    //     this.router.navigate(['/dashboard']);
+    //   },
+    //   error: (err) => {
+    //     const errorText = err?.error?.message || 'Invalid email or password';
+    //     this.errorMsg = errorText;
+    //     this.showPopup(errorText, 'Login Failed', 'error');
+    //     this.isLoading = false;
+    //   }
+    // });
+
+    const fakeToken = 'demo-token-' + btoa(this.credentials.email + ':' + this.credentials.password);
+    if (typeof window !== 'undefined') {
+      localStorage.setItem('token', fakeToken);
+    }
+    this.isLoading = false;
+    this.router.navigate(['/dashboard']);
   }
 }

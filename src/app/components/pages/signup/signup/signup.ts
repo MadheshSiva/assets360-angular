@@ -2,9 +2,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
-import { AuthService } from '../../../../components/service/auth/auth.service';
 import { RegisterData } from '../../../../models/auth.model';
-import { lastValueFrom } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -29,7 +27,7 @@ export class Signup {
   popupMessage = '';
   popupType: 'error' | 'success' | '' = '';
 
-  constructor(private auth: AuthService, private router: Router) {}
+  constructor(private router: Router) {}
 
   showPopup(message: string, title = 'Error', type: 'error' | 'success' | '' = 'error') {
     this.popupMessage = message;
@@ -73,22 +71,29 @@ export class Signup {
 
     this.isLoading = true;
 
-    try {
-      console.log('Calling register with:', this.credentials);
-      const response = await lastValueFrom(this.auth.register(this.credentials));
-      const message = response?.message || 'Registered successfully';
-      console.log('Registration successful', response);
-      this.successMsg = 'Account created! Redirecting to login...';
-      this.showPopup(message, 'Success', 'success');
-      setTimeout(() => this.router.navigate(['/login']), 1500);
-    } catch (err: any) {
-      console.error('Registration failed:', err);
-      const errorText =
-        err?.error?.message || err?.message || 'Registration failed. Please try again.';
-      this.errorMsg = errorText;
-      this.showPopup(errorText, 'Registration Failed', 'error');
-    } finally {
-      this.isLoading = false;
-    }
+    // DEMO MODE: Backend registration is disabled
+    // try {
+    //   console.log('Calling register with:', this.credentials);
+    //   const response = await lastValueFrom(this.auth.register(this.credentials));
+    //   const message = response?.message || 'Registered successfully';
+    //   console.log('Registration successful', response);
+    //   this.successMsg = 'Account created! Redirecting to login...';
+    //   this.showPopup(message, 'Success', 'success');
+    //   setTimeout(() => this.router.navigate(['/login']), 1500);
+    // } catch (err: any) {
+    //   console.error('Registration failed:', err);
+    //   const errorText =
+    //     err?.error?.message || err?.message || 'Registration failed. Please try again.';
+    //   this.errorMsg = errorText;
+    //   this.showPopup(errorText, 'Registration Failed', 'error');
+    // } finally {
+    //   this.isLoading = false;
+    // }
+
+    console.log('DEMO MODE: Registration bypassed for data:', this.credentials);
+    this.successMsg = 'Account created! Redirecting to login...';
+    this.showPopup('Demo account created!', 'Success', 'success');
+    setTimeout(() => this.router.navigate(['/login']), 1500);
+    this.isLoading = false;
   }
 }

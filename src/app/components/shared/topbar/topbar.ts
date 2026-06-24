@@ -19,7 +19,8 @@ export class Topbar {
   }
 
   logout(): void {
-    localStorage.removeItem('token');
+    // DEMO MODE: Token removal is disabled
+    // localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
 }
