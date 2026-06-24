@@ -1,0 +1,526 @@
+@use '../../../../styles/theme' as *;
+
+:host {
+  display: block;
+  font-family: var(--piq-font);
+}
+
+.sidebar {
+  position: fixed;
+  inset: 0 auto 0 0;
+  z-index: 100;
+  width: var(--piq-sidebar-width);
+  background: transparent;
+  color: var(--piq-text-primary);
+  display: flex;
+  background-color: white;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 12px;
+  overflow: hidden;
+  transition: width 0.25s ease;
+  box-sizing: border-box;
+  
+  &.collapsed {
+    width: var(--piq-sidebar-collapsed-width);
+
+    .brand-card {
+      padding: 12px 8px;
+      justify-content: center;
+    }
+
+    .collapse-btn {
+      display: none;
+    }
+
+    .nav-item {
+      justify-content: center;
+      padding: 10px 0;
+    }
+
+    .nav-card {
+      padding: 12px 8px;
+    }
+
+    .nav-dropdown {
+      display: none;
+    }
+  }
+}
+
+.brand-card {
+  background: var(--piq-surface);
+  border: 1px solid var(--piq-border-subtle);
+  border-radius: 14px;
+  padding: 14px 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 64px;
+  box-shadow: var(--piq-shadow-sidebar);
+  position: relative;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  min-width: 0;
+  flex: 1;
+}
+
+.brand-mark {
+  width: 36px;
+  height: 36px;
+  flex: 0 0 36px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+}
+
+.brand-copy {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+}
+
+.brand-copy strong {
+  font-size: 18px;
+  font-weight: 700;
+  color: #7030a0;
+  line-height: 1;
+  white-space: nowrap;
+  letter-spacing: -0.2px;
+}
+
+.collapse-btn {
+  position: absolute;
+  right: -18px; // push outside the sidebar edge
+  top: 50%;
+  transform: translateY(-50%) scale(1);
+
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+
+  // Transparent glass effect
+  background: rgba(255, 255, 255, 0.35);
+  -webkit-backdrop-filter: blur(14px) saturate(160%);
+  backdrop-filter: blur(14px) saturate(160%);
+
+  color: #4a2a72;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  // Very high so the button sits above the sticky topbar / layout
+  z-index: 9999;
+
+  // glass border + soft floating shadow
+  box-shadow:
+    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
+    0 0 0 1px rgba(112, 48, 160, 0.18),
+    0 8px 18px rgba(112, 48, 160, 0.18),
+    0 2px 6px rgba(15, 23, 42, 0.08);
+
+  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+
+  // The inner span holds the icon, rotating it when collapsed
+  .collapse-btn__glass {
+    width: 100%;
+    height: 100%;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    transition: transform 0.3s ease;
+  }
+
+  svg, i {
+    font-size: 16px;
+    pointer-events: none;
+    stroke: currentColor;
+  }
+
+  // When sidebar is collapsed, rotate the icon to face the other way
+  &.collapsed .collapse-btn__glass {
+    transform: rotate(180deg);
+  }
+
+  &:hover {
+    transform: translateY(-50%) scale(1.08);
+    background: rgba(255, 255, 255, 0.55);
+    color: #7030a0;
+    box-shadow:
+      0 0 0 1px rgba(255, 255, 255, 0.8) inset,
+      0 0 0 1px rgba(112, 48, 160, 0.3),
+      0 12px 22px rgba(112, 48, 160, 0.22),
+      0 3px 8px rgba(15, 23, 42, 0.1);
+  }
+
+  &:active {
+    transform: translateY(-50%) scale(0.94);
+  }
+
+  &:focus-visible {
+    outline: 2px solid #7030a0;
+    outline-offset: 3px;
+  }
+}
+
+// White card container wrapping the navigation list
+.nav-card {
+  background: var(--piq-surface);
+  border: 1px solid var(--piq-border-subtle);
+  border-radius: 14px;
+  padding: 14px 10px;
+  box-shadow: var(--piq-shadow-sidebar);
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-height: 0;
+}
+
+.nav {
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  padding: 0;
+  display: grid;
+  gap: 6px;
+  align-content: start;
+  flex: 1;
+  box-shadow: none;
+}
+
+.nav-item {
+  position: relative;
+  min-height: 46px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 14px;
+  border-radius: 10px;
+  color: var(--piq-primary);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  transition: background 0.18s ease, color 0.18s ease;
+
+  &:hover:not(.active) {
+    background: var(--piq-primary-subtle);
+    color: var(--piq-primary);
+  }
+}
+
+// ============= ACTIVE STATE (matches the target screenshot) =============
+.nav-item {
+  position: relative; // IMPORTANT (needed for absolute positioning)
+
+  &.active {
+    color: #7030a0;
+    font-weight: 600;
+
+    // BEFORE ELEMENT
+    &::before {
+      content: "";
+      position: absolute;
+      left: -13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 40px;
+      background: #7030a0;
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+
+    .nav-icon {
+      background-color: #7030a0;
+
+      img {
+        filter: brightness(0) invert(1);
+      }
+    }
+  }
+}
+
+// ============= Nav icon =============
+.nav-icon {
+  width: 26px;
+  height: 26px;
+  flex: 0 0 26px;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+  background: transparent;
+  position: relative;
+  transition: background 0.2s ease;
+
+  img {
+    width: 22px;
+    height: 22px;
+    object-fit: contain;
+  }
+}
+
+.nav-label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  color: inherit;
+}
+
+.nav-item-dropdown {
+  cursor: pointer;
+
+  &:hover:not(.open) {
+    background: var(--piq-primary-subtle);
+    color: var(--piq-primary);
+  }
+
+  &.open {
+    background: var(--piq-primary-subtle);
+    color: #7030a0;
+  }
+}
+
+.nav-caret {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  transition: transform 0.2s ease;
+
+  .nav-item-dropdown.open & {
+    transform: rotate(180deg);
+  }
+
+  svg {
+    width: 14px;
+    height: 14px;
+  }
+}
+
+.nav-dropdown {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-left: 40px;
+  margin-top: 6px;
+}
+
+.nav-dropdown-item {
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+  padding: 0 14px;
+  border-radius: 8px;
+  color: var(--piq-primary);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.18s ease, color 0.18s ease;
+
+  &:hover:not(.active) {
+    background: var(--piq-primary-subtle);
+    color: var(--piq-primary);
+  }
+
+  &.active {
+    color: #7030a0;
+    font-weight: 600;
+    position: relative;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: -13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 30px;
+      background: #7030a0;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+  }
+}
+
+// ============= Flyout panel (Administration right-side menu) =============
+// position: fixed (not absolute) is deliberate: it makes the panel escape any
+// ancestor's overflow:hidden / overflow-x:hidden (e.g. the app's layout-shell
+// wrapper), since fixed positioning is relative to the viewport, not a
+// clipping ancestor. top/left are set inline via [style.top.px]/[style.left.px]
+// in the template, computed from the trigger element's live bounding rect.
+//
+// Background/border/shadow are hard-coded here (not var(--piq-surface) etc.)
+// because this panel is rendered outside the sidebar's own stacking context as
+// a fixed-position layer, so it can't rely on an ancestor's background to show
+// through — it needs to be fully opaque on its own.
+.nav-flyout {
+  position: fixed;
+  top: 0;
+  left: 280px; /* same as sidebar */
+  height: 100vh;
+  width: 300px;
+
+  margin: 0; /* 🔥 remove any gap */
+  
+  background: #fff;
+  border-left: 1px solid #e7e2f5;
+  box-shadow: 6px 0 24px rgba(112, 48, 160, 0.15);
+
+  padding: 16px 12px;
+  z-index: 1000;
+}
+
+@keyframes slideIn {
+  from {
+    transform: translateX(-20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes nav-flyout-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.nav-flyout__header {
+  font-size: 18px;
+  font-weight: 700;
+  color: #1f2937;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+}
+
+// Row shared by both leaf links and the "parent" toggle row
+.nav-flyout-item {
+  position: relative;
+  min-height: 48px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 0 14px;
+  border-radius: 10px;
+  color: var(--piq-primary, #7030a0);
+  text-decoration: none;
+  font-size: 15px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.18s ease, color 0.18s ease;
+
+  &:hover:not(.active) {
+    background: var(--piq-primary-subtle, #f3edfb);
+    color: var(--piq-primary, #7030a0);
+  }
+
+  &.active {
+    color: #7030a0;
+    font-weight: 600;
+
+    &::before {
+      content: "";
+      position: absolute;
+      left: -13px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 5px;
+      height: 30px;
+      background: #7030a0;
+      border-top-right-radius: 8px;
+      border-bottom-right-radius: 8px;
+    }
+  }
+}
+
+// The expandable "User Management" row stays highlighted while open
+.nav-flyout-item--parent.open {
+  background: var(--piq-primary-subtle, #f3edfb);
+  color: #7030a0;
+
+  .nav-flyout-item__arrow {
+    color: #7030a0;
+    transform: rotate(90deg);
+  }
+}
+
+.nav-flyout-item__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.nav-flyout-item__arrow {
+  display: flex;
+  align-items: center;
+  flex: 0 0 auto;
+  color: var(--piq-text-secondary, #9ca3af);
+  transition: transform 0.18s ease, color 0.18s ease;
+
+  svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+
+.nav-flyout-item:hover .nav-flyout-item__arrow {
+  color: #7030a0;
+}
+
+// ============= Nested sub-list (User / Role under User Management) =============
+.nav-flyout-sublist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 4px;
+  padding-left: 12px;
+  border-left: 2px solid var(--piq-border-subtle, #ece7f8);
+  margin-left: 20px;
+}
+
+.nav-flyout-sublist-item {
+  min-height: 38px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--piq-primary, #7030a0);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: background 0.18s ease, color 0.18s ease;
+
+  &:hover:not(.active) {
+    background: var(--piq-primary-subtle, #f3edfb);
+    color: var(--piq-primary, #7030a0);
+  }
+
+  &.active {
+    color: #7030a0;
+    font-weight: 600;
+    background: var(--piq-primary-subtle, #f3edfb);
+  }
+}

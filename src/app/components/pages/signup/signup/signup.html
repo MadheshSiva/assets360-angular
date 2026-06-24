@@ -1,0 +1,98 @@
+<div class="login-shell">
+  <aside class="branding-panel">
+    <div class="brand-top">
+      <div class="brand-mark">PIQ</div>
+      <h1>Welcome to<br />People 360</h1>
+      <p class="brand-subtitle">LOCATE. MONITOR. SECURE. RESPOND.</p>
+    </div>
+
+    <div class="brand-features">
+      <div class="feature-item">Live Camera Monitoring</div>
+      <div class="feature-item">Evacuation Management</div>
+      <div class="feature-item">Access Control</div>
+      <div class="feature-item">Attendance Tracking</div>
+    </div>
+  </aside>
+
+  <section class="login-panel">
+    <div class="login-card">
+      <div class="icon-shell">🤖</div>
+      <h2>Create Account</h2>
+      <p class="login-subtitle">Sign up for People 360</p>
+
+      <form (ngSubmit)="signup()" novalidate class="login-form">
+
+        <label class="field-label">
+          <span>Full Name</span>
+          <input
+            type="text"
+            [(ngModel)]="credentials.fullName"
+            name="fullName"
+            placeholder="Enter your full name"
+            autocomplete="off"
+          />
+        </label>
+
+        <label class="field-label">
+          <span>Username</span>
+          <input
+            type="text"
+            [(ngModel)]="credentials.email"
+            name="email"
+            placeholder="Enter your username"
+            autocomplete="off"
+          />
+        </label>
+
+        <label class="field-label">
+          <span>Password</span>
+          <input
+            type="password"
+            [(ngModel)]="credentials.password"
+            name="password"
+            placeholder="Enter your password"
+            autocomplete="off"
+          />
+        </label>
+
+        <label class="field-label">
+          <span>Confirm Password</span>
+          <input
+            type="password"
+            [(ngModel)]="credentials.confirmPassword"
+            name="confirmPassword"
+            placeholder="Confirm your password"
+            autocomplete="off"
+          />
+        </label>
+
+        <p *ngIf="errorMsg" class="error-msg">{{ errorMsg }}</p>
+        <p *ngIf="successMsg" class="success-msg">{{ successMsg }}</p>
+
+        <button type="submit" class="submit-button" [disabled]="isLoading">
+          {{ isLoading ? 'Creating Account...' : 'Sign Up' }}
+        </button>
+
+        <div *ngIf="popupVisible" class="popup-overlay">
+          <div class="popup-card" [class.error]="popupType === 'error'" [class.success]="popupType === 'success'">
+            <div class="popup-header">
+              <h3>{{ popupTitle }}</h3>
+              <button type="button" class="popup-close" (click)="closePopup()">×</button>
+            </div>
+            <div class="popup-body">
+              <p>{{ popupMessage }}</p>
+            </div>
+            <div class="popup-actions">
+              <button type="button" class="btn-close" (click)="closePopup()">Close</button>
+            </div>
+          </div>
+        </div>
+      </form>
+
+      <div class="login-meta">
+        <span>Already have an account?</span>
+        <a routerLink="/login" class="forgot-link">Sign In</a>
+      </div>
+    </div>
+  </section>
+</div>

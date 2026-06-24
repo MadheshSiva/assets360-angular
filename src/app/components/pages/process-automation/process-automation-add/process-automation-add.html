@@ -1,0 +1,194 @@
+<section class="pa-page">
+  <!-- LEFT SIDEBAR -->
+  <aside class="pa-sidebar">
+    <div class="pa-search">
+      <input
+        type="text"
+        class="pa-search-input"
+        placeholder="Search..."
+        [(ngModel)]="searchTerm"
+        name="searchTerm"
+      />
+      <svg class="pa-search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="7"></circle>
+        <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+      </svg>
+    </div>
+
+    <ul class="pa-list">
+      <li
+        *ngFor="let item of filteredAutomations"
+        class="pa-list-item"
+        [class.active]="item.id === selectedAutomationId"
+        (click)="selectAutomation(item)"
+      >
+        <span>{{ item.name }}</span>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="9 18 15 12 9 6"></polyline>
+        </svg>
+      </li>
+    </ul>
+  </aside>
+
+  <!-- RIGHT PANEL -->
+  <div class="pa-panel">
+    <div class="pa-panel-header">Add</div>
+
+    <form class="pa-form" (ngSubmit)="create()">
+      <div class="pa-field">
+        <label class="pa-label" for="title">Title</label>
+        <input
+          id="title"
+          type="text"
+          class="pa-input"
+          [(ngModel)]="title"
+          name="title"
+        />
+        <p class="pa-error" *ngIf="submitted && !title.trim()">Title is required</p>
+      </div>
+
+      <!-- CONDITIONS -->
+      <div class="pa-section">
+        <div class="pa-section-row">
+          <span class="pa-section-title">Conditions</span>
+          <span class="pa-relationship">Relationship: {{ relationshipLabel }}</span>
+        </div>
+
+        <div class="pa-rule-row" *ngFor="let cond of conditions; let i = index">
+          <!-- column 1: empty for row A, operator dropdown for row B+ -->
+          <div class="pa-rule-operator-slot">
+            <select
+              *ngIf="i > 0"
+              class="pa-operator-select"
+              [(ngModel)]="cond.operator"
+              [name]="'operator' + cond.id"
+            >
+              <option value="AND">AND</option>
+              <option value="OR">OR</option>
+            </select>
+          </div>
+
+          <!-- column 2: Condition A / Condition B label -->
+          <label class="pa-rule-label">{{ conditionLabel(i) }}</label>
+
+          <!-- column 3: dropdown select -->
+          <div class="pa-dropdown-wrap">
+            <input
+              type="text"
+              class="pa-input pa-dropdown-trigger"
+              [class.open]="cond.open"
+              [value]="cond.value"
+              placeholder="Select condition"
+              readonly
+              (click)="toggleConditionDropdown(cond)"
+            />
+
+            <div class="pa-dropdown-panel" *ngIf="cond.open">
+              <div
+                class="pa-dropdown-option"
+                *ngFor="let opt of conditionOptions"
+                [class.highlighted]="cond.value ? opt === cond.value : opt === conditionOptions[0]"
+                (click)="selectConditionOption(cond, opt)"
+              >
+                {{ opt }}
+              </div>
+            </div>
+          </div>
+
+          <!-- columns 4-5: plus always; minus only once a 2nd row exists -->
+          <button
+            type="button"
+            class="pa-icon-btn pa-icon-btn-minus"
+            *ngIf="conditions.length > 1"
+            (click)="removeCondition(cond.id)"
+            title="Remove condition"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="pa-icon-btn"
+            (click)="addCondition()"
+            title="Add condition"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+
+        <div class="pa-rule-row pa-time-row">
+          <label class="pa-rule-label">Set time Period</label>
+          <input type="checkbox" class="pa-checkbox" [(ngModel)]="setTimePeriod" name="setTimePeriod" />
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="pa-section">
+        <div class="pa-section-row">
+          <span class="pa-section-title">Actions</span>
+        </div>
+
+        <div class="pa-rule-row pa-rule-row-action" *ngFor="let act of actions; let i = index">
+          <label class="pa-rule-label">{{ actionLabel(i) }}</label>
+
+          <div class="pa-dropdown-wrap">
+            <input
+              type="text"
+              class="pa-input pa-dropdown-trigger"
+              [class.open]="act.open"
+              [value]="act.value"
+              placeholder="Select action"
+              readonly
+              (click)="toggleActionDropdown(act)"
+            />
+
+            <div class="pa-dropdown-panel" *ngIf="act.open">
+              <div
+                class="pa-dropdown-option"
+                *ngFor="let opt of actionOptions"
+                [class.highlighted]="opt === act.value"
+                (click)="selectActionOption(act, opt)"
+              >
+                {{ opt }}
+              </div>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            class="pa-icon-btn pa-icon-btn-minus"
+            *ngIf="actions.length > 1"
+            (click)="removeAction(act.id)"
+            title="Remove action"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+
+          <button
+            type="button"
+            class="pa-icon-btn"
+            (click)="addAction()"
+            title="Add action"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="pa-actions">
+        <button type="button" class="pa-btn pa-btn-secondary" (click)="cancel()">Cancel</button>
+        <button type="submit" class="pa-btn pa-btn-primary">Create</button>
+      </div>
+    </form>
+  </div>
+</section>

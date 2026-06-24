@@ -1,0 +1,18 @@
+@use '../../../../styles/theme' as *;
+
+:host {
+  display: block;
+  font-family: var(--piq-font);
+}
+
+.footer-shell {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 48px;
+  padding: 0 var(--piq-spacing-lg);
+  background: var(--piq-surface);
+  border-top: 1px solid var(--piq-border-subtle);
+  color: var(--piq-text-secondary);
+  font-size: var(--piq-font-size-xs);
+}

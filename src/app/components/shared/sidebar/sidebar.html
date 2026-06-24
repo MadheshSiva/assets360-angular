@@ -1,0 +1,126 @@
+<aside class="sidebar" [class.collapsed]="collapsed">
+  <div class="brand-card">
+    <div class="brand">
+      <div class="brand-mark">
+        <img src="PurpleIQLOGOPurpleBright.png" alt="Purple IQ" />
+      </div>
+      <div class="brand-copy" *ngIf="!collapsed">
+        <strong>Purple IQ</strong>
+      </div>
+    </div>
+    <button
+      class="collapse-btn"
+      [class.collapsed]="collapsed"
+      type="button"
+      (click)="toggleCollapse()"
+      [attr.aria-label]="collapsed ? 'Expand sidebar' : 'Collapse sidebar'"
+    >
+      <span class="collapse-btn__glass">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="15 18 9 12 15 6"></polyline>
+        </svg>
+      </span>
+    </button>
+  </div>
+
+  <div class="nav-card">
+    <nav class="nav" aria-label="Primary navigation">
+      <ng-container *ngFor="let item of navItems">
+        <a
+          *ngIf="!item.children"
+          [routerLink]="item.path"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{ exact: false }"
+          class="nav-item"
+          [attr.title]="collapsed ? item.label : null"
+        >
+          <span class="nav-icon">
+            <img [src]="item.icon" [alt]="item.label" />
+          </span>
+          <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
+        </a>
+
+        <div
+          *ngIf="item.children"
+          class="nav-item nav-item-dropdown"
+          (click)="toggleDropdown(item.label, $event.currentTarget)"
+          [class.open]="isDropdownOpen(item.label)"
+        >
+          <span class="nav-icon">
+            <img [src]="item.icon" [alt]="item.label" />
+          </span>
+          <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
+          <span class="nav-caret" *ngIf="!collapsed">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+          </span>
+        </div>
+      </ng-container>
+    </nav>
+  </div>
+</aside>
+
+<!--
+  Flyout panel, rendered outside the sidebar's normal flow as position:fixed.
+  This deliberately sits at the end of the template (NOT nested inside .nav-item)
+  so it is not subject to any ancestor's overflow:hidden / overflow-x:hidden clipping
+  (e.g. a layout shell wrapper), and so its z-index stacking is independent of the
+  sidebar's own stacking context.
+-->
+<ng-container *ngFor="let item of navItems">
+  <div
+    class="nav-flyout"
+    *ngIf="item.children && isDropdownOpen(item.label) && flyoutPosition"
+    [style.top.px]="flyoutPosition!.top"
+    [style.left.px]="flyoutPosition!.left"
+    (click)="$event.stopPropagation()"
+  >
+    <div class="nav-flyout__header">{{ item.label }}</div>
+
+    <ng-container *ngFor="let child of item.children">
+
+      <!-- Leaf item: navigates directly and closes the whole flyout -->
+      <a
+        *ngIf="!child.children"
+        [routerLink]="child.path"
+        routerLinkActive="active"
+        [routerLinkActiveOptions]="{ exact: false }"
+        class="nav-flyout-item"
+        (click)="navigateAndClose(child.path); $event.preventDefault()"
+      >
+        <span class="nav-flyout-item__label">{{ child.label }}</span>
+      </a>
+
+      <!-- Parent item: expands a nested sub-list instead of navigating -->
+      <div *ngIf="child.children">
+        <div
+          class="nav-flyout-item nav-flyout-item--parent"
+          [class.open]="isSubDropdownOpen(child.label)"
+          (click)="toggleSubDropdown(child.label)"
+        >
+          <span class="nav-flyout-item__label">{{ child.label }}</span>
+          <span class="nav-flyout-item__arrow">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </span>
+        </div>
+
+        <div class="nav-flyout-sublist" *ngIf="isSubDropdownOpen(child.label)">
+          <a
+            *ngFor="let grandchild of child.children"
+            [routerLink]="grandchild.path"
+            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: false }"
+            class="nav-flyout-sublist-item"
+            (click)="navigateAndClose(grandchild.path); $event.preventDefault()"
+          >
+            {{ grandchild.label }}
+          </a>
+        </div>
+      </div>
+
+    </ng-container>
+  </div>
+</ng-container>

@@ -1,0 +1,116 @@
+@use '../../../../styles/theme' as *;
+
+:host {
+  display: block;
+}
+
+.topbar-shell {
+  height: 72px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 0 24px;
+  background: #ffffff;
+  border-bottom: 1px solid #e5edf6;
+  position: sticky;
+  top: 0;
+  // Keep the topbar below the sidebar's collapse button (which is z-index 9999)
+  z-index: 50;
+}
+
+.menu-toggle,
+.notification-btn {
+  border: 0;
+  background: transparent;
+  color: #0f172a;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  border-radius: 6px;
+}
+
+.menu-toggle {
+  width: 38px;
+  height: 38px;
+}
+
+.menu-toggle:hover,
+.notification-btn:hover {
+  background: #f1f5f9;
+}
+
+.menu-toggle svg,
+.notification-btn svg {
+  width: 22px;
+  height: 22px;
+}
+
+.topbar-spacer {
+  flex: 1;
+}
+
+.notification-btn {
+  width: 38px;
+  height: 38px;
+  position: relative;
+}
+
+.notification-btn span {
+  position: absolute;
+  top: 3px;
+  right: 3px;
+  min-width: 17px;
+  height: 17px;
+  border-radius: 999px;
+  background: #ef233c;
+  color: #fff;
+  display: grid;
+  place-items: center;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.admin-chip {
+  display: grid;
+  grid-template-columns: 38px auto auto;
+  align-items: center;
+  gap: 10px;
+  color: #0f172a;
+}
+
+.avatar {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  background: #2563eb;
+  color: #fff;
+  font-weight: 800;
+}
+
+.admin-chip div:not(.avatar) {
+  display: grid;
+  gap: 2px;
+}
+
+.admin-chip strong {
+  font-size: 13px;
+}
+
+.admin-chip span {
+  color: #64748b;
+  font-size: 11px;
+}
+
+@media (max-width: 640px) {
+  .topbar-shell {
+    height: 60px;
+    padding: 0 14px;
+  }
+
+  .admin-chip div:not(.avatar),
+  .admin-chip b {
+    display: none;
+  }
+}

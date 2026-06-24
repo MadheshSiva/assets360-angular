@@ -1,0 +1,265 @@
+.process-automation-page {
+  min-height: 100%;
+ 
+  font-family: 'Red Hat Display', sans-serif;
+}
+
+.process-automation-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 18px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
+  padding: 32px 28px;
+}
+
+/* Header */
+.pa-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-bottom: 28px;
+}
+
+.pa-title {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 700;
+  color: #111827;
+}
+
+.pa-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+/* Search */
+.pa-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.pa-search input {
+  width: 260px;
+  padding: 10px 40px 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #e0e1ea;
+  background: #fafafa;
+  font-size: 14px;
+  color: #111827;
+}
+
+.pa-search input::placeholder {
+  color: #9ca3af;
+}
+
+.pa-search input:focus-visible {
+  outline: none;
+  border-color: #7c5cf0;
+  box-shadow: 0 0 0 3px rgba(124, 92, 240, 0.15);
+}
+
+.pa-search-icon {
+  position: absolute;
+  right: 12px;
+  width: 18px;
+  height: 18px;
+  color: #7030a0;
+  pointer-events: none;
+}
+
+/* Icon buttons */
+.pa-icon-btn {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  border: 1.5px solid #7030a0;
+  background: #ffffff;
+  color: #7030a0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.pa-icon-btn svg {
+  width: 18px;
+  height: 18px;
+}
+
+.pa-icon-btn:hover {
+  background: #7030a0;
+  color: #ffffff;
+}
+
+.pa-icon-btn:focus-visible {
+  outline: 2px solid #7030a0;
+  outline-offset: 2px;
+}
+
+.pa-hidden-input {
+  display: none;
+}
+
+/* Table */
+.pa-table-wrapper {
+  overflow-x: auto;
+}
+
+.pa-table {
+  width: 100%;
+  min-width: 760px;
+  border-collapse: separate;
+  border-spacing: 0 10px;
+}
+
+.pa-table thead th {
+  text-align: left;
+  font-size: 13px;
+  font-weight: 600;
+  color: #111827;
+  padding: 0 16px 8px;
+}
+
+.pa-row {
+  background: #f2effb;
+}
+
+.pa-row:nth-child(even) {
+  background: #eae5fa;
+}
+
+.pa-row td {
+  padding: 14px 16px;
+  font-size: 14px;
+  color: #374151;
+}
+
+.pa-row td:first-child {
+  border-radius: 12px 0 0 12px;
+  padding-left: 20px;
+}
+
+.pa-row td:last-child {
+  border-radius: 0 12px 12px 0;
+  padding-right: 20px;
+}
+
+.pa-muted {
+  color: #9ca3af;
+}
+
+/* Status */
+.pa-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 14px;
+  color: #9ca3af;
+}
+
+.pa-status::before {
+  content: '';
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+.pa-status-completed {
+  color: #16a34a;
+}
+
+.pa-status-pending {
+  color: #9ca3af;
+}
+
+.pa-status-failed {
+  color: #dc2626;
+}
+
+/* Edit cell */
+.pa-edit-cell {
+  display: flex;
+  gap: 8px;
+}
+
+.pa-mini-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 8px;
+  border: none;
+  background: transparent;
+  color: #7030a0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+
+.pa-mini-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
+.pa-mini-btn:hover {
+  background: rgba(124, 92, 240, 0.12);
+}
+
+.pa-mini-btn:focus-visible {
+  outline: 2px solid #7c5cf0;
+  outline-offset: 2px;
+}
+
+/* Inline edit row */
+.pa-row-edit input,
+.pa-row-edit select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid #d8d7f0;
+  border-radius: 8px;
+  font-size: 14px;
+  color: #111827;
+  background: #ffffff;
+}
+
+.pa-row-edit input:focus-visible,
+.pa-row-edit select:focus-visible {
+  outline: 2px solid #7030a0;
+  outline-offset: 1px;
+}
+
+/* Empty state */
+.pa-empty-row td {
+  border-radius: 12px;
+  padding: 40px 16px;
+}
+
+.pa-empty {
+  text-align: center;
+  color: #9ca3af;
+  font-size: 14px;
+}
+
+/* Responsive */
+@media (max-width: 640px) {
+  .pa-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .pa-search input {
+    width: 100%;
+  }
+
+  .pa-actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+}

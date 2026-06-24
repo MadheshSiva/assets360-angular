@@ -1,0 +1,234 @@
+<section class="wip-page">
+  <!-- Header -->
+  <div class="wip-header">
+    <h1 class="wip-title">WIP Dashboard</h1>
+    <div class="wip-header-actions">
+      <button class="wip-btn wip-btn-primary" type="button">
+        
+        +Add Widget
+      </button>
+      <button class="wip-btn wip-btn-outline" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+        </svg>
+        Filter
+      </button>
+    </div>
+  </div>
+
+  <!-- Stat Cards Row -->
+  <div class="wip-stat-grid">
+    <article class="wip-stat-card" *ngFor="let card of wipStatCards">
+      <div class="wip-stat-top">
+        <div class="wip-stat-icon-wrap">
+          <!-- Total Jobs icon -->
+          <svg *ngIf="card.icon === 'jobs'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
+          <!-- In Progress icon -->
+          <svg *ngIf="card.icon === 'progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M12 7v5l3 2"/>
+          </svg>
+          <!-- Completed icon -->
+          <svg *ngIf="card.icon === 'completed'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="22" height="22">
+            <circle cx="12" cy="12" r="9"/>
+            <path d="M9 12l2 2 4-4"/>
+          </svg>
+          <!-- SLA Breached icon -->
+          <svg *ngIf="card.icon === 'sla'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+            <line x1="12" y1="9" x2="12" y2="13"/>
+            <line x1="12" y1="17" x2="12.01" y2="17"/>
+          </svg>
+          <!-- Planned icon -->
+          <svg *ngIf="card.icon === 'planned'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
+            <rect x="3" y="4" width="18" height="18" rx="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <span class="wip-stat-label" [class.sla-label]="card.icon === 'sla'">{{ card.label }}</span>
+        <button class="wip-more-btn" type="button" aria-label="More options">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+            <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="wip-stat-bottom">
+        <strong class="wip-stat-value">{{ card.value }}</strong>
+        <span class="wip-stat-delta" [class.delta-up]="card.trend === 'up'" [class.delta-down]="card.trend === 'down'">
+          <svg *ngIf="card.trend === 'up'" viewBox="0 0 24 24" fill="currentColor" width="11" height="11"><path d="M12 4l8 8H4z"/></svg>
+          <svg *ngIf="card.trend === 'down'" viewBox="0 0 24 24" fill="currentColor" width="11" height="11"><path d="M12 20l8-8H4z"/></svg>
+          {{ card.delta }}
+        </span>
+      </div>
+    </article>
+  </div>
+
+  <!-- Middle Row: Donut + Area Chart + Alerts -->
+  <div class="wip-mid-grid">
+
+    <!-- Job Status Distribution -->
+    <article class="wip-panel wip-donut-panel">
+      <div class="wip-panel-header">
+        <div class="wip-panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+            <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
+            <path d="M22 12A10 10 0 0 0 12 2v10z"/>
+          </svg>
+        </div>
+        <h2>Job Status Distribution</h2>
+        <button class="wip-more-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+            <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="wip-donut-body">
+        <div class="wip-donut-chart-wrap">
+          <div class="wip-donut-chart">
+            <div class="wip-donut-center">
+              <span class="wip-donut-label">Total Jobs</span>
+              <strong class="wip-donut-total">{{ wipTotalJobs }}</strong>
+            </div>
+          </div>
+        </div>
+        <ul class="wip-donut-legend">
+          <li *ngFor="let seg of wipStatusDistribution">
+            <span class="wip-legend-dot" [style.background]="seg.color"></span>
+            <span class="wip-legend-text">- {{ seg.label }} {{ seg.percent }}%</span>
+          </li>
+        </ul>
+      </div>
+    </article>
+
+    <!-- Completion Trend -->
+    <article class="wip-panel wip-trend-panel">
+      <div class="wip-panel-header">
+        <div class="wip-panel-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
+            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+          </svg>
+        </div>
+        <h2>Completion Trend</h2>
+        <button class="wip-more-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+            <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="wip-trend-body">
+        <div class="wip-trend-y-labels">
+          <span>100%</span>
+          <span>75%</span>
+          <span>50%</span>
+          <span>25%</span>
+          <span>0%</span>
+        </div>
+        <div class="wip-trend-chart-area">
+          <svg viewBox="0 0 420 180" preserveAspectRatio="none" class="wip-area-svg">
+            <defs>
+              <linearGradient id="wipAreaGrad" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#7030a0" stop-opacity="0.35"/>
+                <stop offset="100%" stop-color="#7030a0" stop-opacity="0.02"/>
+              </linearGradient>
+            </defs>
+            <!-- Grid lines -->
+            <line x1="0" y1="0" x2="420" y2="0" stroke="#ede9f4" stroke-width="1"/>
+            <line x1="0" y1="45" x2="420" y2="45" stroke="#ede9f4" stroke-width="1"/>
+            <line x1="0" y1="90" x2="420" y2="90" stroke="#ede9f4" stroke-width="1"/>
+            <line x1="0" y1="135" x2="420" y2="135" stroke="#ede9f4" stroke-width="1"/>
+            <line x1="0" y1="180" x2="420" y2="180" stroke="#ede9f4" stroke-width="1"/>
+            <!-- Area fill -->
+            <path class="wip-area-fill" d="M0,162 C30,162 50,108 70,90 C90,72 110,81 140,63 C170,45 200,90 230,72 C260,54 290,27 320,18 C350,9 380,63 420,45 L420,180 L0,180 Z" fill="url(#wipAreaGrad)"/>
+            <!-- Line -->
+            <path class="wip-area-line" d="M0,162 C30,162 50,108 70,90 C90,72 110,81 140,63 C170,45 200,90 230,72 C260,54 290,27 320,18 C350,9 380,63 420,45" fill="none" stroke="#7030a0" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+            <!-- Data points -->
+            <circle cx="70" cy="90" r="5" fill="#7030a0" stroke="#fff" stroke-width="2"/>
+            <circle cx="140" cy="63" r="5" fill="#7030a0" stroke="#fff" stroke-width="2"/>
+            <circle cx="230" cy="72" r="5" fill="#7030a0" stroke="#fff" stroke-width="2"/>
+            <circle cx="320" cy="18" r="7" fill="#7030a0" stroke="#fff" stroke-width="2"/>
+            <circle cx="420" cy="45" r="5" fill="#7030a0" stroke="#fff" stroke-width="2"/>
+          </svg>
+        </div>
+      </div>
+      <p class="wip-trend-label">Last 7 days</p>
+    </article>
+
+    <!-- Alerts -->
+    <article class="wip-panel wip-alerts-panel">
+      <div class="wip-panel-header">
+        <h2>Alerts</h2>
+        <button class="wip-more-btn" type="button">
+          <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
+            <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>
+          </svg>
+        </button>
+      </div>
+      <div class="wip-alert-list">
+        <div class="wip-alert-row" *ngFor="let alert of wipAlerts">
+          <span class="wip-alert-icon" [class.alert-warning]="alert.type === 'warning'" [class.alert-danger]="alert.type === 'danger'">
+            <svg *ngIf="alert.type === 'warning'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+            <svg *ngIf="alert.type === 'danger'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+              <line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>
+            </svg>
+          </span>
+          <div class="wip-alert-body">
+            <strong>{{ alert.title }}</strong>
+            <p>{{ alert.subtitle }}</p>
+            <small>{{ alert.time }}</small>
+          </div>
+        </div>
+      </div>
+    </article>
+  </div>
+
+  <!-- Active Jobs Table -->
+  <article class="wip-panel wip-jobs-panel">
+    <div class="wip-jobs-header">
+      <h2>Active Jobs</h2>
+      <a href="#" class="wip-view-all">View All &gt;</a>
+    </div>
+    <div class="wip-table-scroll">
+      <table class="wip-table">
+        <thead>
+          <tr>
+            <th>Job ID</th>
+            <th>Asset</th>
+            <th>Status</th>
+            <th>Progress</th>
+            <th>Assigned to</th>
+            <th>ETA</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let job of wipActiveJobs">
+            <td><a href="#" class="wip-job-link">{{ job.id }}</a></td>
+            <td>{{ job.asset }}</td>
+            <td>
+              <span class="wip-status-pill" [ngClass]="'wip-status-' + job.statusClass">{{ job.status }}</span>
+            </td>
+            <td>
+              <div class="wip-progress-cell">
+                <div class="wip-progress-bar-wrap">
+                  <div class="wip-progress-bar" [class]="'wip-bar-' + job.statusClass" [style.width.%]="job.progress"></div>
+                </div>
+                <span class="wip-progress-pct">{{ job.progress }}%</span>
+              </div>
+            </td>
+            <td>{{ job.assignedTo }}</td>
+            <td>{{ job.eta }}</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </article>
+</section>
