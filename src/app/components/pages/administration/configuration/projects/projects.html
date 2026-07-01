@@ -1,0 +1,150 @@
+<section class="projects-page">
+  <h1 class="page-title">Project</h1>
+
+  <div class="projects-layout">
+    <aside class="filter-panel">
+      <button type="button" class="add-project-btn" (click)="openAddProject()">
+        Add Project
+      </button>
+
+      <ul class="cascade-list">
+        <li
+          *ngFor="let name of visibleChain; let i = index; trackBy: trackByName"
+          class="cascade-row"
+          [class.is-header]="i === 0"
+          [class.is-active]="isActive(name)"
+          [class.is-clickable]="isExpandable(name)"
+          [attr.data-depth]="i"
+          (click)="toggle(name)"
+        >
+          <ng-container *ngIf="editingName === name; else displayLabel">
+            <input
+              type="text"
+              class="row-edit-input"
+              [(ngModel)]="editingValue"
+              (click)="$event.stopPropagation()"
+              (keydown.enter)="commitEdit()"
+              (keydown.escape)="cancelEdit()"
+              (blur)="commitEdit()"
+              autofocus
+            />
+          </ng-container>
+          <ng-template #displayLabel>
+            <span class="row-label">{{ name }}</span>
+          </ng-template>
+
+          <span class="row-actions" *ngIf="i > 0">
+            <button
+              type="button"
+              class="row-action-btn"
+              title="Add child location"
+              (click)="$event.stopPropagation(); addChild(name)"
+            >
+              +
+            </button>
+            <button
+              type="button"
+              class="row-action-btn"
+              title="Rename"
+              (click)="startEdit(name, $event)"
+            >
+              ✎
+            </button>
+            <button
+              type="button"
+              class="row-action-btn"
+              title="Delete"
+              (click)="deleteNode(name, $event)"
+            >
+              🗑
+            </button>
+            <span class="row-chevron" aria-hidden="true">
+              <ng-container *ngIf="isActive(name); else chevDown">&rsaquo;</ng-container>
+              <ng-template #chevDown>v</ng-template>
+            </span>
+          </span>
+        </li>
+      </ul>
+    </aside>
+
+    <div class="map-panel">
+      <app-map [locations]="mapLocations"></app-map>
+    </div>
+  </div>
+
+  <div class="modal-overlay" *ngIf="isAddProjectOpen" (click)="closeAddProject()">
+    <div class="modal-card" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2 class="modal-title">Add Project</h2>
+        <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeAddProject()">
+          &times;
+        </button>
+      </header>
+
+      <div class="modal-body">
+        <label class="field-label" for="project-name">
+          Project Name <span class="required-mark">*</span>
+        </label>
+        <input
+          id="project-name"
+          type="text"
+          class="field-input"
+          placeholder="e.g. Website Redesign"
+          [(ngModel)]="addProjectForm.name"
+        />
+
+        <label class="field-label" for="project-description">Description</label>
+        <textarea
+          id="project-description"
+          class="field-textarea"
+          placeholder="Brief overview of the project..."
+          rows="4"
+          [(ngModel)]="addProjectForm.description"
+        ></textarea>
+
+        <div class="field-row">
+          <div class="field-col">
+            <label class="field-label" for="week-start">
+              Week Start <span class="required-mark">*</span>
+            </label>
+            <input
+              id="week-start"
+              type="date"
+              class="field-input"
+              [(ngModel)]="addProjectForm.weekStart"
+            />
+          </div>
+          <div class="field-col">
+            <label class="field-label" for="week-end">
+              Week End <span class="required-mark">*</span>
+            </label>
+            <input
+              id="week-end"
+              type="date"
+              class="field-input"
+              [(ngModel)]="addProjectForm.weekEnd"
+            />
+          </div>
+        </div>
+
+        <label class="field-label">Status</label>
+        <button
+          type="button"
+          class="status-toggle"
+          [class.is-active]="addProjectForm.status === 'active'"
+          (click)="toggleAddProjectStatus()"
+        >
+          <span class="status-toggle-knob"></span>
+          <span class="status-toggle-label">{{ addProjectForm.status === 'active' ? 'Active' : 'Inactive' }}</span>
+        </button>
+
+        <p class="modal-error" *ngIf="addProjectError">{{ addProjectError }}</p>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeAddProject()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submitAddProject()">Create Project</button>
+      </footer>
+    </div>
+  </div>
+</section>

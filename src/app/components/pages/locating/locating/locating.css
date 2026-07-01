@@ -175,69 +175,6 @@
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
 }
 
-/* ============ Map Container (real Leaflet map) ============ */
-.map-container {
-  position: relative;
-  background: #fff;
-  border: 1px solid #e6edf5;
-  border-radius: 10px;
-  height: 480px;
-  overflow: hidden;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-}
-
-.map-canvas {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  background: #e9eef2; /* fallback before tiles load */
-}
-
-/* Subtle pop-up of attribution near the bottom-right (Leaflet renders this for us,
-   but keep this class as a hook for future overrides). */
-.map-canvas .leaflet-control-attribution {
-  font-size: 10px;
-  background: rgba(255, 255, 255, 0.85);
-  padding: 2px 6px;
-  border-radius: 3px;
-}
-
-.map-controls {
-  position: absolute;
-  top: 12px;
-  left: 12px;
-  display: flex;
-  flex-direction: column;
-  background: #fff;
-  border: 1px solid #dbe3ef;
-  border-radius: 6px;
-  overflow: hidden;
-  box-shadow: 0 2px 6px rgba(15, 23, 42, 0.08);
-  z-index: 500; /* sit above Leaflet panes */
-}
-
-.map-control-btn {
-  width: 30px;
-  height: 30px;
-  border: 0;
-  background: #fff;
-  font-size: 18px;
-  font-weight: 700;
-  color: #334155;
-  cursor: pointer;
-  line-height: 1;
-}
-
-.map-control-btn:hover {
-  background: #eef3fb;
-  color: #1d4ed8;
-}
-
-.map-control-btn + .map-control-btn {
-  border-top: 1px solid #eef3f8;
-}
-
 /* ============ Tracked People Summary ============ */
 .tracked-summary {
   background: #fff;
@@ -346,10 +283,6 @@
   .locating-layout {
     grid-template-columns: 1fr;
   }
-
-  .map-container {
-    height: 360px;
-  }
 }
 
 @media (max-width: 700px) {
@@ -362,10 +295,6 @@
   .filter-group {
     flex: 1 1 auto;
     min-width: 0;
-  }
-
-  .map-container {
-    height: 320px;
   }
 
   .cascade-row[data-depth="1"] { margin-left: 8px; }

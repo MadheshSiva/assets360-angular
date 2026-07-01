@@ -1,11 +1,12 @@
 <div class="admin-container">
-  <h1 class="admin-title">Administration</h1>
-
-  <div class="admin-tabs">
-    <a routerLink="/administration/configuration" routerLinkActive="active" class="admin-tab">Configuration</a>
-    <a routerLink="/administration/license" routerLinkActive="active" class="admin-tab">License</a>
-    <a routerLink="/administration/user-management" routerLinkActive="active" class="admin-tab">User Management</a>
-  </div>
-
+  <app-breadcrumb [items]="breadcrumbItems" [dropdownOptions]="dropdownOptions"></app-breadcrumb>
+  
+  <ng-container *ngIf="showLanding">
+    <h2 class="admin-title">Administration</h2>
+    <nav class="admin-tabs">
+      <a *ngFor="let opt of adminOptions" [routerLink]="opt.path" class="admin-tab">{{ opt.label }}</a>
+    </nav>
+  </ng-container>
+  
   <router-outlet></router-outlet>
 </div>

@@ -1,0 +1,66 @@
+<section class="cr-page">
+  <div class="cr-card">
+    <h2 class="cr-title">Create New Role</h2>
+
+    <div class="cr-form-grid">
+      <div class="cr-field">
+        <label class="cr-label" for="roleName">Role Name <span class="cr-required">*</span></label>
+        <input
+          id="roleName"
+          type="text"
+          placeholder="Enter Role Name"
+          [(ngModel)]="roleName"
+          name="roleName"
+          class="cr-input"
+          [class.cr-input-error]="submitted && !isValid" />
+        <span class="cr-error-text" *ngIf="submitted && !isValid">Role name is required.</span>
+      </div>
+
+      <div class="cr-field">
+        <label class="cr-label" for="description">Description</label>
+        <input
+          id="description"
+          type="text"
+          placeholder="Enter description"
+          [(ngModel)]="description"
+          name="description"
+          class="cr-input" />
+      </div>
+    </div>
+
+    <div class="cr-permissions-card">
+      <div class="cr-permissions-header">
+        <span class="cr-permissions-title">Access Permission</span>
+        <div class="cr-permissions-cols">
+          <span>View</span>
+          <span>Edit</span>
+        </div>
+      </div>
+
+      <div class="cr-permissions-list">
+        <div class="cr-permission-row" *ngFor="let perm of permissions">
+          <span class="cr-permission-name">{{ perm.module }}</span>
+          <div class="cr-permissions-cols">
+            <input
+              type="checkbox"
+              class="cr-checkbox"
+              [checked]="perm.view"
+              (change)="toggleView(perm)"
+              [attr.aria-label]="perm.module + ' view'" />
+            <input
+              type="checkbox"
+              class="cr-checkbox"
+              [checked]="perm.edit"
+              (change)="toggleEdit(perm)"
+              [attr.aria-label]="perm.module + ' edit'" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="cr-footer">
+      <button type="button" class="cr-btn cr-btn-cancel" (click)="cancel()">Cancel</button>
+      <button type="button" class="cr-btn cr-btn-save" (click)="saveRole()">Save Role</button>
+    </footer>
+  </div>
+</section>

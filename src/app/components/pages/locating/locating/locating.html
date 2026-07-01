@@ -41,14 +41,8 @@
         </div>
       </header>
 
-      <!-- Real Leaflet map (replaces the static gradient placeholder). -->
-      <div class="map-container">
-        <div #mapEl class="map-canvas"></div>
-        <div class="map-controls">
-          <button type="button" class="map-control-btn" (click)="zoomIn()" aria-label="Zoom in">+</button>
-          <button type="button" class="map-control-btn" (click)="zoomOut()" aria-label="Zoom out">&minus;</button>
-        </div>
-      </div>
+      <!-- Reusable Leaflet map component -->
+      <app-map [locations]="mapLocations"></app-map>
 
       <div class="tracked-summary">
         <h3>Tracked People</h3>

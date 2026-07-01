@@ -83,7 +83,21 @@ export class Dashboard implements OnInit {
   switchTab(tab: ActiveTab): void {
     this.activeTab = tab;
   }
+  // ===== Tab Management =====
+  editTab(tab: ActiveTab): void {
+    // TODO: hook up your rename/edit logic here
+    console.log('Edit tab:', tab);
+  }
 
+  deleteTab(tab: ActiveTab): void {
+    // TODO: hook up your delete logic here
+    console.log('Delete tab:', tab);
+  }
+
+  addNewTab(): void {
+    // TODO: hook up your add-new-tab logic here
+    console.log('Add new tab');
+  }
   openCardPopup(card: AssetsStatCard): void {
     this.closePicker();
     this.cardPopup = this.buildCardPopup(card);

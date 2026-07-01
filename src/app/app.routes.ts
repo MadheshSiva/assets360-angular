@@ -14,7 +14,13 @@ import { Administration } from './components/pages/administration/administration
 import { Configuration } from './components/pages/administration/configuration/configuration';
 import { License } from './components/pages/administration/license/license';
 import { UserManagement } from './components/pages/administration/user-management/user-management';
+import { User } from './components/pages/administration/user-management/user/user';
+import { Role } from './components/pages/administration/user-management/role/role';
+import { CreateRole } from './components/pages/administration/user-management/create-role/create-role';
 
+
+import { Projects } from './components/pages/administration/configuration/projects/projects';
+import { Devices } from './components/pages/administration/configuration/devices/devices';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -37,9 +43,26 @@ export const routes: Routes = [
         component: Administration,
         children: [
           { path: '', redirectTo: 'configuration', pathMatch: 'full' },
-          { path: 'configuration', component: Configuration },
+          {
+            path: 'configuration',
+            component: Configuration,
+            children: [
+              { path: '', redirectTo: 'projects', pathMatch: 'full' },
+              { path: 'projects', component: Projects },
+              { path: 'devices', component: Devices }
+            ]
+          },
           { path: 'license', component: License },
-          { path: 'user-management', component: UserManagement }
+          {
+            path: 'user-management',
+            component: UserManagement,
+            children: [
+              { path: '', redirectTo: 'user', pathMatch: 'full' },
+              { path: 'user', component: User },
+              { path: 'role', component: Role },
+              { path: 'role/create', component: CreateRole }
+            ]
+          }
         ]
       }
     ]

@@ -1,17 +1,10 @@
 import {
-  AfterViewInit,
-  ChangeDetectorRef,
   Component,
-  ElementRef,
-  Inject,
-  OnDestroy,
-  PLATFORM_ID,
   ViewChild,
-  inject,
 } from '@angular/core';
-import { CommonModule, isPlatformBrowser } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { loadLeaflet } from './leaflet-loader';
+import { MapComponent, MapLocation } from '../../../shared/map/map';
 
 export type TrackMode = 'people' | 'assets';
 
@@ -25,11 +18,11 @@ export interface LocationNode {
 @Component({
   standalone: true,
   selector: 'app-locating',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MapComponent],
   templateUrl: './locating.html',
   styleUrls: ['./locating.css'],
 })
-export class Locating implements AfterViewInit, OnDestroy {
+export class Locating {
   mode: TrackMode = 'people';
 
   // The full chain we render in the cascade.
@@ -74,74 +67,16 @@ export class Locating implements AfterViewInit, OnDestroy {
 
   expanded: Set<string> = new Set<string>();
 
-  @ViewChild('mapEl', { static: false }) mapEl?: ElementRef<HTMLDivElement>;
-  // `any` here on purpose — Leaflet's full type surface is huge, and we only
-  // touch a handful of methods. Keeps the component file readable and avoids
-  // fighting the @types/leaflet definitions.
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private map?: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private marker?: any;
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  private L?: any;
-
-  private readonly cdr = inject(ChangeDetectorRef);
-  private readonly isBrowser: boolean;
-
-  constructor(@Inject(PLATFORM_ID) platformId: object) {
-    this.isBrowser = isPlatformBrowser(platformId);
-  }
-
-  async ngAfterViewInit(): Promise<void> {
-    if (!this.isBrowser || !this.mapEl) return;
-    this.L = await loadLeaflet();
-    const L = this.L;
-
-    // Default Leaflet marker icon URLs from the leaflet CDN.
-    const icon = L.icon({
-      iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
-      iconRetinaUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png',
-      shadowUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png',
-      iconSize: [25, 41],
-      iconAnchor: [12, 41],
-      popupAnchor: [1, -34],
-      shadowSize: [41, 41],
-    });
-
-    const start: { lat: number; lng: number; zoom: number } = this.locationTree[0].coords;
-    this.map = L.map(this.mapEl.nativeElement, {
-      center: [start.lat, start.lng],
-      zoom: start.zoom,
-      zoomControl: false,
-      attributionControl: true,
-    });
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors',
-    }).addTo(this.map);
-
-    // Drop the initial marker on the root location so the map isn't empty.
-    this.marker = L.marker([start.lat, start.lng], { icon }).addTo(this.map);
-
-    // Re-flow the map after Angular finishes laying out the DOM. Two passes —
-    // the first is a quick check, the second waits long enough for the layout
-    // grid to settle so the canvas gets the correct dimensions.
-    setTimeout(() => this.map?.invalidateSize(), 100);
-    setTimeout(() => this.map?.invalidateSize(), 400);
-    this.cdr.detectChanges();
-  }
-
-  ngOnDestroy(): void {
-    this.map?.remove();
-    this.map = undefined;
-  }
+  @ViewChild(MapComponent, { static: false }) mapComponent?: MapComponent;
 
   get modeLabel(): string {
     return this.mode === 'people' ? 'Track People' : 'Track Assets';
   }
 
   get visibleChain(): string[] {
-    const chain: string[] = [this.modeLabel, this.locationTree[0].name];
+    const chain: string[] = [this.modeLabel];
+    if (!this.expanded.has(this.modeLabel)) return chain;
+
     let node: LocationNode | undefined = this.locationTree[0];
     while (node && node.children && node.children.length > 0) {
       const next: LocationNode = node.children[0];
@@ -168,28 +103,53 @@ export class Locating implements AfterViewInit, OnDestroy {
   }
 
   isActive(name: string): boolean {
-    if (name === this.modeLabel) return false;
+    if (name === this.modeLabel) return this.expanded.has(this.modeLabel);
     const chain = this.visibleChain;
     return chain[chain.length - 1] === name;
   }
 
   isExpandable(name: string): boolean {
+    if (name === this.modeLabel) return !this.expanded.has(this.modeLabel);
     if (this.expanded.has(name)) return false;
     return this.findNode(name)?.children?.length ? true : false;
+  }
+
+  /** Coords for the map component as MapLocation[] */
+  get mapLocations(): MapLocation[] {
+    return this.locationTree;
   }
 
   /**
    * Click handler: expand the row, then fly the map to that node's coords.
    */
   toggle(name: string): void {
+    if (name === this.modeLabel) {
+      const next = new Set(this.expanded);
+      if (next.has(this.modeLabel)) {
+        next.delete(this.modeLabel);
+        this.locationTree.forEach((node) => {
+          const collectDescendants = (n: LocationNode) => {
+            next.delete(n.name);
+            (n.children ?? []).forEach((child) => collectDescendants(child));
+          };
+          collectDescendants(node);
+        });
+      } else {
+        next.add(this.modeLabel);
+        if (this.locationTree[0]) {
+          next.add(this.locationTree[0].name);
+        }
+      }
+      this.expanded = next;
+      return;
+    }
+
     const isCurrentlyExpanded = this.expanded.has(name);
 
-    // Clicking again collapses the row.
     if (isCurrentlyExpanded) {
       const next = new Set(this.expanded);
       next.delete(name);
 
-      // Also collapse everything deeper than this node so the chain stays consistent.
       const node = this.findNode(name);
       if (node?.children?.length) {
         const collectDescendants = (n: LocationNode) => {
@@ -205,19 +165,12 @@ export class Locating implements AfterViewInit, OnDestroy {
       return;
     }
 
-    // Expand.
     if (!this.isExpandable(name)) return;
     this.expanded = new Set(this.expanded).add(name);
 
     const node = this.findNode(name);
-    if (this.map && this.L && node) {
-      const c = node.coords;
-      this.map.flyTo([c.lat, c.lng], c.zoom, { duration: 0.8 });
-      if (this.marker) {
-        this.marker.setLatLng([c.lat, c.lng]);
-      } else {
-        this.marker = this.L.marker([c.lat, c.lng]).addTo(this.map);
-      }
+    if (this.mapComponent && node) {
+      this.mapComponent.flyTo(node.coords);
     }
   }
 
@@ -232,15 +185,6 @@ export class Locating implements AfterViewInit, OnDestroy {
   }
 
   trackByName = (_: number, name: string) => name;
-
-  // Map zoom controls (wired to Leaflet)
-  zoomIn(): void {
-    this.map?.zoomIn();
-  }
-
-  zoomOut(): void {
-    this.map?.zoomOut();
-  }
 
   // ===== Right-side filter state =====
   selectedDevice: string = 'fixed';
@@ -263,8 +207,8 @@ export class Locating implements AfterViewInit, OnDestroy {
   // ===== Tracked people summary (static) =====
   trackedPeople = [
     { name: 'Ahmed Al-Rashid', location: 'Azy floor - Room 101', status: 'online' as const },
-    { name: 'Sara Mohammed',  location: 'Azy floor - Room 102', status: 'online' as const },
-    { name: 'Khalid Hassan',  location: 'Azy floor - Room 103', status: 'idle' as const },
-    { name: 'Fatima Ali',     location: 'Azy floor - Room 101', status: 'offline' as const },
+    { name: 'Sara Mohammed', location: 'Azy floor - Room 102', status: 'online' as const },
+    { name: 'Khalid Hassan', location: 'Azy floor - Room 103', status: 'idle' as const },
+    { name: 'Fatima Ali', location: 'Azy floor - Room 101', status: 'offline' as const },
   ];
 }

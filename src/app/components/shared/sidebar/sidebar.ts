@@ -42,7 +42,21 @@ export class Sidebar {
       path: '/administration',
       icon: this.assetUrl('Administration-purple.png'),
       children: [
-        { label: 'Configuration', path: '/administration/configuration', icon: '' },
+        {
+          label: 'Configuration',
+          path: '/administration/configuration',
+          icon: '',
+          children: [
+            { label: 'Projects', path: '/administration/configuration/projects', icon: '' },
+            { label: 'Devices', path: '/administration/configuration/devices', icon: '' },
+            { label: 'People', path: '/administration/configuration/people', icon: '' },
+            { label: 'Attendance', path: '/administration/configuration/attendance', icon: '' },
+            { label: 'Access Control', path: '/administration/configuration/access-control', icon: '' },
+            { label: 'OT Management', path: '/administration/configuration/ot-management', icon: '' },
+            { label: 'Visitor Management', path: '/administration/configuration/visitor-management', icon: '' },
+            { label: 'Patrol', path: '/administration/configuration/patrol', icon: '' }
+          ]
+        },
         { label: 'License', path: '/administration/license', icon: '' },
         {
           label: 'User Management',

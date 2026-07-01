@@ -10,4 +10,3 @@ export async function loadLeaflet(): Promise<any> {
   // Use a static specifier so the browser can resolve the module reliably.
   return import('leaflet');
 }
-

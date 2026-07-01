@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RouterModule, RouterOutlet } from '@angular/router';
 
 @Component({
   standalone: true,
   selector: 'app-configuration',
-  imports: [CommonModule],
-  template: '<div class="config-page"><h2>Configuration</h2><p>Configuration page coming soon.</p></div>',
-  styles: [`.config-page { padding: 20px; }`]
+  imports: [CommonModule, RouterModule, RouterOutlet],
+  templateUrl: './configuration.html',
+  styleUrls: ['./configuration.css']
 })
-export class Configuration {}
+export class Configuration {
+  activeTab: 'projects' = 'projects';
+}

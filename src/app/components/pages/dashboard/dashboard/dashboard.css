@@ -13,27 +13,29 @@
 /* ===== Tabs ===== */
 .dash-tabs {
   display: flex;
-  gap: 4px;
-  background: #fff;
-  border: 1px solid #e6edf5;
-  border-radius: 10px;
-  padding: 4px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  align-items: center;
+  gap: 10px;
+  background: #f4f5f7;
+  border: 1px solid #ebedf0;
+  border-radius: 999px;
+  padding: 6px 10px;
   width: fit-content;
+  flex-wrap: wrap;
 }
+
 
 .dash-tab {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  height: 40px;
-  padding: 0 20px;
+  height: 38px;
+  padding: 0 14px;
   border: 0;
-  border-radius: 8px;
+  border-radius: 999px;
   background: transparent;
-  color: #64748b;
+  color: #475569;
   font-size: 14px;
-  font-weight: 700;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.15s ease;
   white-space: nowrap;
@@ -41,13 +43,14 @@
 
 .dash-tab:hover {
   color: #0f172a;
-  background: #f1f5f9;
+    background: #e9eaee;
 }
 
 .dash-tab.active {
   color: #fff;
   background: #7030a0;
-  box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(112, 48, 160, 0.3);
 }
 
 .dash-tab.active svg {
@@ -58,8 +61,73 @@
   stroke: #64748b;
   flex: 0 0 auto;
 }
+.dash-tab:hover svg,
+.dash-tab.active svg {
+  stroke: currentColor;
+}
 
-.dash-tab:hover svg {
+.tab-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 4px;
+}
+
+.tab-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 20px;
+  height: 20px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  opacity: 0.8;
+  cursor: pointer;
+}
+
+.tab-icon-btn:hover {
+  opacity: 1;
+}
+
+.tab-icon-btn svg {
+  width: 14px;
+  height: 14px;
+  stroke: currentColor;
+}
+
+.dash-tab-add {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 38px;
+  padding: 0 14px;
+  border: 0;
+  background: transparent;
+  color: #7030a0;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.dash-tab-add:hover {
+  text-decoration: underline;
+}
+
+@media (max-width: 560px) {
+  .dash-tabs {
+    width: 100%;
+  }
+  .dash-tab {
+    flex: 1;
+    justify-content: center;
+    padding: 0 10px;
+    font-size: 13px;
+  }
+}
+.dash-tab:hover:not(.active) svg {
   stroke: #0f172a;
 }
 

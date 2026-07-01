@@ -1,0 +1,27 @@
+<nav class="breadcrumb-nav" aria-label="Breadcrumb">
+  <ol class="breadcrumb-list">
+    <li *ngFor="let item of items; let last = last" class="breadcrumb-item">
+      <button type="button" class="breadcrumb-btn" 
+              (click)="hasDropdown(item.label) ? toggleDropdown(item.label) : navigate(item.path!)"
+              *ngIf="!last && item.path">
+        {{ item.label }}
+        <span class="breadcrumb-caret" *ngIf="hasDropdown(item.label)">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="6 9 12 15 18 9"></polyline>
+          </svg>
+        </span>
+      </button>
+      
+      <span class="breadcrumb-current" *ngIf="last">{{ item.label }}</span>
+      <span class="breadcrumb-label" *ngIf="!last && !item.path">{{ item.label }}</span>
+      
+      <span *ngIf="!last" class="breadcrumb-separator" aria-hidden="true">›</span>
+      
+      <div class="breadcrumb-dropdown" *ngIf="openDropdown === item.label && hasDropdown(item.label)">
+        <ng-container *ngFor="let opt of getDropdownItems(item.label)">
+          <a [routerLink]="opt.path" class="breadcrumb-dropdown-link" (click)="closeDropdown()">{{ opt.label }}</a>
+        </ng-container>
+      </div>
+    </li>
+  </ol>
+</nav>
