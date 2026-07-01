@@ -10,11 +10,91 @@
 }
 
 .locating-layout {
-  display: grid;
-  grid-template-columns: minmax(320px, 380px) 1fr;
-  gap: 18px;
-  align-items: start;
+   
+  display: flex;
+  align-items: stretch;
   min-width: 0;
+}
+
+.map-wrapper {
+  position: relative;
+}
+.panel-fab {
+  position: absolute;
+  top: 50%;
+  right: 1px;              /* sits inside the map's right edge */
+  transform: translateY(-50%);
+  z-index: 1000;
+
+  width: 36px;
+  height: 54px;
+  border: none;
+  border-top-left-radius:10px;
+  border-bottom-left-radius:10px;
+  background: #7030a0;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(124, 58, 237, 0.35);
+  transition: background 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.panel-fab:hover {
+  background: #5c2585;
+  box-shadow: 0 6px 16px rgba(92, 37, 133, 0.45);
+}
+.stats-panel {
+  background: #fff;
+  border: 1px solid #e6edf5;
+  border-radius: 10px;
+  padding: 18px 18px 22px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  height: 100vh;
+  width: 260px;
+  flex: 0 0 auto;
+  width: 30%;
+}
+
+.stats-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.stat-card {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: #f3f0fb;
+  border-radius: 16px;
+  padding: 14px 18px;
+}
+
+.stat-label {
+  font-size: 14px;
+  font-weight: 500;
+  color: #475569;
+}
+
+.stat-value {
+  font-size: 18px;
+  font-weight: 800;
+  color: #7030a0;
+} 
+.panel-fab .fab-chevron {
+  font-size: 22px;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.locating-layout.panel-collapsed .panel-fab {
+  left: 0;
+}
+
+.locating-layout.panel-collapsed .map-panel {
+  width: 100%;
 }
 
 /* ============ Filter Panel (Left) ============ */
@@ -24,7 +104,10 @@
   border-radius: 10px;
   padding: 18px 18px 22px;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  min-height: 100vh;   /* add this */
+  width: 30%;         /* add this */
 }
+
 
 .panel-title {
   margin: 0 0 18px;
@@ -79,8 +162,8 @@
 /* The active row gets the soft purple pill from the reference. */
 .cascade-row.is-active {
   background: #e9dcfb;
-  border-color: #d6c1f7;
-  color: #4c1d95;
+  border-color: #dcd0ff;
+  color: #7030a0 ;
   font-weight: 700;
 }
 
@@ -125,6 +208,7 @@
   flex-direction: column;
   gap: 16px;
   min-width: 0;
+  width: 70%;
 }
 
 .map-filters {
@@ -156,10 +240,10 @@
 
 .filter-select {
   flex: 1;
-  height: 40px;
+  height: 35px;
   padding: 0 12px;
   border: 1px solid #dbe3ef;
-  border-radius: 8px;
+  border-radius: 25px;
   background: #fff;
   font: inherit;
   font-size: 13px;
@@ -177,6 +261,7 @@
 
 /* ============ Tracked People Summary ============ */
 .tracked-summary {
+  margin-top:16px;
   background: #fff;
   border: 1px solid #e6edf5;
   border-radius: 10px;
@@ -304,3 +389,180 @@
   .cascade-row[data-depth="5"] { margin-left: 40px; }
   .cascade-row[data-depth="6"] { margin-left: 48px; }
 }
+
+/* ============ Statistics Panel Header ============ */
+.stats-panel-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 18px;
+  flex-wrap: wrap;
+}
+
+.stats-panel-header .panel-title {
+  margin: 0;
+}
+
+.stats-period-tabs {
+  display: flex;
+  align-items: center;
+  background: #eef1f6;
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.period-tab {
+  border: none;
+  background: transparent;
+  padding: 4px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.period-tab.is-active {
+  background: #7030a0;
+  color: #fff;
+}
+
+.stats-settings-btn {
+  width: 24px;
+  height: 23px;
+  border-radius: 50%;
+  border: 1.5px solid #7030a0;
+  background: #fff;
+  color: #7030a0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  flex: 0 0 auto;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.stats-settings-btn:hover {
+  background: #7030a0;
+  color: #fff;
+}
+
+.settings-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+/* ============ Statistics Modal ============ */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.45);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.stats-modal {
+  width: 560px;
+  max-width: 92vw;
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25);
+}
+
+.stats-modal-header {
+  background: #e9dcfb;
+  padding: 18px 24px;
+}
+
+.stats-modal-header h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 800;
+  color: #7030a0;
+}
+
+.stats-modal-body {
+  padding: 20px 24px;
+  overflow-y: auto;
+}
+
+.stats-option-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 12px;
+}
+
+.stats-option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: #f8f9fc;
+  border-radius: 25px;
+  border: 1px solid #eef0f4;
+  padding: 10px 16px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+}
+
+.stats-option input[type="checkbox"] {
+  display: none;
+}
+
+.option-check {
+  width: 18px;
+  height: 18px;
+  border-radius: 4px;
+  background: #DCD0FF;
+  border: 1.5px solid #DCD0FF;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #7030a0;
+  flex: 0 0 auto;
+}
+
+.stats-option input[type="checkbox"]:not(:checked) + .option-check {
+  color: transparent;
+}
+
+.stats-modal-footer {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  padding: 16px 24px;
+  border-top: 1px solid #edf2f7;
+}
+
+.btn-close,
+.btn-save {
+  border-radius: 999px;
+  padding: 8px 22px;
+  font-size: 14px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-close {
+  background: #fff;
+  border: 1px solid #cbd5e1;
+  color: #334155;
+}
+
+.btn-save {
+  background: #e9dcfb;
+  color: #7030a0;
+}
+

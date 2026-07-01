@@ -1,6 +1,6 @@
 /* ===================================================
-   GLOBAL / TOKENS
-   =================================================== */
+    GLOBAL / TOKENS
+    =================================================== */
    * {
   box-sizing: border-box;
 }
@@ -66,8 +66,73 @@ body, .dashboard-wrapper {
 }
 
 /* ===================================================
-   LAYOUT
+   ASSETS HEADER
    =================================================== */
+.assets-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.assets-header h1 {
+  margin: 0;
+  font-size: 24px;
+  font-weight: 800;
+  letter-spacing: 0;
+}
+
+.assets-header p {
+  margin: 4px 0 0;
+  color: #64748b;
+  font-size: 13px;
+}
+
+.header-actions {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.dash-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.dash-btn-primary {
+  background: #7030a0;
+  color: #fff;
+}
+
+.dash-btn-primary:hover {
+  background: #5d2384;
+}
+
+.dash-btn-outline {
+  background: #fff;
+  color: #7030a0;
+  border: 1.5px solid #c9a8e0;
+}
+
+.dash-btn-outline:hover {
+  background: #f5edfb;
+}
+
+/* ===================================================
+    LAYOUT
+    =================================================== */
 .layout {
   display: flex;
   min-height: 100vh;

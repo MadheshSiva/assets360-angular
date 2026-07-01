@@ -30,7 +30,7 @@
     }
 
     .collapse-btn {
-      display: none;
+      right: 4px;
     }
 
     .nav-item {
@@ -102,40 +102,76 @@
 
 .collapse-btn {
   position: absolute;
-  right: -18px; // push outside the sidebar edge
+  right: -11px;
   top: 50%;
   transform: translateY(-50%) scale(1);
 
-  width: 40px;
-  height: 40px;
+  width: 30px;
+  height: 30px;
   padding: 0;
   border: 0;
   border-radius: 50%;
+  isolation: isolate; // keeps pseudo-elements' blend modes contained
 
-  // Transparent glass effect
-  background: rgba(255, 255, 255, 0.35);
-  -webkit-backdrop-filter: blur(14px) saturate(160%);
-  backdrop-filter: blur(14px) saturate(160%);
+  // Base glass fill — slight gradient instead of flat white
+  background:
+    linear-gradient(155deg,
+      rgba(255, 255, 255, 0.85) 0%,
+      rgba(255, 255, 255, 0.35) 45%,
+      rgba(255, 255, 255, 0.55) 100%
+    );
 
-  color: #4a2a72;
+  -webkit-backdrop-filter: blur(14px) saturate(180%);
+  backdrop-filter: blur(14px) saturate(180%);
+
   display: flex;
   align-items: center;
   justify-content: center;
-
   cursor: pointer;
-  // Very high so the button sits above the sticky topbar / layout
   z-index: 9999;
 
-  // glass border + soft floating shadow
+  // Layered depth: inner top highlight, inner bottom shadow, crisp edge ring, outer glow
   box-shadow:
-    0 0 0 1px rgba(255, 255, 255, 0.6) inset,
-    0 0 0 1px rgba(112, 48, 160, 0.18),
-    0 8px 18px rgba(112, 48, 160, 0.18),
-    0 2px 6px rgba(15, 23, 42, 0.08);
+    inset 0 1px 1px rgba(255, 255, 255, 0.9),   // top specular highlight
+    inset 0 -1px 2px rgba(112, 48, 160, 0.15),  // bottom internal shadow (glass thickness)
+    inset 0 0 0 1px rgba(255, 255, 255, 0.5),   // subtle glass edge
+    0 0 0 1px rgba(112, 48, 160, 0.18),         // outer edge tint
+    0 6px 16px rgba(112, 48, 160, 0.20),        // ambient drop shadow
+    0 2px 5px rgba(15, 23, 42, 0.10);
 
-  transition: transform 0.25s ease, box-shadow 0.25s ease, background 0.25s ease, color 0.25s ease;
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
 
-  // The inner span holds the icon, rotating it when collapsed
+  // Extra specular highlight as a pseudo-element arc across the top — the
+  // "curved glass catching light" look real iOS glass has
+  &::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.9) 0%,
+      rgba(255, 255, 255, 0) 55%
+    );
+    opacity: 0.7;
+    pointer-events: none;
+    mix-blend-mode: overlay;
+  }
+
+  // Thin bright rim on the lower-left, like light bending through the edge
+  &::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 50%;
+    box-shadow: inset -1px -1px 1px rgba(255, 255, 255, 0.6);
+    pointer-events: none;
+  }
+
   .collapse-btn__glass {
     width: 100%;
     height: 100%;
@@ -143,28 +179,36 @@
     place-items: center;
     border-radius: 50%;
     transition: transform 0.3s ease;
+    position: relative;
+    z-index: 1; // sits above the ::before/::after highlight layers
   }
 
   svg, i {
     font-size: 16px;
     pointer-events: none;
     stroke: currentColor;
+    color: #7030a0;
   }
 
-  // When sidebar is collapsed, rotate the icon to face the other way
   &.collapsed .collapse-btn__glass {
     transform: rotate(180deg);
   }
 
   &:hover {
     transform: translateY(-50%) scale(1.08);
-    background: rgba(255, 255, 255, 0.55);
-    color: #7030a0;
+    background:
+      linear-gradient(155deg,
+        rgba(255, 255, 255, 0.95) 0%,
+        rgba(255, 255, 255, 0.45) 45%,
+        rgba(255, 255, 255, 0.65) 100%
+      );
     box-shadow:
-      0 0 0 1px rgba(255, 255, 255, 0.8) inset,
-      0 0 0 1px rgba(112, 48, 160, 0.3),
-      0 12px 22px rgba(112, 48, 160, 0.22),
-      0 3px 8px rgba(15, 23, 42, 0.1);
+      inset 0 1px 1px rgba(255, 255, 255, 1),
+      inset 0 -1px 2px rgba(112, 48, 160, 0.2),
+      inset 0 0 0 1px rgba(255, 255, 255, 0.6),
+      0 0 0 1px rgba(112, 48, 160, 0.28),
+      0 10px 22px rgba(112, 48, 160, 0.28),
+      0 3px 8px rgba(15, 23, 42, 0.12);
   }
 
   &:active {

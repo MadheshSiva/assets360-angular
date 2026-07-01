@@ -1,19 +1,13 @@
 <section class="locating-page">
   <div class="locating-layout">
-    <!-- Left Panel: Location cascade (always shown, mirrors the reference design) -->
-    <aside class="filter-panel">
+    <!-- Left Panel: Location cascade -->
+    <aside class="filter-panel" *ngIf="!isPanelCollapsed">
       <h2 class="panel-title">Locating</h2>
 
       <ul class="cascade-list">
-        <li
-          *ngFor="let name of visibleChain; let i = index; trackBy: trackByName"
-          class="cascade-row"
-          [class.is-header]="i === 0"
-          [class.is-active]="isActive(name)"
-          [class.is-clickable]="isExpandable(name)"
-          [attr.data-depth]="i"
-          (click)="toggle(name)"
-        >
+        <li *ngFor="let name of visibleChain; let i = index; trackBy: trackByName" class="cascade-row"
+          [class.is-header]="i === 0" [class.is-active]="isActive(name)" [class.is-clickable]="isExpandable(name)"
+          [attr.data-depth]="i" (click)="toggle(name)">
           <span class="row-label">{{ name }}</span>
           <span class="row-chevron" aria-hidden="true">
             <ng-container *ngIf="isActive(name); else chevDown">&rsaquo;</ng-container>
@@ -41,21 +35,88 @@
         </div>
       </header>
 
-      <!-- Reusable Leaflet map component -->
-      <app-map [locations]="mapLocations"></app-map>
+      <!-- Map + its own FAB, anchored to the map's right edge -->
+      <div class="map-wrapper">
+        <app-map [locations]="mapLocations"></app-map>
 
-      <div class="tracked-summary">
-        <h3>Tracked People</h3>
-        <div class="tracked-grid">
-          <div class="tracked-card" *ngFor="let person of trackedPeople">
-            <div class="tracked-card-head">
-              <span class="status-dot" [class]="'status-' + person.status"></span>
-              <strong>{{ person.name }}</strong>
-            </div>
-            <small>{{ person.location }}</small>
-            <span class="status-label" [class]="'status-label-' + person.status">{{ person.status }}</span>
+        <button type="button" class="panel-fab" [class.is-collapsed]="isPanelCollapsed" (click)="togglePanel()"
+          [attr.aria-label]="isPanelCollapsed ? 'Hide statistics' : 'Show statistics'">
+          <span class="fab-chevron">{{ isPanelCollapsed ? '&rsaquo;' : '&lsaquo;' }}</span>
+        </button>
+      </div>
+    </div>
+
+    <!-- Statistics Panel: shown when FAB is toggled open -->
+    <aside class="stats-panel" *ngIf="isPanelCollapsed">
+      <div class="stats-panel-header">
+        <h2 class="panel-title">Statistics</h2>
+
+        <div class="stats-period-tabs">
+          <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'day'"
+            (click)="selectPeriod('day')">Day</button>
+          <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'week'"
+            (click)="selectPeriod('week')">Week</button>
+          <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'month'"
+            (click)="selectPeriod('month')">Month</button>
+        </div>
+
+        <button type="button" class="stats-settings-btn" (click)="openStatsModal()"
+          aria-label="Select statistics to show">
+          <span class="settings-icon" aria-hidden="true">&#9776;</span>
+        </button>
+      </div>
+
+      <div class="stats-list">
+        <div class="stat-card" *ngIf="isStatVisible('topZone')">
+          <span class="stat-label">Top Zone</span>
+          <span class="stat-value">{{ stats.topZone }}</span>
+        </div>
+        <div class="stat-card" *ngIf="isStatVisible('peakTime')">
+          <span class="stat-label">Peak Time</span>
+          <span class="stat-value">{{ stats.peakTime }}</span>
+        </div>
+        <div class="stat-card" *ngIf="isStatVisible('peakDay')">
+          <span class="stat-label">Peak Day</span>
+          <span class="stat-value">{{ stats.peakDay }}</span>
+        </div>
+      </div>
+    </aside>
+
+    <!-- Select Statistics to Show: modal popup -->
+    <div class="modal-overlay" *ngIf="isStatsModalOpen" (click)="closeStatsModal()">
+      <div class="stats-modal" (click)="$event.stopPropagation()">
+        <div class="stats-modal-header">
+          <h3>Select Statistics to Show</h3>
+        </div>
+
+        <div class="stats-modal-body">
+          <div class="stats-option-grid">
+            <label class="stats-option" *ngFor="let opt of statOptions">
+              <input type="checkbox" [checked]="opt.checked" (change)="toggleStatOption(opt.key)" />
+              <span class="option-check" aria-hidden="true">&#10003;</span>
+              <span class="option-label">{{ opt.label }}</span>
+            </label>
           </div>
         </div>
+
+        <div class="stats-modal-footer">
+          <button type="button" class="btn-close" (click)="closeStatsModal()">Close</button>
+          <button type="button" class="btn-save" (click)="saveStatsSelection()">Save</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tracked-summary">
+    <h3>Tracked People</h3>
+    <div class="tracked-grid">
+      <div class="tracked-card" *ngFor="let person of trackedPeople">
+        <div class="tracked-card-head">
+          <span class="status-dot" [class]="'status-' + person.status"></span>
+          <strong>{{ person.name }}</strong>
+        </div>
+        <small>{{ person.location }}</small>
+        <span class="status-label" [class]="'status-label-' + person.status">{{ person.status }}</span>
       </div>
     </div>
   </div>

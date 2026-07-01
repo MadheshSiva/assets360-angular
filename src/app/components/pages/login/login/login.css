@@ -105,17 +105,21 @@
 }
 
 .icon-shell {
-  width: 72px;
-  height: 72px;
-  border-radius: 50%;
-  display: grid;
-  place-items: center;
-  margin: 0 auto ;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+ 
 }
 
 .icon-shell img {
   width: 40px;
   height: 40px;
+  object-fit: contain;
+}
+
+.icon-shell img:nth-child(2) {
+  width: 120px;
+  height: auto;
   object-fit: contain;
 }
 
@@ -185,7 +189,7 @@
 }
 
 .forgot-link {
-  color: #7c3aed;
+  color: #7030a0;
   text-decoration: none;
   font-size: 0.92rem;
 }

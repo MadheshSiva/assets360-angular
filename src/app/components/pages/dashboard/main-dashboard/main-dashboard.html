@@ -4,8 +4,25 @@
 
         <!-- ── MAIN CONTENT ─────────────────────────────────────────── -->
         <main class="main-content">
+           <header class="assets-header">
+             <div>
+               <h1>Assets Dashboard</h1>
+               <p>Overview of asset status and utilization</p>
+             </div>
+             <div class="header-actions">
+               <button class="dash-btn dash-btn-primary" type="button">
+                 + Add Widget
+               </button>
+               <button class="dash-btn dash-btn-outline" type="button">
+                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+                   <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
+                 </svg>
+                 Filter
+               </button>
+             </div>
+           </header>
            <div class="content-container">
-            <div class="stat-grid">
+             <div class="stat-grid">
                 <div *ngFor="let card of statCards; let i = index" class="stat-card" [ngClass]="getStatCardClass(i)" role="button" tabindex="0" (click)="onStatCardClick(card, i)" (keydown.enter)="onStatCardClick(card, i)">
                     <div class="stat-card-icon">
                         <ng-container [ngSwitch]="i">

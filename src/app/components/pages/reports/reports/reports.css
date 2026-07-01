@@ -1,11 +1,11 @@
 /* ── Design tokens ── */
 :host {
-  --purple:        #7c3aed;
+  --purple:        #7030a0;
   --purple-light:  #ede9fe;
   --purple-border: #c4b5fd;
   --text-primary:  #111827;
   --text-muted:    #6b7280;
-  --text-link:     #7c3aed;
+  --text-link:     #7030a0;
   --border:        #e5e7eb;
   --row-alt:       #f5f3ff;   /* very faint purple tint for even rows */
   --status-done-text:  #6b7280;
@@ -92,18 +92,30 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 24px;
-  height: 24px;
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  color: #7030a0;
+  width: 20px;
+  height: 20px;
   border-radius: 50%;
-  transition: background 0.15s;
+  border: 1.5px solid var(--purple);
+  background: #ffffff;
+  color: var(--purple);
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  flex-shrink: 0;
+}
+
+.icon-btn svg {
+  width: 18px;
+  height: 18px;
 }
 
 .icon-btn:hover {
-  background: #672a97;
+  background: var(--purple);
+  color: #ffffff;
+}
+
+.icon-btn:focus-visible {
+  outline: 2px solid var(--purple);
+  outline-offset: 2px;
 }
 
 .icon-btn--danger {
@@ -112,6 +124,7 @@
 
 .icon-btn--danger:hover {
   background: #fee2e2;
+  color: #dc2626;
 }
 
 /* ── Frequency filter tabs ── */

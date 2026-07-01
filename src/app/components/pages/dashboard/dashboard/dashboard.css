@@ -135,6 +135,39 @@
   display: none;
 }
 
+.dash-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 16px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  transition: all 0.15s ease;
+}
+
+.dash-btn-primary {
+  background: #7030a0;
+  color: #fff;
+}
+
+.dash-btn-primary:hover {
+  background: #5d2384;
+}
+
+.dash-btn-outline {
+  background: #fff;
+  color: #7030a0;
+  border: 1.5px solid #c9a8e0;
+}
+
+.dash-btn-outline:hover {
+  background: #f5edfb;
+}
+
 @media (max-width: 560px) {
   .dash-tabs {
     width: 100%;

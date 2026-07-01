@@ -1,6 +1,7 @@
 import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
 
 export type FrequencyFilter = 'Monthly' | 'Weekly' | 'Daily' | 'Once';
@@ -28,6 +29,7 @@ export interface Report {
 })
 export class Reports {
   private http = inject(HttpClient);
+  private router = inject(Router);
   private apiUrl = environment.reportsApiUrl || environment.apiUrl;
 
   reports: Report[] = [];
@@ -90,7 +92,7 @@ export class Reports {
   }
 
   addReport() {
-    // Open add report modal/dialog
+    this.router.navigate(['/report/create']);
   }
 
   uploadReport() {

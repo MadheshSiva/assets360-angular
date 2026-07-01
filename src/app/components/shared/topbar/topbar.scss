@@ -116,6 +116,12 @@
   font-size: 11px;
 }
 
+@media (min-width: 1025px) {
+  .menu-toggle {
+    display: none;
+  }
+}
+
 @media (max-width: 640px) {
   .topbar-shell {
     height: 60px;

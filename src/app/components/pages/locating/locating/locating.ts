@@ -28,6 +28,11 @@ export class Locating {
   // The full chain we render in the cascade.
   // Coords roughly approximate UAE → Oman → Muscat area → street → building,
   // with progressively deeper zoom levels so each click visibly zooms in.
+  isPanelCollapsed = false;
+
+  togglePanel(): void {
+    this.isPanelCollapsed = !this.isPanelCollapsed;
+  }
   locationTree: LocationNode[] = [
     {
       name: 'UAE',
@@ -103,7 +108,7 @@ export class Locating {
   }
 
   isActive(name: string): boolean {
-    if (name === this.modeLabel) return this.expanded.has(this.modeLabel);
+    if (name === this.modeLabel) return false;
     const chain = this.visibleChain;
     return chain[chain.length - 1] === name;
   }
@@ -203,7 +208,48 @@ export class Locating {
     { label: 'Movement Status', value: 'movement' },
     { label: 'Battery Level', value: 'battery' },
   ];
+selectedPeriod: 'day' | 'week' | 'month' = 'month';
+isStatsModalOpen = false;
 
+stats = {
+  topZone: 'Zone A',
+  peakTime: '14:00',
+  peakDay: 'Monday',
+};
+
+// Full list mirrors the reference popup. Only keys present in `stats`
+// actually render a card right now — the rest are placeholders for later.
+statOptions: { key: string; label: string; checked: boolean }[] = [
+  { key: 'topZone', label: 'Top Zone', checked: true },
+  { key: 'peakTime', label: 'Peak Time', checked: true },
+  { key: 'peakDay', label: 'Peak Day', checked: true },
+  
+];
+
+selectPeriod(period: 'day' | 'week' | 'month'): void {
+  this.selectedPeriod = period;
+}
+
+openStatsModal(): void {
+  this.isStatsModalOpen = true;
+}
+
+closeStatsModal(): void {
+  this.isStatsModalOpen = false;
+}
+
+toggleStatOption(key: string): void {
+  const opt = this.statOptions.find((o) => o.key === key);
+  if (opt) opt.checked = !opt.checked;
+}
+
+saveStatsSelection(): void {
+  this.isStatsModalOpen = false;
+}
+
+isStatVisible(key: string): boolean {
+  return this.statOptions.find((o) => o.key === key)?.checked ?? false;
+}
   // ===== Tracked people summary (static) =====
   trackedPeople = [
     { name: 'Ahmed Al-Rashid', location: 'Azy floor - Room 101', status: 'online' as const },

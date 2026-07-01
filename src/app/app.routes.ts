@@ -5,8 +5,7 @@ import { Dashboard } from './components/pages/dashboard/dashboard/dashboard';
 import { Locating } from './components/pages/locating/locating/locating';
 import { Events } from './components/pages/events/events/events';
 import { Reports } from './components/pages/reports/reports/reports';
-import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
-import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
+import { CreateReport } from './components/pages/reports/create-report/create-report';
 import { Layout } from './components/shared/layout/layout';
 // DEMO MODE: Auth guard import kept for reference
 // import { authGuard } from './components/guard/auth-guard';
@@ -18,9 +17,10 @@ import { User } from './components/pages/administration/user-management/user/use
 import { Role } from './components/pages/administration/user-management/role/role';
 import { CreateRole } from './components/pages/administration/user-management/create-role/create-role';
 
-
 import { Projects } from './components/pages/administration/configuration/projects/projects';
 import { Devices } from './components/pages/administration/configuration/devices/devices';
+import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
+import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -36,6 +36,7 @@ export const routes: Routes = [
       { path: 'locating', component: Locating },
       { path: 'events', component: Events },
       { path: 'report', component: Reports },
+      { path: 'report/create', component: CreateReport },
       { path: 'process-automation', component: ProcessAutomation },
       { path: 'process-automation/add', component: ProcessAutomationAdd },
       {

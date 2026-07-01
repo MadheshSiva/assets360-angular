@@ -1,7 +1,7 @@
 <aside class="sidebar" [class.collapsed]="collapsed">
   <div class="brand-card">
     <div class="brand">
-      <div class="brand-mark">
+      <div class="brand-mark" (click)="collapsed && toggleCollapse()">
         <img src="PurpleIQLOGOPurpleBright.png" alt="Purple IQ" />
       </div>
       <div class="brand-copy" *ngIf="!collapsed">
