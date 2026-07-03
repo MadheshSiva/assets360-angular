@@ -4,7 +4,7 @@
   font-family: 'Red Hat Display', sans-serif;
 }
 
-.devices-page {
+.assets-page {
   display: block;
   width: 100%;
 }
@@ -102,13 +102,68 @@
   height: 18px;
 }
 
-.icon-btn:hover {
+.icon-btn:hover:not(:disabled) {
   background: #5d2588;
   color: #fff;
 }
 
-.icon-btn:active {
+.icon-btn:active:not(:disabled) {
   transform: scale(0.94);
+}
+
+.icon-btn:disabled {
+  border-color: #d8d7e6;
+  color: #c3c2d4;
+  cursor: not-allowed;
+}
+
+/* Column picker */
+.column-picker-wrap {
+  position: relative;
+}
+
+.column-picker-panel {
+  position: absolute;
+  top: calc(100% + 10px);
+  right: 0;
+  width: 220px;
+  background: #ffffff;
+  border: 1px solid #eef0f4;
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, 0.14);
+  padding: 10px;
+  z-index: 20;
+}
+
+.column-picker-title {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #94a3b8;
+  padding: 4px 8px 8px;
+}
+
+.column-picker-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 7px 8px;
+  border-radius: 8px;
+  font-size: 13.5px;
+  color: #334155;
+  cursor: pointer;
+}
+
+.column-picker-item:hover {
+  background: #f7f5fc;
+}
+
+.column-picker-item input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: #7030a0;
+  cursor: pointer;
 }
 
 /* Table */
@@ -117,14 +172,14 @@
   overflow-x: auto;
 }
 
-.devices-table {
+.assets-table {
   width: 100%;
   border-collapse: collapse;
   font-size: 13px;
   min-width: 1000px;
 }
 
-.devices-table thead th {
+.assets-table thead th {
   text-align: left;
   font-weight: 700;
   color: #0f172a;
@@ -133,18 +188,33 @@
   white-space: nowrap;
 }
 
-.devices-table tbody td {
+.assets-table tbody td {
   padding: 8px 14px;
   color: #475066;
   white-space: nowrap;
 }
 
-.devices-table tbody tr:nth-child(odd) {
+.assets-table tbody tr:nth-child(odd) {
   background: #ffffff;
 }
 
-.devices-table tbody tr:nth-child(even) {
+.assets-table tbody tr:nth-child(even) {
   background: #f7f7fc;
+}
+
+.assets-table tbody tr.row-selected {
+  background: #f3edfb;
+}
+
+.selection-col {
+  width: 40px;
+}
+
+.selection-col input[type='checkbox'] {
+  width: 16px;
+  height: 16px;
+  accent-color: #7030a0;
+  cursor: pointer;
 }
 
 .mono {
@@ -153,50 +223,11 @@
   color: #475066;
 }
 
-.zone-cell {
-  font-weight: 700;
-  color: #0f172a;
-}
-
 .empty-row {
   text-align: center;
   padding: 32px 16px;
   color: #9aa1b1;
   white-space: normal;
-}
-
-/* Actions */
-.actions {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-}
-
-.action-btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  height: 28px;
-  border: none;
-  background: transparent;
-  color: #7030a0;
-  cursor: pointer;
-  padding: 0;
-  transition: opacity 0.15s ease, transform 0.1s ease;
-}
-
-.action-btn svg {
-  width: 18px;
-  height: 18px;
-}
-
-.action-btn:hover {
-  opacity: 0.7;
-}
-
-.action-btn:active {
-  transform: scale(0.92);
 }
 
 /* Responsive */
@@ -221,7 +252,7 @@
   }
 }
 
-/* ===== Add Device Modal ===== */
+/* ===== Create / Edit Asset Modal ===== */
 .modal-overlay {
   position: fixed;
   inset: 0;
@@ -237,7 +268,7 @@
   background: #ffffff;
   border-radius: 18px;
   width: 100%;
-  max-width: 880px;
+  max-width: 720px;
   max-height: 90vh;
   overflow-y: auto;
   box-shadow: 0 20px 60px rgba(15, 23, 42, 0.25);
@@ -332,6 +363,10 @@
   gap: 8px;
 }
 
+.form-field-wide {
+  grid-column: 1 / -1;
+}
+
 .form-field label {
   font-size: 12px;
   font-weight: 700;
@@ -344,7 +379,7 @@
   color: #ef4444;
 }
 
-.form-field input[type="text"] {
+.form-field input[type='text'] {
   height: 46px;
   border-radius: 10px;
   border: 1px solid #e2e4ea;
@@ -357,11 +392,11 @@
   transition: border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.form-field input[type="text"]::placeholder {
+.form-field input[type='text']::placeholder {
   color: #9aa1b1;
 }
 
-.form-field input[type="text"]:focus {
+.form-field input[type='text']:focus {
   border-color: #7030a0;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
 }
@@ -371,7 +406,7 @@
 }
 
 .select-wrap::after {
-  content: "";
+  content: '';
   position: absolute;
   right: 16px;
   top: 50%;
@@ -403,52 +438,6 @@
 .form-field select:focus {
   border-color: #7030a0;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
-}
-
-.status-toggle-wrap {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  height: 46px;
-}
-
-.toggle {
-  position: relative;
-  width: 48px;
-  height: 26px;
-  border-radius: 999px;
-  border: none;
-  background: #cbd2e0;
-  cursor: pointer;
-  padding: 0;
-  flex-shrink: 0;
-  transition: background 0.2s ease;
-}
-
-.toggle-knob {
-  position: absolute;
-  top: 3px;
-  left: 3px;
-  width: 20px;
-  height: 20px;
-  border-radius: 50%;
-  background: #fff;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-  transition: transform 0.2s ease;
-}
-
-.toggle-on {
-  background: #7030a0;
-}
-
-.toggle-on .toggle-knob {
-  transform: translateX(22px);
-}
-
-.toggle-label {
-  font-size: 14.5px;
-  font-weight: 600;
-  color: #334155;
 }
 
 .modal-footer {
@@ -507,82 +496,6 @@
 
   .modal-header,
   .modal-form {
-    padding-left: 20px;
-    padding-right: 20px;
-  }
-}
-
-/* ===== Device List preview (inside modal) ===== */
-.device-list-section {
-  padding: 0 32px 28px;
-}
-
-.device-list-divider {
-  display: flex;
-  align-items: center;
-  gap: 14px;
-  margin-bottom: 16px;
-}
-
-.device-list-divider::before,
-.device-list-divider::after {
-  content: "";
-  flex: 1;
-  height: 1px;
-  background: #e7e8ee;
-}
-
-.device-list-label {
-  font-size: 12px;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  color: #94a3b8;
-  text-transform: uppercase;
-  white-space: nowrap;
-}
-
-.device-list-wrap {
-  border: 1px solid #edeef2;
-  border-radius: 12px;
-  overflow-x: auto;
-  background: #fafafe;
-}
-
-.device-list-table {
-  width: 100%;
-  min-width: 760px;
-  border-collapse: collapse;
-  font-size: 13px;
-}
-
-.device-list-table thead th {
-  text-align: left;
-  font-weight: 700;
-  font-size: 12px;
-  letter-spacing: 0.03em;
-  color: #334155;
-  text-transform: uppercase;
-  padding: 8px 14px;
-  border-bottom: 1px solid #edeef2;
-  white-space: nowrap;
-}
-
-.device-list-table tbody td {
-  padding: 8px 14px;
-  color: #475066;
-  white-space: nowrap;
-}
-
-.device-list-empty td {
-  text-align: center;
-  padding: 28px 16px;
-  color: #1e293b;
-  font-size: 14px;
-  white-space: normal;
-}
-
-@media (max-width: 640px) {
-  .device-list-section {
     padding-left: 20px;
     padding-right: 20px;
   }

@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { RoleService, ModulePermission } from '../../../../services/user.service';
+import { HierarchyNode } from '../../../../../models/hierarchy-node.model';
+import { HierarchyNodeComponent } from '../../../../../components/hierarchy-node/hierarchy-node-component';
 
 @Component({
   standalone: true,
   selector: 'app-create-role',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, HierarchyNodeComponent],
   templateUrl: './create-role.html',
   styleUrls: ['./create-role.css']
 })
@@ -15,10 +17,12 @@ export class CreateRole {
   roleName = '';
   description = '';
   permissions: ModulePermission[];
+  hierarchy: HierarchyNode[];
   submitted = false;
 
   constructor(private service: RoleService, private router: Router) {
     this.permissions = this.service.getEmptyPermissions();
+    this.hierarchy = this.service.getHierarchyData();
   }
 
   toggleView(perm: ModulePermission): void {
@@ -35,6 +39,14 @@ export class CreateRole {
     return this.roleName.trim().length > 0;
   }
 
+  private getSelectedHierarchyIds(nodes: HierarchyNode[] = this.hierarchy, acc: string[] = []): string[] {
+    for (const node of nodes) {
+      if (node.checked) acc.push(node.id);
+      if (node.children?.length) this.getSelectedHierarchyIds(node.children, acc);
+    }
+    return acc;
+  }
+
   saveRole(): void {
     this.submitted = true;
     if (!this.isValid) return;
@@ -43,6 +55,7 @@ export class CreateRole {
       roleName: this.roleName.trim(),
       description: this.description.trim(),
       accessPermission: this.permissions,
+      hierarchyPermission: this.getSelectedHierarchyIds(),
       clientId: 'CLT-' + Math.floor(1000 + Math.random() * 9000)
     });
 

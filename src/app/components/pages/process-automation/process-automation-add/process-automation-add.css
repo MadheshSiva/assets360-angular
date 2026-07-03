@@ -7,11 +7,11 @@
 
 /* ===== Sidebar ===== */
 .pa-sidebar {
-  width: 280px;
+  width: 240px;
   flex-shrink: 0;
   background: #ffffff;
-  border-radius: 18px 0 0 18px;
-  padding: 20px 16px;
+  border-radius: 16px 0 0 16px;
+  padding: 16px 12px;
   box-sizing: border-box;
   border: 1px solid #e9e6f5;
   border-right: none;
@@ -24,11 +24,11 @@
 
 .pa-search-input {
   width: 100%;
-  padding: 10px 36px 10px 14px;
-  border-radius: 10px;
+  padding: 8px 36px 8px 12px;
+  border-radius: 8px;
   border: 1px solid #e0e1ea;
   background: #fafafa;
-  font-size: 14px;
+  font-size: 13px;
   color: #111827;
   box-sizing: border-box;
 }
@@ -41,11 +41,11 @@
 
 .pa-search-icon {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
   color: #7c3aed;
   pointer-events: none;
 }
@@ -63,11 +63,11 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 12px 16px;
-  border-radius: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
   background: #ffffff;
   color: #111827;
-  font-size: 15px;
+  font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   border: 1px solid transparent;
@@ -95,50 +95,50 @@
   background: #ffffff;
   border-radius: 0 18px 18px 0;
   border: 1px solid #e9e6f5;
-  padding: 0 32px 32px;
+  padding: 0 24px 24px;
   box-sizing: border-box;
   position: relative;
 }
 
 .pa-panel-header {
   background: #d9d9d9;
-  border-radius: 10px;
-  padding: 7px 7px;
+  border-radius: 8px;
+  padding: 6px 6px;
 
-  font-size: 20px;
+  font-size: 18px;
   font-weight: 400;
   color: #111827;
- margin-top: 20px;
-  margin-bottom: 24px;
+   margin-top: 16px;
+  margin-bottom: 16px;
   
 }
 
 .pa-form {
   display: flex;
   flex-direction: column;
-  gap: 28px;
+  gap: 20px;
 }
 
 .pa-field {
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  max-width: 540px;
+  gap: 6px;
+  max-width: 500px;
 }
 
 .pa-label {
-  font-size: 15px;
+  font-size: 13px;
   font-weight: 500;
   color: #7030a0;
 }
 
 .pa-input {
   width: 100%;
-  padding: 12px 14px;
-  border-radius: 10px;
+  padding: 8px 12px;
+  border-radius: 8px;
   border: 1px solid #d8d9e3;
   background: #ffffff;
-  font-size: 14px;
+  font-size: 13px;
   color: #111827;
   box-sizing: border-box;
 }
@@ -146,7 +146,7 @@
 .pa-input:focus-visible {
   outline: none;
   border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
 }
 
 .pa-error {
@@ -159,23 +159,23 @@
 .pa-section {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 14px;
 }
 
 .pa-section-row {
   display: flex;
   align-items: center;
-  gap: 24px;
+  gap: 16px;
 }
 
 .pa-section-title {
-  font-size: 16px;
+  font-size: 15px;
   font-weight: 600;
   color: #7030a0;
 }
 
 .pa-relationship {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #7030a0;
 }
@@ -183,24 +183,25 @@
 /* Row grid: operator-slot | label | select(grows) | minus | plus */
 .pa-rule-row {
   display: grid;
-  grid-template-columns: 86px 110px minmax(0, 1fr) 44px 44px;
+  grid-template-columns: 60px 90px minmax(0, 1fr) 32px 32px;
   align-items: center;
-  gap: 14px;
-  max-width: 680px;
+  gap: 8px;
+  max-width: 560px;
   position: relative;
 }
 
 .pa-rule-row-action {
-  grid-template-columns: 110px minmax(0, 1fr) 44px 44px;
+  grid-template-columns: 90px minmax(0, 1fr) 32px 32px;
 }
 
 .pa-rule-operator-slot {
   display: flex;
   align-items: center;
+  width: 60px;
 }
 
 .pa-rule-label {
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   color: #111827;
   white-space: nowrap;
@@ -208,11 +209,11 @@
 
 .pa-operator-select {
   width: 80px;
-  padding: 9px 10px;
-  border-radius: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
   border: 1px solid #d8d9e3;
   background: #ffffff;
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 600;
   color: #111827;
   cursor: pointer;
@@ -221,11 +222,11 @@
 .pa-operator-select:focus-visible {
   outline: none;
   border-color: #7c3aed;
-  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+  box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.15);
 }
 
 .pa-time-row {
-  grid-template-columns: 86px 110px auto;
+  grid-template-columns: 60px 90px auto;
 }
 
 .pa-checkbox {
@@ -233,6 +234,25 @@
   height: 18px;
   accent-color: #6d28d9;
   cursor: pointer;
+}
+
+/* ===== Cascading sub-rows (device/property/compare, people, zone, time) =====
+   These reuse the same grid as .pa-rule-row so their content lines up under
+   the level-1 dropdown, but skip the operator/label/+/- columns. */
+.pa-rule-subrow > * {
+  grid-column: 3;
+}
+
+/* ===== Cascading sub-rows for Actions (device/type/status, notify toggles) =====
+   These reuse the same grid as .pa-rule-row-action so their content lines up
+   under the level-1 action dropdown (column 2 here, since actions have no
+   operator column), but skip the label/+/- columns. */
+.pa-rule-subrow-action {
+  grid-template-columns: 110px minmax(0, 1fr) 44px 44px;
+}
+
+.pa-rule-subrow-action > * {
+  grid-column: 2;
 }
 
 /* ===== Custom dropdown ===== */
@@ -270,8 +290,8 @@
 }
 
 .pa-dropdown-option {
-  padding: 12px 16px;
-  font-size: 14px;
+  padding: 8px 12px;
+  font-size: 13px;
   color: #111827;
   cursor: pointer;
 }
@@ -285,14 +305,87 @@
   color: #7030a0;
 }
 
+/* ===== Time picker (When the time is) ===== */
+.pa-time-fields {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.pa-time-group {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: 1px solid #d8d9e3;
+  background: #ffffff;
+}
+
+.pa-time-input {
+  width: 22px;
+  border: none;
+  outline: none;
+  text-align: center;
+  font-size: 13px;
+  color: #111827;
+  font-family: inherit;
+}
+
+.pa-time-input::placeholder {
+  color: #9ca3af;
+}
+
+.pa-time-colon {
+  color: #9ca3af;
+  font-weight: 600;
+  font-size: 12px;
+}
+
+/* ===== Day / toggle button row (When the time is, notify channels) ===== */
+.pa-day-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.pa-day-btn {
+  padding: 6px 10px;
+  border-radius: 6px;
+  border: 1px solid #d8d9e3;
+  background: #fafafa;
+  color: #111827;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+}
+
+.pa-day-btn:hover {
+  background: #f3eefb;
+}
+
+.pa-day-btn.active {
+  background: #7030a0;
+  border-color: #7030a0;
+  color: #ffffff;
+}
+
+.pa-effective-time {
+  font-size: 12px;
+  font-weight: 500;
+  color: #7030a0;
+}
+
 /* ===== Icon buttons (+ / -) ===== */
 .pa-icon-btn {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 40px;
-  height: 40px;
-  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
   border: none;
   background: #7030a0;
   color: #ffffff;
@@ -302,8 +395,8 @@
 }
 
 .pa-icon-btn svg {
-  width: 16px;
-  height: 16px;
+  width: 14px;
+  height: 14px;
 }
 
 .pa-icon-btn:hover {
@@ -334,9 +427,9 @@
 }
 
 .pa-btn {
-  padding: 12px 28px;
-  border-radius: 10px;
-  font-size: 15px;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-size: 14px;
   font-weight: 600;
   cursor: pointer;
   transition: background 0.15s, color 0.15s;

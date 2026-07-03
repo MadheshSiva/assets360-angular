@@ -40,24 +40,38 @@ export class Administration {
   configOptions: BreadcrumbOption[] = [
     { label: 'Projects', path: '/administration/configuration/projects' },
     { label: 'Devices', path: '/administration/configuration/devices' },
-    { label: 'People', path: '/administration/configuration/people' },
-    { label: 'Attendance', path: '/administration/configuration/attendance' },
-    { label: 'Access Control', path: '/administration/configuration/access-control' },
-    { label: 'OT Management', path: '/administration/configuration/ot-management' },
-    { label: 'Visitor Management', path: '/administration/configuration/visitor-management' },
-    { label: 'Patrol', path: '/administration/configuration/patrol' }
+    { label: 'Assets', path: '/administration/configuration/assets' },
+    { label: 'Maintenance', path: '/administration/configuration/maintenance' },
+    { label: 'Workflows', path: '/administration/configuration/workflows' },
+    { label: 'WIP', path: '/administration/configuration/wip' },
+    { label: 'Master Management', path: '/administration/configuration/master-management' },
+    
   ];
 
   // Maps URL slug -> breadcrumb label, used when building the trail
   private configSlugLabelMap: Record<string, string> = {
     'projects': 'Projects',
     'devices': 'Devices',
+    'assets': 'Assets',
     'people': 'People',
     'attendance': 'Attendance',
     'access-control': 'Access Control',
     'ot-management': 'OT Management',
     'visitor-management': 'Visitor Management',
     'patrol': 'Patrol'
+  };
+
+  // Maps URL slug -> breadcrumb label for pages nested under Assets
+  private assetsSlugLabelMap: Record<string, string> = {
+    'location-history': 'Location History',
+    'assignment-ownership': 'Assignment / Ownership',
+    'asset-lifecycle': 'Asset Lifecycle',
+    'tracking-telemetry': 'Tracking & Telemetry',
+    'maintenance-service': 'Maintenance & Service',
+    'utilization-performance': 'Utilization & Performance',
+    'financial': 'Financial',
+    'document-attachment': 'Document & Attachment',
+    'warranty-contract': 'Warranty & Contract'
   };
 
   constructor(private router: Router) {
@@ -95,7 +109,17 @@ export class Administration {
       if (childSlug) {
         const childLabel = this.configSlugLabelMap[childSlug];
         if (childLabel) {
-          this.breadcrumbItems.push({ label: childLabel, path: null });
+          const grandchildSlug = childSlug === 'assets' ? segments[configIdx + 2] : undefined;
+          const grandchildLabel = grandchildSlug ? this.assetsSlugLabelMap[grandchildSlug] : undefined;
+
+          this.breadcrumbItems.push({
+            label: childLabel,
+            path: grandchildLabel ? '/administration/configuration/assets' : null
+          });
+
+          if (grandchildLabel) {
+            this.breadcrumbItems.push({ label: grandchildLabel, path: null });
+          }
         }
       }
     }

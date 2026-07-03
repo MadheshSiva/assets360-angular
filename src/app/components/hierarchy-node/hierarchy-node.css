@@ -1,0 +1,52 @@
+.hn-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 8px;
+}
+
+.hn-chevron {
+  width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hn-chevron-hidden {
+  visibility: hidden;
+  cursor: default;
+}
+
+.hn-chevron svg {
+  transition: transform 0.15s ease;
+}
+
+.hn-chevron-rotated {
+  transform: rotate(90deg);
+}
+
+.hn-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: #7030a0;
+  cursor: pointer;
+  flex-shrink: 0;
+}
+
+.hn-label {
+  font-size: 15px;
+  color: #111827;
+  cursor: pointer;
+  user-select: none;
+}
+
+.hn-children {
+  display: flex;
+  flex-direction: column;
+}

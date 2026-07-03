@@ -54,75 +54,233 @@
           <span class="pa-relationship">Relationship: {{ relationshipLabel }}</span>
         </div>
 
-        <div class="pa-rule-row" *ngFor="let cond of conditions; let i = index">
-          <!-- column 1: empty for row A, operator dropdown for row B+ -->
-          <div class="pa-rule-operator-slot">
-            <select
-              *ngIf="i > 0"
-              class="pa-operator-select"
-              [(ngModel)]="cond.operator"
-              [name]="'operator' + cond.id"
+        <ng-container *ngFor="let cond of conditions; let i = index">
+
+          <!-- LEVEL 1: condition type row (operator + label + type dropdown + minus/plus) -->
+          <div class="pa-rule-row">
+            <div class="pa-rule-operator-slot">
+              <select
+                *ngIf="i > 0"
+                class="pa-operator-select"
+                [(ngModel)]="cond.operator"
+                [name]="'operator' + cond.id"
+              >
+                <option value="AND">AND</option>
+                <option value="OR">OR</option>
+              </select>
+            </div>
+
+            <label class="pa-rule-label">{{ conditionLabel(i) }}</label>
+
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="cond.openField === 'type'"
+                [value]="cond.type"
+                placeholder="Select condition"
+                readonly
+                (click)="toggleField(cond, 'type')"
+              />
+
+              <div class="pa-dropdown-panel" *ngIf="cond.openField === 'type'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of conditionTypeOptions"
+                  [class.highlighted]="opt === cond.type"
+                  (click)="selectType(cond, opt)"
+                >
+                  {{ opt }}
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="pa-icon-btn pa-icon-btn-minus"
+              *ngIf="conditions.length > 1"
+              (click)="removeCondition(cond.id)"
+              title="Remove condition"
             >
-              <option value="AND">AND</option>
-              <option value="OR">OR</option>
-            </select>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              class="pa-icon-btn"
+              (click)="addCondition()"
+              title="Add condition"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
           </div>
 
-          <!-- column 2: Condition A / Condition B label -->
-          <label class="pa-rule-label">{{ conditionLabel(i) }}</label>
-
-          <!-- column 3: dropdown select -->
-          <div class="pa-dropdown-wrap">
-            <input
-              type="text"
-              class="pa-input pa-dropdown-trigger"
-              [class.open]="cond.open"
-              [value]="cond.value"
-              placeholder="Select condition"
-              readonly
-              (click)="toggleConditionDropdown(cond)"
-            />
-
-            <div class="pa-dropdown-panel" *ngIf="cond.open">
-              <div
-                class="pa-dropdown-option"
-                *ngFor="let opt of conditionOptions"
-                [class.highlighted]="cond.value ? opt === cond.value : opt === conditionOptions[0]"
-                (click)="selectConditionOption(cond, opt)"
-              >
-                {{ opt }}
+          <!-- ===== "When the device is" cascade ===== -->
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the device is'">
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="cond.openField === 'device'"
+                [value]="cond.device"
+                placeholder="Select Device"
+                readonly
+                (click)="toggleField(cond, 'device')"
+              />
+              <div class="pa-dropdown-panel" *ngIf="cond.openField === 'device'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of deviceOptions"
+                  [class.highlighted]="opt === cond.device"
+                  (click)="selectDevice(cond, opt)"
+                >
+                  {{ opt }}
+                </div>
               </div>
             </div>
           </div>
 
-          <!-- columns 4-5: plus always; minus only once a 2nd row exists -->
-          <button
-            type="button"
-            class="pa-icon-btn pa-icon-btn-minus"
-            *ngIf="conditions.length > 1"
-            (click)="removeCondition(cond.id)"
-            title="Remove condition"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the device is' && cond.device">
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="cond.openField === 'property'"
+                [value]="cond.property"
+                placeholder="Select property"
+                readonly
+                (click)="toggleField(cond, 'property')"
+              />
+              <div class="pa-dropdown-panel" *ngIf="cond.openField === 'property'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of propertyOptions"
+                  [class.highlighted]="opt === cond.property"
+                  (click)="selectProperty(cond, opt)"
+                >
+                  {{ opt }}
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <button
-            type="button"
-            class="pa-icon-btn"
-            (click)="addCondition()"
-            title="Add condition"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
-        </div>
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the device is' && cond.property">
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="cond.openField === 'compare'"
+                [value]="cond.compareOp"
+                placeholder="Select condition"
+                readonly
+                (click)="toggleField(cond, 'compare')"
+              />
+              <div class="pa-dropdown-panel" *ngIf="cond.openField === 'compare'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of compareOptionsFor(cond)"
+                  [class.highlighted]="opt === cond.compareOp"
+                  (click)="selectCompare(cond, opt)"
+                >
+                  {{ opt }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== "When the people is" ===== -->
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the people is'">
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="cond.openField === 'people'"
+                [value]="cond.people"
+                placeholder="Select people"
+                readonly
+                (click)="toggleField(cond, 'people')"
+              />
+              <div class="pa-dropdown-panel" *ngIf="cond.openField === 'people'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of peopleOptions"
+                  [class.highlighted]="opt === cond.people"
+                  (click)="selectPeople(cond, opt)"
+                >
+                  {{ opt }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== "When the zone is" ===== -->
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the zone is'">
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="cond.openField === 'zone'"
+                [value]="cond.zone"
+                placeholder="Select zone"
+                readonly
+                (click)="toggleField(cond, 'zone')"
+              />
+              <div class="pa-dropdown-panel" *ngIf="cond.openField === 'zone'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of zoneOptions"
+                  [class.highlighted]="opt === cond.zone"
+                  (click)="selectZone(cond, opt)"
+                >
+                  {{ opt }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== "When the time is" cascade ===== -->
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the time is'">
+            <div class="pa-time-fields">
+              <div class="pa-time-group">
+                <input type="text" class="pa-time-input" maxlength="2" placeholder="HH" [(ngModel)]="cond.startHH" [name]="'startHH' + cond.id" />
+                <span class="pa-time-colon">:</span>
+                <input type="text" class="pa-time-input" maxlength="2" placeholder="MM" [(ngModel)]="cond.startMM" [name]="'startMM' + cond.id" />
+              </div>
+              <div class="pa-time-group">
+                <input type="text" class="pa-time-input" maxlength="2" placeholder="HH" [(ngModel)]="cond.endHH" [name]="'endHH' + cond.id" />
+                <span class="pa-time-colon">:</span>
+                <input type="text" class="pa-time-input" maxlength="2" placeholder="MM" [(ngModel)]="cond.endMM" [name]="'endMM' + cond.id" />
+              </div>
+            </div>
+          </div>
+
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the time is'">
+            <div class="pa-day-row">
+              <button
+                type="button"
+                class="pa-day-btn"
+                *ngFor="let d of dayOptions"
+                [class.active]="isDaySelected(cond, d)"
+                (click)="toggleDay(cond, d)"
+              >
+                {{ d }}
+              </button>
+            </div>
+          </div>
+
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the time is'">
+            <span class="pa-effective-time">{{ effectiveTimeLabel(cond) }}</span>
+          </div>
+
+        </ng-container>
 
         <div class="pa-rule-row pa-time-row">
-          <label class="pa-rule-label">Set time Period</label>
+          <label class="pa-rule-label">Time Period</label>
           <input type="checkbox" class="pa-checkbox" [(ngModel)]="setTimePeriod" name="setTimePeriod" />
         </div>
       </div>
@@ -133,56 +291,149 @@
           <span class="pa-section-title">Actions</span>
         </div>
 
-        <div class="pa-rule-row pa-rule-row-action" *ngFor="let act of actions; let i = index">
-          <label class="pa-rule-label">{{ actionLabel(i) }}</label>
+        <ng-container *ngFor="let act of actions; let i = index">
 
-          <div class="pa-dropdown-wrap">
-            <input
-              type="text"
-              class="pa-input pa-dropdown-trigger"
-              [class.open]="act.open"
-              [value]="act.value"
-              placeholder="Select action"
-              readonly
-              (click)="toggleActionDropdown(act)"
-            />
+          <!-- LEVEL 1: action type row (label + type dropdown + minus/plus) -->
+          <div class="pa-rule-row pa-rule-row-action">
+            <label class="pa-rule-label">{{ actionLabel(i) }}</label>
 
-            <div class="pa-dropdown-panel" *ngIf="act.open">
-              <div
-                class="pa-dropdown-option"
-                *ngFor="let opt of actionOptions"
-                [class.highlighted]="opt === act.value"
-                (click)="selectActionOption(act, opt)"
-              >
-                {{ opt }}
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="act.openField === 'type'"
+                [value]="act.value"
+                placeholder="Select action"
+                readonly
+                (click)="toggleActionField(act, 'type')"
+              />
+
+              <div class="pa-dropdown-panel" *ngIf="act.openField === 'type'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of actionOptions"
+                  [class.highlighted]="opt === act.value"
+                  (click)="selectActionType(act, opt)"
+                >
+                  {{ opt }}
+                </div>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              class="pa-icon-btn pa-icon-btn-minus"
+              *ngIf="actions.length > 1"
+              (click)="removeAction(act.id)"
+              title="Remove action"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+
+            <button
+              type="button"
+              class="pa-icon-btn"
+              (click)="addAction()"
+              title="Add action"
+            >
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <line x1="12" y1="5" x2="12" y2="19"></line>
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+              </svg>
+            </button>
+          </div>
+
+          <!-- ===== "Trigger device(s) to.." cascade ===== -->
+          <div class="pa-rule-row pa-rule-subrow-action" *ngIf="act.value === 'Trigger device(s) to..'">
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="act.openField === 'device'"
+                [value]="act.device"
+                placeholder="Select device"
+                readonly
+                (click)="toggleActionField(act, 'device')"
+              />
+              <div class="pa-dropdown-panel" *ngIf="act.openField === 'device'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of actionDeviceOptions"
+                  [class.highlighted]="opt === act.device"
+                  (click)="selectActionDevice(act, opt)"
+                >
+                  {{ opt }}
+                </div>
               </div>
             </div>
           </div>
 
-          <button
-            type="button"
-            class="pa-icon-btn pa-icon-btn-minus"
-            *ngIf="actions.length > 1"
-            (click)="removeAction(act.id)"
-            title="Remove action"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
+          <div class="pa-rule-row pa-rule-subrow-action" *ngIf="act.value === 'Trigger device(s) to..' && act.device">
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="act.openField === 'deviceType'"
+                [value]="act.deviceType"
+                placeholder="Select type"
+                readonly
+                (click)="toggleActionField(act, 'deviceType')"
+              />
+              <div class="pa-dropdown-panel" *ngIf="act.openField === 'deviceType'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of actionDeviceTypeOptions"
+                  [class.highlighted]="opt === act.deviceType"
+                  (click)="selectActionDeviceType(act, opt)"
+                >
+                  {{ opt }}
+                </div>
+              </div>
+            </div>
+          </div>
 
-          <button
-            type="button"
-            class="pa-icon-btn"
-            (click)="addAction()"
-            title="Add action"
-          >
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-              <line x1="12" y1="5" x2="12" y2="19"></line>
-              <line x1="5" y1="12" x2="19" y2="12"></line>
-            </svg>
-          </button>
-        </div>
+          <div class="pa-rule-row pa-rule-subrow-action" *ngIf="act.value === 'Trigger device(s) to..' && act.deviceType">
+            <div class="pa-dropdown-wrap">
+              <input
+                type="text"
+                class="pa-input pa-dropdown-trigger"
+                [class.open]="act.openField === 'status'"
+                [value]="act.status"
+                placeholder="Select status"
+                readonly
+                (click)="toggleActionField(act, 'status')"
+              />
+              <div class="pa-dropdown-panel" *ngIf="act.openField === 'status'">
+                <div
+                  class="pa-dropdown-option"
+                  *ngFor="let opt of actionStatusOptions"
+                  [class.highlighted]="opt === act.status"
+                  (click)="selectActionStatus(act, opt)"
+                >
+                  {{ opt }}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ===== "Send an alarm notification" toggle row ===== -->
+          <div class="pa-rule-row pa-rule-subrow-action" *ngIf="act.value === 'Send an alarm notification'">
+            <div class="pa-day-row">
+              <button
+                type="button"
+                class="pa-day-btn"
+                *ngFor="let ch of notifyChannelOptions"
+                [class.active]="isNotifyChannelSelected(act, ch)"
+                (click)="toggleNotifyChannel(act, ch)"
+              >
+                {{ ch }}
+              </button>
+            </div>
+          </div>
+
+        </ng-container>
       </div>
 
       <div class="pa-actions">

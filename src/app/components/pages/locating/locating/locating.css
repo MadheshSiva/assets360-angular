@@ -106,6 +106,7 @@
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
   min-height: 100vh;   /* add this */
   width: 30%;         /* add this */
+ 
 }
 
 
@@ -209,6 +210,7 @@
   gap: 16px;
   min-width: 0;
   width: 70%;
+  margin-left: 10px;
 }
 
 .map-filters {

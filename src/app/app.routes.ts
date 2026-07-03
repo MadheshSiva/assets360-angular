@@ -19,6 +19,9 @@ import { CreateRole } from './components/pages/administration/user-management/cr
 
 import { Projects } from './components/pages/administration/configuration/projects/projects';
 import { Devices } from './components/pages/administration/configuration/devices/devices';
+import { Assets } from './components/pages/administration/configuration/assets/assets';
+import { AssetLocationHistory } from './components/pages/administration/configuration/assets/location-history/location-history';
+import { AssetAssignmentOwnership } from './components/pages/administration/configuration/assets/assignment-ownership/assignment-ownership';
 import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
 import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
 
@@ -50,7 +53,10 @@ export const routes: Routes = [
             children: [
               { path: '', redirectTo: 'projects', pathMatch: 'full' },
               { path: 'projects', component: Projects },
-              { path: 'devices', component: Devices }
+              { path: 'devices', component: Devices },
+              { path: 'assets', component: Assets },
+              { path: 'assets/location-history', component: AssetLocationHistory },
+              { path: 'assets/assignment-ownership', component: AssetAssignmentOwnership }
             ]
           },
           { path: 'license', component: License },

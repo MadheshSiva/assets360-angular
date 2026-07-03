@@ -1,0 +1,31 @@
+<div class="hn-row" [style.paddingLeft.px]="level * 20">
+  <button
+    type="button"
+    class="hn-chevron"
+    [class.hn-chevron-hidden]="!hasChildren"
+    (click)="toggleExpand()"
+    [attr.aria-label]="node.expanded ? 'Collapse' : 'Expand'">
+    <svg *ngIf="hasChildren" width="14" height="14" viewBox="0 0 24 24" fill="none"
+         [class.hn-chevron-rotated]="node.expanded">
+      <path d="M9 6l6 6-6 6" stroke="#111827" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+  </button>
+
+  <input
+    type="checkbox"
+    class="hn-checkbox"
+    [checked]="node.checked"
+    [indeterminate]="isIndeterminate"
+    (change)="toggleCheck()" />
+
+  <span class="hn-label" (click)="toggleExpand()">{{ node.name }}</span>
+</div>
+
+<div class="hn-children" *ngIf="node.expanded && hasChildren">
+  <app-hierarchy-node
+    *ngFor="let child of node.children"
+    [node]="child"
+    [level]="level + 1"
+    (changed)="onChildChanged()">
+  </app-hierarchy-node>
+</div>

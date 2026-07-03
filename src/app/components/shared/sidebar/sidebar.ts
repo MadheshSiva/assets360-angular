@@ -28,6 +28,8 @@ export class Sidebar {
   openDropdown: string | null = null;
   // label of the nested sub-item that's expanded inside the open flyout (e.g. 'User Management')
   openSubDropdown: string | null = null;
+  // label of the third-level item expanded inside the open sub-dropdown (e.g. 'Assets')
+  openSubSubDropdown: string | null = null;
   // viewport coordinates for the currently open flyout, computed from the clicked trigger element
   flyoutPosition: { top: number; left: number } | null = null;
 
@@ -47,14 +49,28 @@ export class Sidebar {
           path: '/administration/configuration',
           icon: '',
           children: [
-            { label: 'Projects', path: '/administration/configuration/projects', icon: '' },
+            { label: 'Project', path: '/administration/configuration/projects', icon: '' },
             { label: 'Devices', path: '/administration/configuration/devices', icon: '' },
-            { label: 'People', path: '/administration/configuration/people', icon: '' },
-            { label: 'Attendance', path: '/administration/configuration/attendance', icon: '' },
-            { label: 'Access Control', path: '/administration/configuration/access-control', icon: '' },
-            { label: 'OT Management', path: '/administration/configuration/ot-management', icon: '' },
-            { label: 'Visitor Management', path: '/administration/configuration/visitor-management', icon: '' },
-            { label: 'Patrol', path: '/administration/configuration/patrol', icon: '' }
+            {
+              label: 'Assets',
+              path: '/administration/configuration/assets',
+              icon: '',
+              children: [
+                { label: 'Location History', path: '/administration/configuration/assets/location-history', icon: '' },
+                { label: 'Assignment / Ownership', path: '/administration/configuration/assets/assignment-ownership', icon: '' },
+                { label: 'Asset Lifecycle', path: '/administration/configuration/assets/asset-lifecycle', icon: '' },
+                { label: 'Tracking & Telemetry', path: '/administration/configuration/assets/tracking-telemetry', icon: '' },
+                { label: 'Maintenance & Service', path: '/administration/configuration/assets/maintenance-service', icon: '' },
+                { label: 'Utilization & Performance', path: '/administration/configuration/assets/utilization-performance', icon: '' },
+                { label: 'Financial', path: '/administration/configuration/assets/financial', icon: '' },
+                { label: 'Document & Attachment', path: '/administration/configuration/assets/document-attachment', icon: '' },
+                { label: 'Warranty & Contract', path: '/administration/configuration/assets/warranty-contract', icon: '' }
+              ]
+            },
+            { label: 'Maintenance', path: '/administration/configuration/maintenance', icon: '' },
+            { label: 'Workflows', path: '/administration/configuration/workflows', icon: '' },
+            { label: 'WIP', path: '/administration/configuration/wip', icon: '' },
+            { label: 'Master Management', path: '/administration/configuration/master-management', icon: '' }
           ]
         },
         { label: 'License', path: '/administration/license', icon: '' },
@@ -94,6 +110,7 @@ export class Sidebar {
     if (this.openDropdown === label) {
       this.openDropdown = null;
       this.openSubDropdown = null;
+      this.openSubSubDropdown = null;
       this.flyoutPosition = null;
       return;
     }
@@ -103,6 +120,7 @@ export class Sidebar {
       // position (template guards on `flyoutPosition` before rendering anyway).
       this.openDropdown = label;
       this.openSubDropdown = null;
+      this.openSubSubDropdown = null;
       this.flyoutPosition = null;
       return;
     }
@@ -116,6 +134,7 @@ export class Sidebar {
     };
     this.openDropdown = label;
     this.openSubDropdown = null;
+    this.openSubSubDropdown = null;
   }
 
   isDropdownOpen(label: string): boolean {
@@ -125,16 +144,27 @@ export class Sidebar {
   // Expands/collapses a nested item inside the open flyout (e.g. "User Management")
   toggleSubDropdown(label: string): void {
     this.openSubDropdown = this.openSubDropdown === label ? null : label;
+    this.openSubSubDropdown = null;
   }
 
   isSubDropdownOpen(label: string): boolean {
     return this.openSubDropdown === label;
   }
 
+  // Expands/collapses a third-level item inside the open sub-dropdown (e.g. "Assets")
+  toggleSubSubDropdown(label: string): void {
+    this.openSubSubDropdown = this.openSubSubDropdown === label ? null : label;
+  }
+
+  isSubSubDropdownOpen(label: string): boolean {
+    return this.openSubSubDropdown === label;
+  }
+
   // Navigates to a leaf item's route and closes the whole flyout stack
   navigateAndClose(path: string): void {
     this.openDropdown = null;
     this.openSubDropdown = null;
+    this.openSubSubDropdown = null;
     this.flyoutPosition = null;
     this.router.navigateByUrl(path);
   }
@@ -149,6 +179,7 @@ export class Sidebar {
     if (!clickedInsideSidebar && !clickedInsideFlyout) {
       this.openDropdown = null;
       this.openSubDropdown = null;
+      this.openSubSubDropdown = null;
       this.flyoutPosition = null;
     }
   }
@@ -161,6 +192,7 @@ export class Sidebar {
     if (this.openDropdown) {
       this.openDropdown = null;
       this.openSubDropdown = null;
+      this.openSubSubDropdown = null;
       this.flyoutPosition = null;
     }
   }
@@ -170,6 +202,7 @@ export class Sidebar {
     if (this.openDropdown) {
       this.openDropdown = null;
       this.openSubDropdown = null;
+      this.openSubSubDropdown = null;
       this.flyoutPosition = null;
     }
   }

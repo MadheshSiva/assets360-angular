@@ -108,16 +108,50 @@
         </div>
 
         <div class="nav-flyout-sublist" *ngIf="isSubDropdownOpen(child.label)">
-          <a
-            *ngFor="let grandchild of child.children"
-            [routerLink]="grandchild.path"
-            routerLinkActive="active"
-            [routerLinkActiveOptions]="{ exact: false }"
-            class="nav-flyout-sublist-item"
-            (click)="navigateAndClose(grandchild.path); $event.preventDefault()"
-          >
-            {{ grandchild.label }}
-          </a>
+          <ng-container *ngFor="let grandchild of child.children">
+
+            <!-- Leaf grandchild: navigates directly and closes the whole flyout -->
+            <a
+              *ngIf="!grandchild.children"
+              [routerLink]="grandchild.path"
+              routerLinkActive="active"
+              [routerLinkActiveOptions]="{ exact: false }"
+              class="nav-flyout-sublist-item"
+              (click)="navigateAndClose(grandchild.path); $event.preventDefault()"
+            >
+              {{ grandchild.label }}
+            </a>
+
+            <!-- Parent grandchild: expands a third-level list instead of navigating -->
+            <div *ngIf="grandchild.children">
+              <div
+                class="nav-flyout-sublist-item nav-flyout-sublist-item--parent"
+                [class.open]="isSubSubDropdownOpen(grandchild.label)"
+                (click)="toggleSubSubDropdown(grandchild.label)"
+              >
+                <span>{{ grandchild.label }}</span>
+                <span class="nav-flyout-item__arrow">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="9 18 15 12 9 6"></polyline>
+                  </svg>
+                </span>
+              </div>
+
+              <div class="nav-flyout-subsublist" *ngIf="isSubSubDropdownOpen(grandchild.label)">
+                <a
+                  *ngFor="let leaf of grandchild.children"
+                  [routerLink]="leaf.path"
+                  routerLinkActive="active"
+                  [routerLinkActiveOptions]="{ exact: false }"
+                  class="nav-flyout-subsublist-item"
+                  (click)="navigateAndClose(leaf.path); $event.preventDefault()"
+                >
+                  {{ leaf.label }}
+                </a>
+              </div>
+            </div>
+
+          </ng-container>
         </div>
       </div>
 

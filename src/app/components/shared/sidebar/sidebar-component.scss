@@ -17,7 +17,7 @@
   flex-direction: column;
   gap: 14px;
   padding: 16px 12px;
-  overflow: hidden;
+  overflow: visible;
   transition: width 0.25s ease;
   box-sizing: border-box;
   
@@ -29,9 +29,7 @@
       justify-content: center;
     }
 
-    .collapse-btn {
-      right: 4px;
-    }
+    
 
     .nav-item {
       justify-content: center;
@@ -102,12 +100,12 @@
 
 .collapse-btn {
   position: absolute;
-  right: -11px;
+  right: -24px;
   top: 50%;
   transform: translateY(-50%) scale(1);
 
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 0;
   border-radius: 50%;
@@ -417,9 +415,10 @@
   left: 280px; /* same as sidebar */
   height: 100vh;
   width: 300px;
+  overflow-y: auto;
 
   margin: 0; /* 🔥 remove any gap */
-  
+
   background: #fff;
   border-left: 1px solid #e7e2f5;
   box-shadow: 6px 0 24px rgba(112, 48, 160, 0.15);
@@ -554,6 +553,61 @@
   color: var(--piq-primary, #7030a0);
   text-decoration: none;
   font-size: 14px;
+  font-weight: 500;
+  transition: background 0.18s ease, color 0.18s ease;
+
+  &:hover:not(.active) {
+    background: var(--piq-primary-subtle, #f3edfb);
+    color: var(--piq-primary, #7030a0);
+  }
+
+  &.active {
+    color: #7030a0;
+    font-weight: 600;
+    background: var(--piq-primary-subtle, #f3edfb);
+  }
+}
+
+.nav-flyout-sublist-item--parent {
+  cursor: pointer;
+  justify-content: space-between;
+  gap: 10px;
+
+  &:hover:not(.open) {
+    background: var(--piq-primary-subtle, #f3edfb);
+  }
+
+  &.open {
+    background: var(--piq-primary-subtle, #f3edfb);
+    color: #7030a0;
+
+    .nav-flyout-item__arrow {
+      color: #7030a0;
+      transform: rotate(90deg);
+    }
+  }
+}
+
+// ============= Third-level list (e.g. Location History under Assets) =============
+.nav-flyout-subsublist {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin: 2px 0 4px;
+  padding-left: 12px;
+  border-left: 2px solid var(--piq-border-subtle, #ece7f8);
+  margin-left: 24px;
+}
+
+.nav-flyout-subsublist-item {
+  min-height: 34px;
+  display: flex;
+  align-items: center;
+  padding: 0 12px;
+  border-radius: 8px;
+  color: var(--piq-primary, #7030a0);
+  text-decoration: none;
+  font-size: 13.5px;
   font-weight: 500;
   transition: background 0.18s ease, color 0.18s ease;
 

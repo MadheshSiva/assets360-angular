@@ -28,31 +28,46 @@
       </div>
     </div>
 
-    <div class="cr-permissions-card">
-      <div class="cr-permissions-header">
-        <span class="cr-permissions-title">Access Permission</span>
-        <div class="cr-permissions-cols">
-          <span>View</span>
-          <span>Edit</span>
+    <div class="cr-permissions-grid">
+      <div class="cr-permissions-card">
+        <div class="cr-permissions-header">
+          <span class="cr-permissions-title">Hierarchy Permission</span>
+        </div>
+        <div class="cr-hierarchy-list">
+          <app-hierarchy-node
+            *ngFor="let node of hierarchy"
+            [node]="node"
+            [level]="0">
+          </app-hierarchy-node>
         </div>
       </div>
 
-      <div class="cr-permissions-list">
-        <div class="cr-permission-row" *ngFor="let perm of permissions">
-          <span class="cr-permission-name">{{ perm.module }}</span>
+      <div class="cr-permissions-card">
+        <div class="cr-permissions-header">
+          <span class="cr-permissions-title">Access Permission</span>
           <div class="cr-permissions-cols">
-            <input
-              type="checkbox"
-              class="cr-checkbox"
-              [checked]="perm.view"
-              (change)="toggleView(perm)"
-              [attr.aria-label]="perm.module + ' view'" />
-            <input
-              type="checkbox"
-              class="cr-checkbox"
-              [checked]="perm.edit"
-              (change)="toggleEdit(perm)"
-              [attr.aria-label]="perm.module + ' edit'" />
+            <span>View</span>
+            <span>Edit</span>
+          </div>
+        </div>
+
+        <div class="cr-permissions-list">
+          <div class="cr-permission-row" *ngFor="let perm of permissions">
+            <span class="cr-permission-name">{{ perm.module }}</span>
+            <div class="cr-permissions-cols">
+              <input
+                type="checkbox"
+                class="cr-checkbox"
+                [checked]="perm.view"
+                (change)="toggleView(perm)"
+                [attr.aria-label]="perm.module + ' view'" />
+              <input
+                type="checkbox"
+                class="cr-checkbox"
+                [checked]="perm.edit"
+                (change)="toggleEdit(perm)"
+                [attr.aria-label]="perm.module + ' edit'" />
+            </div>
           </div>
         </div>
       </div>

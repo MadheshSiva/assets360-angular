@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
+import { HierarchyNode } from "../../models/hierarchy-node.model"
 
 export interface ModulePermission {
   module: string;
@@ -12,6 +13,7 @@ export interface AppRole {
   roleName: string;
   description: string;
   accessPermission: ModulePermission[];
+  hierarchyPermission: string[];
   clientId: string;
 }
 
@@ -39,6 +41,7 @@ export class RoleService {
       roleName: 'Admin',
       description: 'Full system access',
       accessPermission: DEFAULT_MODULES.map(module => ({ module, view: true, edit: true })),
+      hierarchyPermission: [],
       clientId: 'CLT-1001'
     },
     {
@@ -46,6 +49,7 @@ export class RoleService {
       roleName: 'Operator',
       description: 'Manages daily operations',
       accessPermission: DEFAULT_MODULES.map(module => ({ module, view: true, edit: false })),
+      hierarchyPermission: [],
       clientId: 'CLT-1002'
     },
     {
@@ -53,6 +57,7 @@ export class RoleService {
       roleName: 'Viewer',
       description: 'Read-only access',
       accessPermission: DEFAULT_MODULES.map(module => ({ module, view: true, edit: false })),
+      hierarchyPermission: [],
       clientId: 'CLT-1003'
     },
     {
@@ -60,6 +65,7 @@ export class RoleService {
       roleName: 'Auditor',
       description: 'Reviews logs and reports',
       accessPermission: DEFAULT_MODULES.map(module => ({ module, view: true, edit: false })),
+      hierarchyPermission: [],
       clientId: 'CLT-1004'
     }
   ]);
@@ -71,6 +77,62 @@ export class RoleService {
 
   getEmptyPermissions(): ModulePermission[] {
     return buildDefaultPermissions();
+  }
+
+  /**
+   * Returns the project hierarchy tree used in the "Hierarchy Permission" panel.
+   * In production, replace this with an HttpClient call to your projects API.
+   */
+  getHierarchyData(): HierarchyNode[] {
+    return [
+      {
+        id: 'test', name: 'Test', checked: false, expanded: false,
+        children: [
+          { id: 'test-site-1', name: 'Site A', checked: false, expanded: false },
+          { id: 'test-site-2', name: 'Site B', checked: false, expanded: false }
+        ]
+      },
+      {
+        id: 'maf', name: 'MAF', checked: false, expanded: false,
+        children: [
+          { id: 'maf-mall-1', name: 'MAF Mall 1', checked: false, expanded: false },
+          { id: 'maf-mall-2', name: 'MAF Mall 2', checked: false, expanded: false }
+        ]
+      },
+      {
+        id: 'test2', name: 'Test2', checked: false, expanded: false,
+        children: [
+          { id: 'test2-site-1', name: 'Site A', checked: false, expanded: false }
+        ]
+      },
+      {
+        id: 'test3', name: 'Test3', checked: false, expanded: false,
+        children: [
+          { id: 'test3-site-1', name: 'Site A', checked: false, expanded: false }
+        ]
+      },
+      {
+        id: 'customer-analytics-bdf', name: 'Customer Analytics BDF', checked: false, expanded: false,
+        children: [
+          { id: 'ca-bdf-store-1', name: 'Store 1', checked: false, expanded: false },
+          { id: 'ca-bdf-store-2', name: 'Store 2', checked: false, expanded: false }
+        ]
+      },
+      {
+        id: 'customer-analytics-mall', name: 'Customer Analytics MALL', checked: false, expanded: false,
+        children: [
+          { id: 'ca-mall-1', name: 'Mall 1', checked: false, expanded: false },
+          { id: 'ca-mall-2', name: 'Mall 2', checked: false, expanded: false }
+        ]
+      },
+      {
+        id: 'red-crescent', name: 'Red Crescent', checked: false, expanded: false,
+        children: [
+          { id: 'rc-branch-1', name: 'Branch 1', checked: false, expanded: false },
+          { id: 'rc-branch-2', name: 'Branch 2', checked: false, expanded: false }
+        ]
+      }
+    ];
   }
 
   addRole(role: Omit<AppRole, 'roleId'>): AppRole {
