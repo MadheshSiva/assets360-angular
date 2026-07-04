@@ -89,25 +89,17 @@
     <app-main-dashboard></app-main-dashboard>
   </div>
 
-<!-- Assets Tab Content (existing dashboard UI) -->
-   <div *ngIf="activeTab === 'assets'">
-     <header class="dashboard-header">
-       <div>
-         <h1>Work Order Dashboard</h1>
-         <p>Overview of maintenance operations</p>
-       </div>
+  <!-- Assets Tab Content (existing dashboard UI) -->
+  <div *ngIf="activeTab === 'assets'">
+    <header class="dashboard-header">
+      <div class="header-title">
+        <h1>Work Order Dashboard</h1>
+        <p>Overview of maintenance operations</p>
+      </div>
 
-       <div class="header-actions">
-         <button class="dash-btn dash-btn-primary" type="button">
-           + Add Widget
-         </button>
-         <button class="dash-btn dash-btn-outline" type="button">
-           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-             <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-           </svg>
-           Filter
-         </button>
-         <div class="date-filter-wrap" (click)="$event.stopPropagation()">
+      <div class="header-actions">
+
+        <div class="date-filter-wrap" (click)="$event.stopPropagation()">
           <button class="date-filter" type="button" (click)="togglePicker()" [class.open]="isPickerOpen"
             aria-label="Select date range">
             <span class="icon-sm">
@@ -186,16 +178,27 @@
               </div>
             </footer>
           </div>
+          <label class="search-box">
+            <span class="sr-only">Search</span>
+            <input type="search" placeholder="Search assets, work orders..." />
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="11" cy="11" r="8" />
+              <line x1="21" y1="21" x2="16.65" y2="16.65" />
+            </svg>
+          </label>
+        </div>
+        <div class="action-buttons">
+          <button class="dash-btn dash-btn-primary" type="button">
+            + Add Widget
+          </button>
+          <button class="dash-btn dash-btn-outline" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+              <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+            </svg>
+            Filter
+          </button>
         </div>
 
-        <label class="search-box">
-          <span class="sr-only">Search</span>
-          <input type="search" placeholder="Search assets, work orders..." />
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-            <circle cx="11" cy="11" r="8" />
-            <line x1="21" y1="21" x2="16.65" y2="16.65" />
-          </svg>
-        </label>
       </div>
     </header>
 

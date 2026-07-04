@@ -19,7 +19,7 @@
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 16px;
-  margin-bottom: 28px;
+  margin-bottom: 20px;
 }
 
 .pa-title {
@@ -46,7 +46,7 @@
 .pa-search input {
   width: 260px;
   padding: 10px 40px 10px 14px;
-  border-radius: 10px;
+  border-radius: 25px;
   border: 1px solid #e0e1ea;
   background: #fafafa;
   font-size: 14px;

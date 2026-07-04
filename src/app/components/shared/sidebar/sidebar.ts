@@ -56,6 +56,7 @@ export class Sidebar {
               path: '/administration/configuration/assets',
               icon: '',
               children: [
+                { label: 'Asset Registry', path: '/administration/configuration/assets/asset-registry', icon: '' },
                 { label: 'Location History', path: '/administration/configuration/assets/location-history', icon: '' },
                 { label: 'Assignment / Ownership', path: '/administration/configuration/assets/assignment-ownership', icon: '' },
                 { label: 'Asset Lifecycle', path: '/administration/configuration/assets/asset-lifecycle', icon: '' },
@@ -64,7 +65,13 @@ export class Sidebar {
                 { label: 'Utilization & Performance', path: '/administration/configuration/assets/utilization-performance', icon: '' },
                 { label: 'Financial', path: '/administration/configuration/assets/financial', icon: '' },
                 { label: 'Document & Attachment', path: '/administration/configuration/assets/document-attachment', icon: '' },
-                { label: 'Warranty & Contract', path: '/administration/configuration/assets/warranty-contract', icon: '' }
+                { label: 'Warranty & Contract', path: '/administration/configuration/assets/warranty-contract', icon: '' },
+                { label: 'Alert & Incident', path: '/administration/configuration/assets/alert-incident', icon: '' },
+                { label: 'Audit & Verification', path: '/administration/configuration/assets/audit-verification', icon: '' },
+                { label: 'Activity / Audit Trail', path: '/administration/configuration/assets/activity-audit-trail', icon: '' },
+                { label: 'Custom / Domain-specific Asset Type Fields', path: '/administration/configuration/assets/custom-domain-fields', icon: '' },
+                { label: 'Integration', path: '/administration/configuration/assets/integration', icon: '' },
+                { label: 'Compliance & Certification', path: '/administration/configuration/assets/compliance-certification', icon: '' }
               ]
             },
             { label: 'Maintenance', path: '/administration/configuration/maintenance', icon: '' },

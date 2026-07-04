@@ -67,9 +67,11 @@
   border: 1px solid #e5e7eb;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-  min-width: 160px;
+  min-width: 180px;
   z-index: 1000;
   margin-top: 4px;
+  height: 300px;
+  overflow-y: auto;
 }
 
 .breadcrumb-dropdown-link {

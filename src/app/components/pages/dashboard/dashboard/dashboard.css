@@ -18,7 +18,7 @@
   background: #f4f5f7;
   border: 1px solid #ebedf0;
   border-radius: 999px;
-  padding: 6px 10px;
+  padding: 3px 5px;
   width: fit-content;
   flex-wrap: wrap;
 }
@@ -29,7 +29,7 @@
   align-items: center;
   gap: 8px;
   height: 38px;
-  padding: 0 14px;
+  padding: 0 7px;
   border: 0;
   border-radius: 999px;
   background: transparent;
@@ -185,8 +185,14 @@
   align-items: center;
   justify-content: space-between;
   gap: 16px;
+  margin-bottom: 10px;
 }
-
+.header-title {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  width: 40%;
+}
 .dashboard-header h1 {
   margin: 0;
   font-size: 24px;
@@ -207,7 +213,11 @@
   flex-wrap: wrap;
   justify-content: flex-end;
 }
-
+.action-buttons {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
 .date-filter,
 .search-box {
   height: 42px;
@@ -218,6 +228,7 @@
   align-items: center;
   gap: 9px;
   color: #334155;
+  margin-left: 8px;
   box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
 }
 

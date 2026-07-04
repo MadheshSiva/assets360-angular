@@ -45,7 +45,26 @@ export class Administration {
     { label: 'Workflows', path: '/administration/configuration/workflows' },
     { label: 'WIP', path: '/administration/configuration/wip' },
     { label: 'Master Management', path: '/administration/configuration/master-management' },
-    
+
+  ];
+
+  assetsOptions: BreadcrumbOption[] = [
+    { label: 'Asset Registry', path: '/administration/configuration/assets/asset-registry' },
+    { label: 'Location History', path: '/administration/configuration/assets/location-history' },
+    { label: 'Assignment / Ownership', path: '/administration/configuration/assets/assignment-ownership' },
+    { label: 'Asset Lifecycle', path: '/administration/configuration/assets/asset-lifecycle' },
+    { label: 'Tracking & Telemetry', path: '/administration/configuration/assets/tracking-telemetry' },
+    { label: 'Maintenance & Service', path: '/administration/configuration/assets/maintenance-service' },
+    { label: 'Utilization & Performance', path: '/administration/configuration/assets/utilization-performance' },
+    { label: 'Financial', path: '/administration/configuration/assets/financial' },
+    { label: 'Document & Attachment', path: '/administration/configuration/assets/document-attachment' },
+    { label: 'Warranty & Contract', path: '/administration/configuration/assets/warranty-contract' },
+    { label: 'Alert & Incident', path: '/administration/configuration/assets/alert-incident' },
+    { label: 'Audit & Verification', path: '/administration/configuration/assets/audit-verification' },
+    { label: 'Activity / Audit Trail', path: '/administration/configuration/assets/activity-audit-trail' },
+    { label: 'Custom / Domain-specific Asset Type Fields', path: '/administration/configuration/assets/custom-domain-fields' },
+    { label: 'Integration', path: '/administration/configuration/assets/integration' },
+    { label: 'Compliance & Certification', path: '/administration/configuration/assets/compliance-certification' }
   ];
 
   // Maps URL slug -> breadcrumb label, used when building the trail
@@ -63,6 +82,7 @@ export class Administration {
 
   // Maps URL slug -> breadcrumb label for pages nested under Assets
   private assetsSlugLabelMap: Record<string, string> = {
+    'asset-registry': 'Asset Registry',
     'location-history': 'Location History',
     'assignment-ownership': 'Assignment / Ownership',
     'asset-lifecycle': 'Asset Lifecycle',
@@ -71,7 +91,13 @@ export class Administration {
     'utilization-performance': 'Utilization & Performance',
     'financial': 'Financial',
     'document-attachment': 'Document & Attachment',
-    'warranty-contract': 'Warranty & Contract'
+    'warranty-contract': 'Warranty & Contract',
+    'alert-incident': 'Alert & Incident',
+    'audit-verification': 'Audit & Verification',
+    'activity-audit-trail': 'Activity / Audit Trail',
+    'custom-domain-fields': 'Custom / Domain-specific Asset Type Fields',
+    'integration': 'Integration',
+    'compliance-certification': 'Compliance & Certification'
   };
 
   constructor(private router: Router) {
@@ -97,6 +123,7 @@ export class Administration {
     this.dropdownOptions.set('Administration', this.adminOptions);
     this.dropdownOptions.set('User Management', this.userMgmtOptions);
     this.dropdownOptions.set('Configuration', this.configOptions);
+    this.dropdownOptions.set('Assets', this.assetsOptions);
 
     const userMgmtIdx = segments.indexOf('user-management');
     const configIdx = segments.indexOf('configuration');
