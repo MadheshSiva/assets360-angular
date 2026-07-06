@@ -67,11 +67,27 @@ export class Administration {
     { label: 'Compliance & Certification', path: '/administration/configuration/assets/compliance-certification' }
   ];
 
+  maintenanceOptions: BreadcrumbOption[] = [
+    { label: 'Work Order', path: '/administration/configuration/maintenance/work-order' },
+    { label: 'Maintenance Task', path: '/administration/configuration/maintenance/maintenance-task' },
+    { label: 'Preventive Maintenance', path: '/administration/configuration/maintenance/preventive-maintenance' },
+    { label: 'Predictive Maintenance', path: '/administration/configuration/maintenance/predictive-maintenance' },
+    { label: 'Breakdown / Issue Reporting', path: '/administration/configuration/maintenance/breakdown-issue-reporting' },
+    { label: 'Spare Parts', path: '/administration/configuration/maintenance/spare-parts' },
+    { label: 'Technician', path: '/administration/configuration/maintenance/technician' },
+    { label: 'Vendor / AMC', path: '/administration/configuration/maintenance/vendor-amc' },
+    { label: 'Cost Tracking', path: '/administration/configuration/maintenance/cost-tracking' },
+    { label: 'Downtime Tracking', path: '/administration/configuration/maintenance/downtime-tracking' },
+    { label: 'Performance', path: '/administration/configuration/maintenance/performance' },
+    { label: 'Compliance & Inspection', path: '/administration/configuration/maintenance/compliance-inspection' }
+  ];
+
   // Maps URL slug -> breadcrumb label, used when building the trail
   private configSlugLabelMap: Record<string, string> = {
     'projects': 'Projects',
     'devices': 'Devices',
     'assets': 'Assets',
+    'maintenance': 'Maintenance',
     'people': 'People',
     'attendance': 'Attendance',
     'access-control': 'Access Control',
@@ -100,6 +116,22 @@ export class Administration {
     'compliance-certification': 'Compliance & Certification'
   };
 
+  // Maps URL slug -> breadcrumb label for pages nested under Maintenance
+  private maintenanceSlugLabelMap: Record<string, string> = {
+    'work-order': 'Work Order',
+    'maintenance-task': 'Maintenance Task',
+    'preventive-maintenance': 'Preventive Maintenance',
+    'predictive-maintenance': 'Predictive Maintenance',
+    'breakdown-issue-reporting': 'Breakdown / Issue Reporting',
+    'spare-parts': 'Spare Parts',
+    'technician': 'Technician',
+    'vendor-amc': 'Vendor / AMC',
+    'cost-tracking': 'Cost Tracking',
+    'downtime-tracking': 'Downtime Tracking',
+    'performance': 'Performance',
+    'compliance-inspection': 'Compliance & Inspection'
+  };
+
   constructor(private router: Router) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -124,6 +156,7 @@ export class Administration {
     this.dropdownOptions.set('User Management', this.userMgmtOptions);
     this.dropdownOptions.set('Configuration', this.configOptions);
     this.dropdownOptions.set('Assets', this.assetsOptions);
+    this.dropdownOptions.set('Maintenance', this.maintenanceOptions);
 
     const userMgmtIdx = segments.indexOf('user-management');
     const configIdx = segments.indexOf('configuration');
@@ -136,12 +169,16 @@ export class Administration {
       if (childSlug) {
         const childLabel = this.configSlugLabelMap[childSlug];
         if (childLabel) {
-          const grandchildSlug = childSlug === 'assets' ? segments[configIdx + 2] : undefined;
-          const grandchildLabel = grandchildSlug ? this.assetsSlugLabelMap[grandchildSlug] : undefined;
+          const grandchildSlugMap: Record<string, Record<string, string>> = {
+            'assets': this.assetsSlugLabelMap,
+            'maintenance': this.maintenanceSlugLabelMap
+          };
+          const grandchildSlug = grandchildSlugMap[childSlug] ? segments[configIdx + 2] : undefined;
+          const grandchildLabel = grandchildSlug ? grandchildSlugMap[childSlug][grandchildSlug] : undefined;
 
           this.breadcrumbItems.push({
             label: childLabel,
-            path: grandchildLabel ? '/administration/configuration/assets' : null
+            path: grandchildLabel ? `/administration/configuration/${childSlug}` : null
           });
 
           if (grandchildLabel) {

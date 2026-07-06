@@ -74,7 +74,25 @@ export class Sidebar {
                 { label: 'Compliance & Certification', path: '/administration/configuration/assets/compliance-certification', icon: '' }
               ]
             },
-            { label: 'Maintenance', path: '/administration/configuration/maintenance', icon: '' },
+            {
+              label: 'Maintenance',
+              path: '/administration/configuration/maintenance',
+              icon: '',
+              children: [
+                { label: 'Work Order', path: '/administration/configuration/maintenance/work-order', icon: '' },
+                { label: 'Maintenance Task', path: '/administration/configuration/maintenance/maintenance-task', icon: '' },
+                { label: 'Preventive Maintenance', path: '/administration/configuration/maintenance/preventive-maintenance', icon: '' },
+                { label: 'Predictive Maintenance', path: '/administration/configuration/maintenance/predictive-maintenance', icon: '' },
+                { label: 'Breakdown / Issue Reporting', path: '/administration/configuration/maintenance/breakdown-issue-reporting', icon: '' },
+                { label: 'Spare Parts', path: '/administration/configuration/maintenance/spare-parts', icon: '' },
+                { label: 'Technician', path: '/administration/configuration/maintenance/technician', icon: '' },
+                { label: 'Vendor / AMC', path: '/administration/configuration/maintenance/vendor-amc', icon: '' },
+                { label: 'Cost Tracking', path: '/administration/configuration/maintenance/cost-tracking', icon: '' },
+                { label: 'Downtime Tracking', path: '/administration/configuration/maintenance/downtime-tracking', icon: '' },
+                { label: 'Performance', path: '/administration/configuration/maintenance/performance', icon: '' },
+                { label: 'Compliance & Inspection', path: '/administration/configuration/maintenance/compliance-inspection', icon: '' }
+              ]
+            },
             { label: 'Workflows', path: '/administration/configuration/workflows', icon: '' },
             { label: 'WIP', path: '/administration/configuration/wip', icon: '' },
             { label: 'Master Management', path: '/administration/configuration/master-management', icon: '' }

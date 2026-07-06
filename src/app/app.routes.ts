@@ -35,6 +35,18 @@ import { AssetActivityAuditTrail } from './components/pages/administration/confi
 import { AssetCustomDomainFields } from './components/pages/administration/configuration/assets/custom-domain-fields/custom-domain-fields';
 import { AssetIntegration } from './components/pages/administration/configuration/assets/integration/integration';
 import { AssetComplianceCertification } from './components/pages/administration/configuration/assets/compliance-certification/compliance-certification';
+import { MaintenanceWorkOrder } from './components/pages/administration/configuration/maintenance/work-order/work-order';
+import { MaintenanceTask } from './components/pages/administration/configuration/maintenance/maintenance-task/maintenance-task';
+import { MaintenancePreventive } from './components/pages/administration/configuration/maintenance/preventive-maintenance/preventive-maintenance';
+import { MaintenancePredictive } from './components/pages/administration/configuration/maintenance/predictive-maintenance/predictive-maintenance';
+import { MaintenanceBreakdownIssueReporting } from './components/pages/administration/configuration/maintenance/breakdown-issue-reporting/breakdown-issue-reporting';
+import { MaintenanceSpareParts } from './components/pages/administration/configuration/maintenance/spare-parts/spare-parts';
+import { MaintenanceTechnician } from './components/pages/administration/configuration/maintenance/technician/technician';
+import { MaintenanceVendorAmc } from './components/pages/administration/configuration/maintenance/vendor-amc/vendor-amc';
+import { MaintenanceCostTracking } from './components/pages/administration/configuration/maintenance/cost-tracking/cost-tracking';
+import { MaintenanceDowntimeTracking } from './components/pages/administration/configuration/maintenance/downtime-tracking/downtime-tracking';
+import { MaintenancePerformance } from './components/pages/administration/configuration/maintenance/performance/performance';
+import { MaintenanceComplianceInspection } from './components/pages/administration/configuration/maintenance/compliance-inspection/compliance-inspection';
 import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
 import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
 
@@ -83,7 +95,20 @@ export const routes: Routes = [
               { path: 'assets/activity-audit-trail', component: AssetActivityAuditTrail },
               { path: 'assets/custom-domain-fields', component: AssetCustomDomainFields },
               { path: 'assets/integration', component: AssetIntegration },
-              { path: 'assets/compliance-certification', component: AssetComplianceCertification }
+              { path: 'assets/compliance-certification', component: AssetComplianceCertification },
+              { path: 'maintenance', redirectTo: 'maintenance/work-order', pathMatch: 'full' },
+              { path: 'maintenance/work-order', component: MaintenanceWorkOrder },
+              { path: 'maintenance/maintenance-task', component: MaintenanceTask },
+              { path: 'maintenance/preventive-maintenance', component: MaintenancePreventive },
+              { path: 'maintenance/predictive-maintenance', component: MaintenancePredictive },
+              { path: 'maintenance/breakdown-issue-reporting', component: MaintenanceBreakdownIssueReporting },
+              { path: 'maintenance/spare-parts', component: MaintenanceSpareParts },
+              { path: 'maintenance/technician', component: MaintenanceTechnician },
+              { path: 'maintenance/vendor-amc', component: MaintenanceVendorAmc },
+              { path: 'maintenance/cost-tracking', component: MaintenanceCostTracking },
+              { path: 'maintenance/downtime-tracking', component: MaintenanceDowntimeTracking },
+              { path: 'maintenance/performance', component: MaintenancePerformance },
+              { path: 'maintenance/compliance-inspection', component: MaintenanceComplianceInspection }
             ]
           },
           { path: 'license', component: License },
