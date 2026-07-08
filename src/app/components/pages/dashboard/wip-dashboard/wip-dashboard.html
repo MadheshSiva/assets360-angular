@@ -20,7 +20,7 @@
   <div class="wip-stat-grid">
     <article class="wip-stat-card" *ngFor="let card of wipStatCards">
       <div class="wip-stat-top">
-        <div class="wip-stat-icon-wrap">
+        <div class="wip-stat-icon-wrap" [ngClass]="getIconClass(card.icon)">
           <!-- Total Jobs icon -->
           <svg *ngIf="card.icon === 'jobs'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
             <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
@@ -51,7 +51,7 @@
             <line x1="3" y1="10" x2="21" y2="10"/>
           </svg>
         </div>
-        <span class="wip-stat-label" [class.sla-label]="card.icon === 'sla'">{{ card.label }}</span>
+        <span class="wip-stat-label">{{ card.label }}</span>
         <button class="wip-more-btn" type="button" aria-label="More options">
           <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
             <circle cx="5" cy="12" r="2"/><circle cx="12" cy="12" r="2"/><circle cx="19" cy="12" r="2"/>

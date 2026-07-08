@@ -2,6 +2,8 @@ import { Component, ElementRef, HostListener, Output, EventEmitter } from '@angu
 import { CommonModule } from '@angular/common';
 import { Router, NavigationEnd, RouterModule } from '@angular/router';
 import { filter } from 'rxjs';
+import { AuthService } from '../../service/auth/auth.service';
+import { environment } from '../../../../environments/environment';
 
 interface BreadcrumbItem {
   label: string;
@@ -21,10 +23,14 @@ export class Topbar {
   isDropdownOpen = false;
   flyoutPosition: { top: number; left: number } | null = null;
 
-  constructor(private router: Router, private elementRef: ElementRef) {
+  constructor(private router: Router, private elementRef: ElementRef, private auth: AuthService) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
       .subscribe(() => this.updateBreadcrumbs());
+  }
+
+  get displayEmail(): string {
+    return this.auth.getUserEmail() || environment.supportEmail;
   }
 
   toggleMenu(): void {

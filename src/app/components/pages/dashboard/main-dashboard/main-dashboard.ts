@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { MapComponent, MapPin } from '../../../shared/map/map';
 
 interface StatCard {
   label: string;
@@ -74,12 +75,19 @@ interface DashboardData {
 @Component({
   standalone: true,
   selector: 'app-main-dashboard',
-  imports: [CommonModule],
+  imports: [CommonModule, MapComponent],
   templateUrl: './main-dashboard.html',
   styleUrls: ['./main-dashboard.css'],
 })
 export class MainDashboard implements OnInit {
   statCards: StatCard[] = [];
+  mapPins: MapPin[] = [
+    { lat: 40.7168, lng: -74.001, color: '#22c55e', label: 'Forklift FL-07' },
+    { lat: 40.7118, lng: -74.012, color: '#2563eb', label: 'Generator GEN-12' },
+    { lat: 40.7098, lng: -73.998, color: '#f97316', label: 'HVAC System' },
+    { lat: 40.7138, lng: -74.008, color: '#7c3aed', label: 'Compressor AC-04' },
+    { lat: 40.7078, lng: -74.005, color: '#ef4444', label: 'Server SRV-09' },
+  ];
   assetStatusDonut: DashboardData['assetStatusDonut'] = { total: '', totalLabel: '', legend: [] };
   assetsByTypeDonut: DashboardData['assetsByTypeDonut'] = { total: '', totalLabel: '', legend: [] };
   recentAlerts: AlertItem[] = [];
@@ -113,9 +121,9 @@ export class MainDashboard implements OnInit {
     this.cd.detectChanges(); 
   }
 
-  getStatCardClass(index: number): string {
-    const classes = ['blue-card', 'green-card', 'purple-card', 'orange-card', 'red-card'];
-    return classes[index] || '';
+  getStatIconClass(index: number): string {
+    const classes = ['icon-purple', 'icon-green', 'icon-orange', 'icon-red', 'icon-blue'];
+    return classes[index] || 'icon-blue';
   }
 
   getAlertBgClass(severity: string): string {

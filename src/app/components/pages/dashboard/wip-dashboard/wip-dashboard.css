@@ -95,24 +95,25 @@
 .wip-stat-icon-wrap {
   width: 36px;
   height: 36px;
-  border-radius: 8px;
-  background: #f3eafb;
+  border-radius: 999px;
   display: grid;
   place-items: center;
-  color: #7030a0;
+  color: #fff;
   flex: 0 0 auto;
 }
+
+.wip-stat-icon-wrap.icon-purple { background: #7c3aed; }
+.wip-stat-icon-wrap.icon-blue   { background: #2563eb; }
+.wip-stat-icon-wrap.icon-green  { background: #22c55e; }
+.wip-stat-icon-wrap.icon-red    { background: #ef4444; }
+.wip-stat-icon-wrap.icon-orange { background: #f97316; }
 
 .wip-stat-label {
   flex: 1;
   font-size: 13px;
   font-weight: 700;
-  color: #7030a0;
+  color: #0f172a;
   line-height: 1.2;
-}
-
-.wip-stat-label.sla-label {
-  color: #e6880a;
 }
 
 .wip-more-btn {
@@ -543,7 +544,7 @@
 /* Responsive */
 @media (max-width: 1300px) {
   .wip-stat-grid {
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: repeat(4, 1fr);
   }
   .wip-mid-grid {
     grid-template-columns: 1fr 1fr;

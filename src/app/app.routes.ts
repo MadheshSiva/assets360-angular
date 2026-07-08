@@ -49,6 +49,22 @@ import { MaintenancePerformance } from './components/pages/administration/config
 import { MaintenanceComplianceInspection } from './components/pages/administration/configuration/maintenance/compliance-inspection/compliance-inspection';
 import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
 import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
+import { WipJobMaster } from './components/pages/administration/configuration/wip/job-master/job-master';
+import { WipStatusMaster } from './components/pages/administration/configuration/wip/status-master/status-master';
+import { WipResourceMaster } from './components/pages/administration/configuration/wip/resource-master/resource-master';
+import { WipTaskMaster } from './components/pages/administration/configuration/wip/task-master/task-master';
+import { WipChecklistMaster } from './components/pages/administration/configuration/wip/checklist-master/checklist-master';
+import { WipChecklistItems } from './components/pages/administration/configuration/wip/checklist-items/checklist-items';
+import { WipLocationMaster } from './components/pages/administration/configuration/wip/location-master/location-master';
+import { WipAssetLinking } from './components/pages/administration/configuration/wip/asset-linking/asset-linking';
+import { WipSlaMaster } from './components/pages/administration/configuration/wip/sla-master/sla-master';
+import { WipIssueDelay } from './components/pages/administration/configuration/wip/issue-delay/issue-delay';
+import { WipMaterialConsumption } from './components/pages/administration/configuration/wip/material-consumption/material-consumption';
+import { WipPermitCompliance } from './components/pages/administration/configuration/wip/permit-compliance/permit-compliance';
+import { WipProgressLog } from './components/pages/administration/configuration/wip/progress-log/progress-log';
+import { WipAlerts } from './components/pages/administration/configuration/wip/alerts/alerts';
+import { WipKpiConfig } from './components/pages/administration/configuration/wip/kpi-config/kpi-config';
+import { WipRoleAccess } from './components/pages/administration/configuration/wip/role-access/role-access';
 
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
@@ -108,7 +124,24 @@ export const routes: Routes = [
               { path: 'maintenance/cost-tracking', component: MaintenanceCostTracking },
               { path: 'maintenance/downtime-tracking', component: MaintenanceDowntimeTracking },
               { path: 'maintenance/performance', component: MaintenancePerformance },
-              { path: 'maintenance/compliance-inspection', component: MaintenanceComplianceInspection }
+              { path: 'maintenance/compliance-inspection', component: MaintenanceComplianceInspection },
+              { path: 'wip', redirectTo: 'wip/job-master', pathMatch: 'full' },
+              { path: 'wip/job-master', component: WipJobMaster },
+              { path: 'wip/status-master', component: WipStatusMaster },
+              { path: 'wip/resource-master', component: WipResourceMaster },
+              { path: 'wip/task-master', component: WipTaskMaster },
+              { path: 'wip/checklist-master', component: WipChecklistMaster },
+              { path: 'wip/checklist-items', component: WipChecklistItems },
+              { path: 'wip/location-master', component: WipLocationMaster },
+              { path: 'wip/asset-linking', component: WipAssetLinking },
+              { path: 'wip/sla-master', component: WipSlaMaster },
+              { path: 'wip/issue-delay', component: WipIssueDelay },
+              { path: 'wip/material-consumption', component: WipMaterialConsumption },
+              { path: 'wip/permit-compliance', component: WipPermitCompliance },
+              { path: 'wip/progress-log', component: WipProgressLog },
+              { path: 'wip/alerts', component: WipAlerts },
+              { path: 'wip/kpi-config', component: WipKpiConfig },
+              { path: 'wip/role-access', component: WipRoleAccess }
             ]
           },
           { path: 'license', component: License },

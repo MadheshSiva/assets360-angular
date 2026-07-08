@@ -67,3 +67,8 @@
     height: 320px;
   }
 }
+
+::ng-deep .colored-pin-icon {
+  background: transparent !important;
+  border: none !important;
+}

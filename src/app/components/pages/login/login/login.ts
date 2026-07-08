@@ -62,6 +62,7 @@ export class Login {
     if (typeof window !== 'undefined') {
       localStorage.setItem('token', fakeToken);
     }
+    this.auth.setUserEmail(this.credentials.email);
     this.isLoading = false;
     this.router.navigate(['/dashboard']);
   }

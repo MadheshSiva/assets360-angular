@@ -40,6 +40,7 @@ export class AuthService {
   logout(): void {
     if (typeof window !== 'undefined') {
       localStorage.removeItem('token');
+      localStorage.removeItem('userEmail');
     }
     this.router.navigate(['/login']);
   }
@@ -50,5 +51,15 @@ export class AuthService {
 
   getToken(): string | null {
     return typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+  }
+
+  setUserEmail(email: string): void {
+    if (typeof window !== 'undefined' && email) {
+      localStorage.setItem('userEmail', email);
+    }
+  }
+
+  getUserEmail(): string | null {
+    return typeof window !== 'undefined' ? localStorage.getItem('userEmail') : null;
   }
 }

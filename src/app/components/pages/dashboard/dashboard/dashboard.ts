@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MainDashboard } from '../main-dashboard/main-dashboard';
 import { WipDashboard } from '../wip-dashboard/wip-dashboard';
+import { MapComponent, MapPin } from '../../../shared/map/map';
 
 interface AssetsStatCard {
   label: string;
@@ -71,7 +72,7 @@ interface AssetsData {
 @Component({
   standalone: true,
   selector: 'app-dashboard',
-  imports: [CommonModule, FormsModule, MainDashboard, WipDashboard],
+  imports: [CommonModule, FormsModule, MainDashboard, WipDashboard, MapComponent],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
 })
@@ -79,6 +80,12 @@ export class Dashboard implements OnInit {
   // ===== Tabs =====
   activeTab: ActiveTab = 'dashboard';
   cardPopup: CardPopup | null = null;
+  mapPins: MapPin[] = [
+    { lat: 40.7168, lng: -74.001, color: '#2563eb', label: 'WO-2456 · Air Compressor AC-04' },
+    { lat: 40.7118, lng: -74.012, color: '#f97316', label: 'WO-2455 · HVAC System' },
+    { lat: 40.7098, lng: -73.998, color: '#22c55e', label: 'WO-2454 · Generator GEN-12' },
+    { lat: 40.7138, lng: -74.008, color: '#ef4444', label: 'WO-2452 · Forklift FL-07' },
+  ];
 
   switchTab(tab: ActiveTab): void {
     this.activeTab = tab;

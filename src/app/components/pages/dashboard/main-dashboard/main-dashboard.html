@@ -23,8 +23,8 @@
            </header>
            <div class="content-container">
              <div class="stat-grid">
-                <div *ngFor="let card of statCards; let i = index" class="stat-card" [ngClass]="getStatCardClass(i)" role="button" tabindex="0" (click)="onStatCardClick(card, i)" (keydown.enter)="onStatCardClick(card, i)">
-                    <div class="stat-card-icon">
+                <div *ngFor="let card of statCards; let i = index" class="stat-card" role="button" tabindex="0" (click)="onStatCardClick(card, i)" (keydown.enter)="onStatCardClick(card, i)">
+                    <div class="stat-card-icon" [ngClass]="getStatIconClass(i)">
                         <ng-container [ngSwitch]="i">
                             <svg *ngSwitchCase="0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
@@ -64,8 +64,20 @@
             </div>
            </div>
             <!-- ROW 1: STAT CARDS -->
-            
+
             <!-- END STAT CARDS -->
+
+            <!-- ROW 1B: ASSET MAP (commented out per request)
+            <div class="panel map-panel-wrap">
+                <div class="panel-header">
+                    <h2>Assets on Map</h2>
+                </div>
+                <div class="map-panel-body">
+                    <app-map [pins]="mapPins"></app-map>
+                </div>
+                <a href="#" class="panel-link">View all locations <span>›</span></a>
+            </div>
+            END ASSET MAP -->
 
             <!-- ROW 2: Asset Status Donut + Assets by Type Donut + Recent Alerts -->
             <div class="row2-grid">

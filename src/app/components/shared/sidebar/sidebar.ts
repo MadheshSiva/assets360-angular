@@ -94,7 +94,29 @@ export class Sidebar {
               ]
             },
             { label: 'Workflows', path: '/administration/configuration/workflows', icon: '' },
-            { label: 'WIP', path: '/administration/configuration/wip', icon: '' },
+            {
+              label: 'WIP',
+              path: '/administration/configuration/wip',
+              icon: '',
+              children: [
+                { label: 'Job Master', path: '/administration/configuration/wip/job-master', icon: '' },
+                { label: 'Status Master', path: '/administration/configuration/wip/status-master', icon: '' },
+                { label: 'Resource Master', path: '/administration/configuration/wip/resource-master', icon: '' },
+                { label: 'Task Master', path: '/administration/configuration/wip/task-master', icon: '' },
+                { label: 'Checklist Master', path: '/administration/configuration/wip/checklist-master', icon: '' },
+                { label: 'Checklist Items', path: '/administration/configuration/wip/checklist-items', icon: '' },
+                { label: 'Location Master', path: '/administration/configuration/wip/location-master', icon: '' },
+                { label: 'Asset Linking', path: '/administration/configuration/wip/asset-linking', icon: '' },
+                { label: 'SLA Master', path: '/administration/configuration/wip/sla-master', icon: '' },
+                { label: 'Issue / Delay', path: '/administration/configuration/wip/issue-delay', icon: '' },
+                { label: 'Material Consumption', path: '/administration/configuration/wip/material-consumption', icon: '' },
+                { label: 'Permit / Compliance', path: '/administration/configuration/wip/permit-compliance', icon: '' },
+                { label: 'Progress Log', path: '/administration/configuration/wip/progress-log', icon: '' },
+                { label: 'Alerts', path: '/administration/configuration/wip/alerts', icon: '' },
+                { label: 'KPI Config', path: '/administration/configuration/wip/kpi-config', icon: '' },
+                { label: 'Role & Access', path: '/administration/configuration/wip/role-access', icon: '' }
+              ]
+            },
             { label: 'Master Management', path: '/administration/configuration/master-management', icon: '' }
           ]
         },

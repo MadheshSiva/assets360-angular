@@ -82,12 +82,32 @@ export class Administration {
     { label: 'Compliance & Inspection', path: '/administration/configuration/maintenance/compliance-inspection' }
   ];
 
+  wipOptions: BreadcrumbOption[] = [
+    { label: 'Job Master', path: '/administration/configuration/wip/job-master' },
+    { label: 'Status Master', path: '/administration/configuration/wip/status-master' },
+    { label: 'Resource Master', path: '/administration/configuration/wip/resource-master' },
+    { label: 'Task Master', path: '/administration/configuration/wip/task-master' },
+    { label: 'Checklist Master', path: '/administration/configuration/wip/checklist-master' },
+    { label: 'Checklist Items', path: '/administration/configuration/wip/checklist-items' },
+    { label: 'Location Master', path: '/administration/configuration/wip/location-master' },
+    { label: 'Asset Linking', path: '/administration/configuration/wip/asset-linking' },
+    { label: 'SLA Master', path: '/administration/configuration/wip/sla-master' },
+    { label: 'Issue / Delay', path: '/administration/configuration/wip/issue-delay' },
+    { label: 'Material Consumption', path: '/administration/configuration/wip/material-consumption' },
+    { label: 'Permit / Compliance', path: '/administration/configuration/wip/permit-compliance' },
+    { label: 'Progress Log', path: '/administration/configuration/wip/progress-log' },
+    { label: 'Alerts', path: '/administration/configuration/wip/alerts' },
+    { label: 'KPI Config', path: '/administration/configuration/wip/kpi-config' },
+    { label: 'Role & Access', path: '/administration/configuration/wip/role-access' }
+  ];
+
   // Maps URL slug -> breadcrumb label, used when building the trail
   private configSlugLabelMap: Record<string, string> = {
     'projects': 'Projects',
     'devices': 'Devices',
     'assets': 'Assets',
     'maintenance': 'Maintenance',
+    'wip': 'WIP',
     'people': 'People',
     'attendance': 'Attendance',
     'access-control': 'Access Control',
@@ -132,6 +152,26 @@ export class Administration {
     'compliance-inspection': 'Compliance & Inspection'
   };
 
+  // Maps URL slug -> breadcrumb label for pages nested under WIP
+  private wipSlugLabelMap: Record<string, string> = {
+    'job-master': 'Job Master',
+    'status-master': 'Status Master',
+    'resource-master': 'Resource Master',
+    'task-master': 'Task Master',
+    'checklist-master': 'Checklist Master',
+    'checklist-items': 'Checklist Items',
+    'location-master': 'Location Master',
+    'asset-linking': 'Asset Linking',
+    'sla-master': 'SLA Master',
+    'issue-delay': 'Issue / Delay',
+    'material-consumption': 'Material Consumption',
+    'permit-compliance': 'Permit / Compliance',
+    'progress-log': 'Progress Log',
+    'alerts': 'Alerts',
+    'kpi-config': 'KPI Config',
+    'role-access': 'Role & Access'
+  };
+
   constructor(private router: Router) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -157,6 +197,7 @@ export class Administration {
     this.dropdownOptions.set('Configuration', this.configOptions);
     this.dropdownOptions.set('Assets', this.assetsOptions);
     this.dropdownOptions.set('Maintenance', this.maintenanceOptions);
+    this.dropdownOptions.set('WIP', this.wipOptions);
 
     const userMgmtIdx = segments.indexOf('user-management');
     const configIdx = segments.indexOf('configuration');
@@ -171,7 +212,8 @@ export class Administration {
         if (childLabel) {
           const grandchildSlugMap: Record<string, Record<string, string>> = {
             'assets': this.assetsSlugLabelMap,
-            'maintenance': this.maintenanceSlugLabelMap
+            'maintenance': this.maintenanceSlugLabelMap,
+            'wip': this.wipSlugLabelMap
           };
           const grandchildSlug = grandchildSlugMap[childSlug] ? segments[configIdx + 2] : undefined;
           const grandchildLabel = grandchildSlug ? grandchildSlugMap[childSlug][grandchildSlug] : undefined;

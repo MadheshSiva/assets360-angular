@@ -22,6 +22,13 @@ export interface MapLocation {
   children?: MapLocation[];
 }
 
+export interface MapPin {
+  lat: number;
+  lng: number;
+  color?: string;
+  label?: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-map',
@@ -31,6 +38,7 @@ export interface MapLocation {
 })
 export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() locations: MapLocation[] = [];
+  @Input() pins: MapPin[] = [];
 
   @Output() locationClick = new EventEmitter<MapLocation>();
 
@@ -49,7 +57,8 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   async ngAfterViewInit(): Promise<void> {
-    if (!this.isBrowser || !this.mapEl || this.locations.length === 0) return;
+    if (!this.isBrowser || !this.mapEl) return;
+    if (this.locations.length === 0 && this.pins.length === 0) return;
     await this.initializeMap();
   }
 
@@ -65,9 +74,37 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   private async initializeMap(): Promise<void> {
-    if (!this.mapEl || this.locations.length === 0) return;
+    if (!this.mapEl || (this.locations.length === 0 && this.pins.length === 0)) return;
     this.L = await loadLeaflet();
     const L = this.L;
+
+    if (this.pins.length > 0) {
+      this.map = L.map(this.mapEl.nativeElement, {
+        zoomControl: false,
+        attributionControl: true,
+      });
+      L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        maxZoom: 19,
+        attribution: '© OpenStreetMap contributors',
+      }).addTo(this.map);
+
+      this.pins.forEach((pin) => {
+        const pinIcon = L.divIcon({
+          className: 'colored-pin-icon',
+          html: this.buildPinSvg(pin.color || '#2563eb'),
+          iconSize: [28, 34],
+          iconAnchor: [14, 34],
+        });
+        L.marker([pin.lat, pin.lng], { icon: pinIcon }).addTo(this.map);
+      });
+
+      const bounds = L.latLngBounds(this.pins.map((pin) => [pin.lat, pin.lng]));
+      this.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+
+      setTimeout(() => this.map?.invalidateSize(), 100);
+      setTimeout(() => this.map?.invalidateSize(), 400);
+      return;
+    }
 
     const icon = L.icon({
       iconUrl: 'https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png',
@@ -95,6 +132,13 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     setTimeout(() => this.map?.invalidateSize(), 100);
     setTimeout(() => this.map?.invalidateSize(), 400);
+  }
+
+  private buildPinSvg(color: string): string {
+    return `<svg width="28" height="34" viewBox="0 0 24 30" xmlns="http://www.w3.org/2000/svg">
+      <path fill="${color}" stroke="white" stroke-width="1" d="M12 0C5.9 0 1 4.9 1 11c0 8.25 11 18 11 18s11-9.75 11-18c0-6.1-4.9-11-11-11z"/>
+      <circle cx="12" cy="11" r="4.2" fill="white"/>
+    </svg>`;
   }
 
   private updateInitialLocation(): void {

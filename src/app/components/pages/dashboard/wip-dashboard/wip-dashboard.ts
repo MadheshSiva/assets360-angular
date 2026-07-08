@@ -80,6 +80,18 @@ export class WipDashboard {
 
   wipTotalJobs = 182;
 
+  private readonly iconClassMap: Record<string, string> = {
+    jobs: 'icon-purple',
+    progress: 'icon-blue',
+    completed: 'icon-green',
+    sla: 'icon-red',
+    planned: 'icon-orange',
+  };
+
+  getIconClass(icon: string): string {
+    return this.iconClassMap[icon] || 'icon-purple';
+  }
+
   wipStatusDistribution: WipStatusDistribution[] = [
     { label: 'In Progress', percent: 35, color: '#e391c9' },
     { label: 'Planned',     percent: 20, color: '#7030a0' },
