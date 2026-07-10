@@ -1,6 +1,6 @@
 .events-page {
    min-height: 100%;
-   padding: 24px;
+   
    box-sizing: border-box;
    background: #f5f6fa;
    font-family: 'Red Hat Display', sans-serif;
@@ -9,7 +9,7 @@
 /* ── CARD ── */
 .events-card {
   background: #ffffff;
-  border: 1px solid #e5e7eb;
+  border: var(--piq-card-border);
   border-radius: 18px;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.05);
   overflow: hidden;

@@ -4,6 +4,7 @@
   --piq-sidebar-width: 230px;
   --piq-sidebar-collapsed-width: 72px;
   --piq-font: 'Red Hat Display', sans-serif;
+  --piq-card-border: 1px solid #d4d6da;
 }
 
 * {
@@ -14,5 +15,4 @@ html,
 body {
   margin: 0;
   min-width: 0;
-  overflow-x: hidden;
 }

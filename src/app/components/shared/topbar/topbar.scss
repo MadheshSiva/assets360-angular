@@ -1,7 +1,7 @@
 @use '../../../../styles/theme' as *;
 
 :host {
-  display: block;
+  display: contents;
 }
 
 @keyframes fadeIn {
@@ -16,7 +16,7 @@
 }
 
 .topbar-shell {
-  height: 72px;
+  height: 52px;
   display: flex;
   align-items: center;
   gap: 14px;
@@ -25,8 +25,9 @@
   border-bottom: 1px solid #e5edf6;
   position: sticky;
   top: 0;
+  border-radius: 999px;
   // Keep the topbar below the sidebar's collapse button (which is z-index 9999)
-  z-index: 50;
+  z-index: 1500;
 }
 
 .menu-toggle,

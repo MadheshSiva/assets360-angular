@@ -20,7 +20,8 @@ body {
 
 .card {
   padding: 20px;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08); /* soft shadow instead of border */
+  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: var(--piq-card-border);
 }
 
 .dashboard-grid {
@@ -73,7 +74,7 @@ body, .dashboard-wrapper {
   align-items: center;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: 16px;
+  margin-bottom: 5px;
 }
 
 .assets-header h1 {
@@ -255,10 +256,10 @@ body, .dashboard-wrapper {
    =================================================== */
 .main-content {
   flex: 1;
-  padding: 20px;
+  
   display: flex;
   width: 100%;
-  padding: 20px;
+  
   flex-direction: column;
   gap: 16px;
 }
@@ -270,6 +271,7 @@ body, .dashboard-wrapper {
   background: white;
   border-radius: 12px;
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
+  border: var(--piq-card-border);
 }
 
 .panel-header {
@@ -304,9 +306,10 @@ body, .dashboard-wrapper {
   background: #ffffff;              /* white card */
   border-radius: 12px;              /* rounded corners */
   box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-  padding: 16px;   
-  border: 1px solid #f1f1f1; 
-  cursor: pointer;      
+  padding: 16px;
+  border: var(--piq-card-border);
+  cursor: pointer;
+      
 }
 .panel:hover,
 .stat-card:hover {
@@ -363,6 +366,23 @@ body, .dashboard-wrapper {
    display: grid;
   grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
   gap: 16px;
+}
+
+/* Alerts (65%) + Top Active Assets (35%) side by side */
+.alerts-row {
+  display: flex;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.alerts-row .alerts-panel {
+  flex: 0 0 65%;
+  max-width: 65%;
+}
+
+.alerts-row .top-active-panel {
+  flex: 1 1 35%;
+  min-width: 0;
 }
 
 /* Donut panels */
@@ -643,7 +663,6 @@ body, .dashboard-wrapper {
    =================================================== */
 @media (max-width: 1400px) {
   .row2-grid { grid-template-columns: 1fr 1fr; }
-  .row2-grid .alerts-panel { grid-column: span 2; }
 }
 
 @media (max-width: 1200px) {
@@ -655,7 +674,12 @@ body, .dashboard-wrapper {
 @media (max-width: 900px) {
   .stat-grid { grid-template-columns: repeat(2, 1fr); }
   .row2-grid { grid-template-columns: 1fr; }
-  .row2-grid .alerts-panel { grid-column: span 1; }
+  .alerts-row { flex-direction: column; }
+  .alerts-row .alerts-panel,
+  .alerts-row .top-active-panel {
+    flex: 1 1 auto;
+    max-width: 100%;
+  }
 }
 
 @media (max-width: 720px) {

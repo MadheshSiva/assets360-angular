@@ -159,6 +159,11 @@
                     <a href="#" class="panel-link">View full report <span>›</span></a>
                 </div>
 
+            </div>
+
+            <!-- Alerts (65%) + Top Active Assets (35%) side by side -->
+            <div class="alerts-row">
+
                 <!-- Recent Alerts -->
                 <div class="panel alerts-panel">
                     <div class="panel-header">
@@ -202,6 +207,35 @@
                                 <span class="alert-asset" [ngClass]="getAlertTextClass(alert.severity)">{{ alert.asset }}</span>
                             </div>
                             <span class="alert-time">{{ alert.time }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Top Active Assets with speed bars -->
+                <div class="panel top-active-panel">
+                    <div class="panel-header">
+                        <h2>Top Active Assets</h2>
+                        <a href="#" class="view-all">View all</a>
+                    </div>
+                    <div class="top-active-list">
+                        <div *ngFor="let asset of topActiveAssets" class="top-active-item">
+                            <div class="ta-avatar" [style.background]="asset.thumbColor">
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white"
+                                    stroke-width="2">
+                                    <rect x="1" y="3" width="15" height="13" rx="2" />
+                                    <path d="M16 8h4l3 3v5h-7V8z" />
+                                    <circle cx="5.5" cy="18.5" r="2.5" />
+                                    <circle cx="18.5" cy="18.5" r="2.5" />
+                                </svg>
+                            </div>
+                            <div class="ta-info">
+                                <strong>{{ asset.assetId }}</strong>
+                                <span>{{ asset.route }}</span>
+                                <div class="speed-bar-wrap">
+                                    <div class="speed-bar" [style.width.%]="asset.speedPercent" [style.background]="asset.thumbColor"></div>
+                                </div>
+                            </div>
+                            <span class="ta-speed" [style.color]="asset.thumbColor">{{ asset.speed }}</span>
                         </div>
                     </div>
                 </div>
@@ -321,37 +355,8 @@
                     </div>
                 </div>
 
-                <!-- Right: Top Active Assets + Top by Distance stacked -->
+                <!-- Right: Top by Distance -->
                 <div class="right-tables-col">
-
-                    <!-- Top Active Assets with speed bars -->
-                    <div class="panel top-active-panel">
-                        <div class="panel-header">
-                            <h2>Top Active Assets</h2>
-                            <a href="#" class="view-all">View all</a>
-                        </div>
-                        <div class="top-active-list">
-                            <div *ngFor="let asset of topActiveAssets" class="top-active-item">
-                                <div class="ta-avatar" [style.background]="asset.thumbColor">
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="white"
-                                        stroke-width="2">
-                                        <rect x="1" y="3" width="15" height="13" rx="2" />
-                                        <path d="M16 8h4l3 3v5h-7V8z" />
-                                        <circle cx="5.5" cy="18.5" r="2.5" />
-                                        <circle cx="18.5" cy="18.5" r="2.5" />
-                                    </svg>
-                                </div>
-                                <div class="ta-info">
-                                    <strong>{{ asset.assetId }}</strong>
-                                    <span>{{ asset.route }}</span>
-                                    <div class="speed-bar-wrap">
-                                        <div class="speed-bar" [style.width.%]="asset.speedPercent" [style.background]="asset.thumbColor"></div>
-                                    </div>
-                                </div>
-                                <span class="ta-speed" [style.color]="asset.thumbColor">{{ asset.speed }}</span>
-                            </div>
-                        </div>
-                    </div>
 
                     <!-- Top Assets by Distance -->
                     <div class="panel top-dist-panel">

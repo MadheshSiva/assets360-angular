@@ -158,6 +158,10 @@
       </div>
       <p class="wip-trend-label">Last 7 days</p>
     </article>
+  </div>
+
+  <!-- Bottom Row: Alerts (narrow) + Active Jobs (wide) side by side -->
+  <div class="wip-bottom-row">
 
     <!-- Alerts -->
     <article class="wip-panel wip-alerts-panel">
@@ -189,46 +193,46 @@
         </div>
       </div>
     </article>
-  </div>
 
-  <!-- Active Jobs Table -->
-  <article class="wip-panel wip-jobs-panel">
-    <div class="wip-jobs-header">
-      <h2>Active Jobs</h2>
-      <a href="#" class="wip-view-all">View All &gt;</a>
-    </div>
-    <div class="wip-table-scroll">
-      <table class="wip-table">
-        <thead>
-          <tr>
-            <th>Job ID</th>
-            <th>Asset</th>
-            <th>Status</th>
-            <th>Progress</th>
-            <th>Assigned to</th>
-            <th>ETA</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr *ngFor="let job of wipActiveJobs">
-            <td><a href="#" class="wip-job-link">{{ job.id }}</a></td>
-            <td>{{ job.asset }}</td>
-            <td>
-              <span class="wip-status-pill" [ngClass]="'wip-status-' + job.statusClass">{{ job.status }}</span>
-            </td>
-            <td>
-              <div class="wip-progress-cell">
-                <div class="wip-progress-bar-wrap">
-                  <div class="wip-progress-bar" [class]="'wip-bar-' + job.statusClass" [style.width.%]="job.progress"></div>
+    <!-- Active Jobs Table -->
+    <article class="wip-panel wip-jobs-panel">
+      <div class="wip-jobs-header">
+        <h2>Active Jobs</h2>
+        <a href="#" class="wip-view-all">View All &gt;</a>
+      </div>
+      <div class="wip-table-scroll">
+        <table class="wip-table">
+          <thead>
+            <tr>
+              <th>Job ID</th>
+              <th>Asset</th>
+              <th>Status</th>
+              <th>Progress</th>
+              <th>Assigned to</th>
+              <th>ETA</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let job of wipActiveJobs">
+              <td><a href="#" class="wip-job-link">{{ job.id }}</a></td>
+              <td>{{ job.asset }}</td>
+              <td>
+                <span class="wip-status-pill" [ngClass]="'wip-status-' + job.statusClass">{{ job.status }}</span>
+              </td>
+              <td>
+                <div class="wip-progress-cell">
+                  <div class="wip-progress-bar-wrap">
+                    <div class="wip-progress-bar" [class]="'wip-bar-' + job.statusClass" [style.width.%]="job.progress"></div>
+                  </div>
+                  <span class="wip-progress-pct">{{ job.progress }}%</span>
                 </div>
-                <span class="wip-progress-pct">{{ job.progress }}%</span>
-              </div>
-            </td>
-            <td>{{ job.assignedTo }}</td>
-            <td>{{ job.eta }}</td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-  </article>
+              </td>
+              <td>{{ job.assignedTo }}</td>
+              <td>{{ job.eta }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </article>
+  </div>
 </section>

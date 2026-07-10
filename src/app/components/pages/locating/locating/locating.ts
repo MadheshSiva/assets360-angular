@@ -124,6 +124,14 @@ export class Locating {
     return this.locationTree;
   }
 
+  /** When the deepest active row is "Third Right" or "Azy floor", show a static image instead of the live map. */
+  get mapOverlayImage(): string | null {
+    const activeName = this.visibleChain[this.visibleChain.length - 1];
+    if (activeName === 'Third Right') return '/mapp.png';
+    if (activeName === 'Azy floor') return '/mappp.png';
+    return null;
+  }
+
   /**
    * Click handler: expand the row, then fly the map to that node's coords.
    */

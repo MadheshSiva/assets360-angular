@@ -37,7 +37,8 @@
 
       <!-- Map + its own FAB, anchored to the map's right edge -->
       <div class="map-wrapper">
-        <app-map [locations]="mapLocations"></app-map>
+        <app-map *ngIf="!mapOverlayImage" [locations]="mapLocations"></app-map>
+        <img *ngIf="mapOverlayImage" [src]="mapOverlayImage" class="map-image-overlay" alt="Location map" />
 
         <button type="button" class="panel-fab" [class.is-collapsed]="isPanelCollapsed" (click)="togglePanel()"
           [attr.aria-label]="isPanelCollapsed ? 'Hide statistics' : 'Show statistics'">
@@ -108,7 +109,7 @@
   </div>
 
   <div class="tracked-summary">
-    <h3>Tracked People</h3>
+    <h3>Tracked Assets</h3>
     <div class="tracked-grid">
       <div class="tracked-card" *ngFor="let person of trackedPeople">
         <div class="tracked-card-head">
