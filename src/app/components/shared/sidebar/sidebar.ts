@@ -117,7 +117,24 @@ export class Sidebar {
                 { label: 'Role & Access', path: '/administration/configuration/wip/role-access', icon: '' }
               ]
             },
-            { label: 'Master Management', path: '/administration/configuration/master-management', icon: '' }
+            {
+              label: 'Master Management',
+              path: '/administration/configuration/master-management',
+              icon: '',
+              children: [
+                { label: 'Master Maintenance', path: '/administration/configuration/master-management/master-maintenance', icon: '' },
+                { label: 'Category / Sub-category', path: '/administration/configuration/master-management/category-subcategory', icon: '' },
+                { label: 'Asset Type', path: '/administration/configuration/master-management/asset-type', icon: '' },
+                { label: 'Assigned Custodian / Department', path: '/administration/configuration/master-management/assigned-custodian-department', icon: '' },
+                { label: 'Current Location', path: '/administration/configuration/master-management/current-location', icon: '' },
+                { label: 'Status Changes', path: '/administration/configuration/master-management/status-changes', icon: '' },
+                { label: 'Tag IDs', path: '/administration/configuration/master-management/tag-ids', icon: '' },
+                { label: 'Depreciation Method', path: '/administration/configuration/master-management/depreciation-method', icon: '' },
+                { label: 'Cost Center', path: '/administration/configuration/master-management/cost-center', icon: '' },
+                { label: 'Alert Type', path: '/administration/configuration/master-management/alert-type', icon: '' },
+                { label: 'Resolution Status', path: '/administration/configuration/master-management/resolution-status', icon: '' }
+              ]
+            }
           ]
         },
         { label: 'License', path: '/administration/license', icon: '' },

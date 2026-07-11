@@ -47,6 +47,17 @@ import { MaintenanceCostTracking } from './components/pages/administration/confi
 import { MaintenanceDowntimeTracking } from './components/pages/administration/configuration/maintenance/downtime-tracking/downtime-tracking';
 import { MaintenancePerformance } from './components/pages/administration/configuration/maintenance/performance/performance';
 import { MaintenanceComplianceInspection } from './components/pages/administration/configuration/maintenance/compliance-inspection/compliance-inspection';
+import { MasterManagementMaster } from './components/pages/administration/configuration/master-management/master-maintenance/master-maintenance';
+import { MasterManagementCategorySubcategory } from './components/pages/administration/configuration/master-management/category-subcategory/category-subcategory';
+import { MasterManagementAssetType } from './components/pages/administration/configuration/master-management/asset-type/asset-type';
+import { MasterManagementAssignedCustodianDepartment } from './components/pages/administration/configuration/master-management/assigned-custodian-department/assigned-custodian-department';
+import { MasterManagementCurrentLocation } from './components/pages/administration/configuration/master-management/current-location/current-location';
+import { MasterManagementStatusChanges } from './components/pages/administration/configuration/master-management/status-changes/status-changes';
+import { MasterManagementTagIds } from './components/pages/administration/configuration/master-management/tag-ids/tag-ids';
+import { MasterManagementDepreciationMethod } from './components/pages/administration/configuration/master-management/depreciation-method/depreciation-method';
+import { MasterManagementCostCenter } from './components/pages/administration/configuration/master-management/cost-center/cost-center';
+import { MasterManagementAlertType } from './components/pages/administration/configuration/master-management/alert-type/alert-type';
+import { MasterManagementResolutionStatus } from './components/pages/administration/configuration/master-management/resolution-status/resolution-status';
 import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
 import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
 import { WipJobMaster } from './components/pages/administration/configuration/wip/job-master/job-master';
@@ -141,7 +152,19 @@ export const routes: Routes = [
               { path: 'wip/progress-log', component: WipProgressLog },
               { path: 'wip/alerts', component: WipAlerts },
               { path: 'wip/kpi-config', component: WipKpiConfig },
-              { path: 'wip/role-access', component: WipRoleAccess }
+              { path: 'wip/role-access', component: WipRoleAccess },
+              { path: 'master-management', redirectTo: 'master-management/master-maintenance', pathMatch: 'full' },
+              { path: 'master-management/master-maintenance', component: MasterManagementMaster },
+              { path: 'master-management/category-subcategory', component: MasterManagementCategorySubcategory },
+              { path: 'master-management/asset-type', component: MasterManagementAssetType },
+              { path: 'master-management/assigned-custodian-department', component: MasterManagementAssignedCustodianDepartment },
+              { path: 'master-management/current-location', component: MasterManagementCurrentLocation },
+              { path: 'master-management/status-changes', component: MasterManagementStatusChanges },
+              { path: 'master-management/tag-ids', component: MasterManagementTagIds },
+              { path: 'master-management/depreciation-method', component: MasterManagementDepreciationMethod },
+              { path: 'master-management/cost-center', component: MasterManagementCostCenter },
+              { path: 'master-management/alert-type', component: MasterManagementAlertType },
+              { path: 'master-management/resolution-status', component: MasterManagementResolutionStatus }
             ]
           },
           { path: 'license', component: License },
