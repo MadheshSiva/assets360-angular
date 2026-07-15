@@ -58,6 +58,28 @@ import { MasterManagementDepreciationMethod } from './components/pages/administr
 import { MasterManagementCostCenter } from './components/pages/administration/configuration/master-management/cost-center/cost-center';
 import { MasterManagementAlertType } from './components/pages/administration/configuration/master-management/alert-type/alert-type';
 import { MasterManagementResolutionStatus } from './components/pages/administration/configuration/master-management/resolution-status/resolution-status';
+import { MasterManagementAuditorDetails } from './components/pages/administration/configuration/master-management/auditor-details/auditor-details';
+import { MasterManagementPhysicalVerificationResult } from './components/pages/administration/configuration/master-management/physical-verification-result/physical-verification-result';
+import { MasterManagementAssetTypeFields } from './components/pages/administration/configuration/master-management/asset-type-fields/asset-type-fields';
+import { MasterManagementApiSyncStatusMaster } from './components/pages/administration/configuration/master-management/api-sync-status-master/api-sync-status-master';
+import { MasterManagementCertificationTypeMaster } from './components/pages/administration/configuration/master-management/certification-type-master/certification-type-master';
+import { MasterManagementWorkType } from './components/pages/administration/configuration/master-management/work-type/work-type';
+import { MasterManagementPriority } from './components/pages/administration/configuration/master-management/priority/priority';
+import { MasterManagementStatus } from './components/pages/administration/configuration/master-management/status/status';
+import { MasterManagementResourceType } from './components/pages/administration/configuration/master-management/resource-type/resource-type';
+import { MasterManagementSkillMaster } from './components/pages/administration/configuration/master-management/skill-master/skill-master';
+import { MasterManagementShiftMaster } from './components/pages/administration/configuration/master-management/shift-master/shift-master';
+import { MasterManagementChecklistTypeMaster } from './components/pages/administration/configuration/master-management/checklist-type-master/checklist-type-master';
+import { MasterManagementResponseTypeMaster } from './components/pages/administration/configuration/master-management/response-type-master/response-type-master';
+import { MasterManagementConditionMaster } from './components/pages/administration/configuration/master-management/condition-master/condition-master';
+import { MasterManagementIssueTypeMaster } from './components/pages/administration/configuration/master-management/issue-type-master/issue-type-master';
+import { MasterManagementSeverityMaster } from './components/pages/administration/configuration/master-management/severity-master/severity-master';
+import { MasterManagementUnitMaster } from './components/pages/administration/configuration/master-management/unit-master/unit-master';
+import { MasterManagementPermitTypeMaster } from './components/pages/administration/configuration/master-management/permit-type-master/permit-type-master';
+import { MasterManagementUpdateSourceMaster } from './components/pages/administration/configuration/master-management/update-source-master/update-source-master';
+import { MasterManagementChartTypeMaster } from './components/pages/administration/configuration/master-management/chart-type-master/chart-type-master';
+import { MasterManagementPermissionMaster } from './components/pages/administration/configuration/master-management/permission-master/permission-master';
+import { MasterManagementModuleAccessMaster } from './components/pages/administration/configuration/master-management/module-access-master/module-access-master';
 import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
 import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
 import { WipJobMaster } from './components/pages/administration/configuration/wip/job-master/job-master';
@@ -164,7 +186,29 @@ export const routes: Routes = [
               { path: 'master-management/depreciation-method', component: MasterManagementDepreciationMethod },
               { path: 'master-management/cost-center', component: MasterManagementCostCenter },
               { path: 'master-management/alert-type', component: MasterManagementAlertType },
-              { path: 'master-management/resolution-status', component: MasterManagementResolutionStatus }
+              { path: 'master-management/resolution-status', component: MasterManagementResolutionStatus },
+              { path: 'master-management/auditor-details', component: MasterManagementAuditorDetails },
+              { path: 'master-management/physical-verification-result', component: MasterManagementPhysicalVerificationResult },
+              { path: 'master-management/asset-type-fields', component: MasterManagementAssetTypeFields },
+              { path: 'master-management/api-sync-status-master', component: MasterManagementApiSyncStatusMaster },
+              { path: 'master-management/certification-type-master', component: MasterManagementCertificationTypeMaster },
+              { path: 'master-management/work-type', component: MasterManagementWorkType },
+              { path: 'master-management/priority', component: MasterManagementPriority },
+              { path: 'master-management/status', component: MasterManagementStatus },
+              { path: 'master-management/resource-type', component: MasterManagementResourceType },
+              { path: 'master-management/skill-master', component: MasterManagementSkillMaster },
+              { path: 'master-management/shift-master', component: MasterManagementShiftMaster },
+              { path: 'master-management/checklist-type-master', component: MasterManagementChecklistTypeMaster },
+              { path: 'master-management/response-type-master', component: MasterManagementResponseTypeMaster },
+              { path: 'master-management/condition-master', component: MasterManagementConditionMaster },
+              { path: 'master-management/issue-type-master', component: MasterManagementIssueTypeMaster },
+              { path: 'master-management/severity-master', component: MasterManagementSeverityMaster },
+              { path: 'master-management/unit-master', component: MasterManagementUnitMaster },
+              { path: 'master-management/permit-type-master', component: MasterManagementPermitTypeMaster },
+              { path: 'master-management/update-source-master', component: MasterManagementUpdateSourceMaster },
+              { path: 'master-management/chart-type-master', component: MasterManagementChartTypeMaster },
+              { path: 'master-management/permission-master', component: MasterManagementPermissionMaster },
+              { path: 'master-management/module-access-master', component: MasterManagementModuleAccessMaster }
             ]
           },
           { path: 'license', component: License },

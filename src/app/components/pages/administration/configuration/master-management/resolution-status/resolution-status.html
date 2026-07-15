@@ -77,12 +77,14 @@
             <th class="selection-col">
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
-            <th *ngIf="isColumnVisible('resolutionStatusId')">Resolution Status ID</th>
+            <th *ngIf="isColumnVisible('resolutionStatusId')">Status ID</th>
             <th *ngIf="isColumnVisible('statusName')">Status Name</th>
             <th *ngIf="isColumnVisible('statusCode')">Status Code</th>
+            <th *ngIf="isColumnVisible('description')">Description</th>
+            <th *ngIf="isColumnVisible('isFinalStatus')">Is Final Status</th>
+            <th *ngIf="isColumnVisible('statusCategory')">Status Category</th>
             <th *ngIf="isColumnVisible('sequenceOrder')">Sequence Order</th>
-            <th *ngIf="isColumnVisible('isClosedStatus')">Is Closed Status</th>
-            <th *ngIf="isColumnVisible('isDefault')">Is Default</th>
+            <th *ngIf="isColumnVisible('statusColor')">Status Color</th>
           </tr>
         </thead>
         <tbody>
@@ -93,12 +95,17 @@
             <td *ngIf="isColumnVisible('resolutionStatusId')" class="mono">{{ r.resolutionStatusId }}</td>
             <td *ngIf="isColumnVisible('statusName')">{{ r.statusName }}</td>
             <td *ngIf="isColumnVisible('statusCode')">{{ r.statusCode }}</td>
-            <td *ngIf="isColumnVisible('sequenceOrder')">{{ r.sequenceOrder ?? '-' }}</td>
-            <td *ngIf="isColumnVisible('isClosedStatus')">
-              <span class="badge" [attr.data-flag]="r.isClosedStatus">{{ r.isClosedStatus ? 'Yes' : 'No' }}</span>
+            <td *ngIf="isColumnVisible('description')">{{ r.description || '-' }}</td>
+            <td *ngIf="isColumnVisible('isFinalStatus')">
+              <span class="badge" [attr.data-flag]="r.isFinalStatus === 'Yes'">{{ r.isFinalStatus || '-' }}</span>
             </td>
-            <td *ngIf="isColumnVisible('isDefault')">
-              <span class="badge" [attr.data-flag]="r.isDefault">{{ r.isDefault ? 'Yes' : 'No' }}</span>
+            <td *ngIf="isColumnVisible('statusCategory')">
+              <span class="badge" [attr.data-status]="r.statusCategory">{{ r.statusCategory || '-' }}</span>
+            </td>
+            <td *ngIf="isColumnVisible('sequenceOrder')">{{ r.sequenceOrder ?? '-' }}</td>
+            <td *ngIf="isColumnVisible('statusColor')">
+              <span class="color-swatch" [style.background]="r.statusColor"></span>
+              {{ r.statusColor || '-' }}
             </td>
           </tr>
 
@@ -138,7 +145,7 @@
     <form class="modal-form" (ngSubmit)="submitForm()" #recordForm="ngForm">
       <div class="form-grid">
         <div class="form-field">
-          <label>RESOLUTION STATUS ID</label>
+          <label>STATUS ID</label>
           <input type="text" name="resolutionStatusId" placeholder="Auto-generated if left blank" [(ngModel)]="form.resolutionStatusId" [readonly]="isEditMode" />
         </div>
 
@@ -152,28 +159,39 @@
           <input type="text" name="statusCode" placeholder="Enter status code" [(ngModel)]="form.statusCode" />
         </div>
 
+        <div class="form-field form-field-wide">
+          <label>DESCRIPTION</label>
+          <textarea name="description" placeholder="Enter description" [(ngModel)]="form.description"></textarea>
+        </div>
+
+        <div class="form-field">
+          <label>IS FINAL STATUS <span class="required">*</span></label>
+          <div class="select-wrap">
+            <select name="isFinalStatus" [(ngModel)]="form.isFinalStatus" required>
+              <option value="" disabled selected>-- Select --</option>
+              <option *ngFor="let f of finalStatusMaster" [value]="f">{{ f }}</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-field">
+          <label>STATUS CATEGORY <span class="required">*</span></label>
+          <div class="select-wrap">
+            <select name="statusCategory" [(ngModel)]="form.statusCategory" required>
+              <option value="" disabled selected>-- Select Category --</option>
+              <option *ngFor="let c of categoryMaster" [value]="c">{{ c }}</option>
+            </select>
+          </div>
+        </div>
+
         <div class="form-field">
           <label>SEQUENCE ORDER</label>
           <input type="number" name="sequenceOrder" min="0" [(ngModel)]="form.sequenceOrder" />
         </div>
 
         <div class="form-field">
-          <label class="checkbox-label">
-            <input type="checkbox" name="isClosedStatus" [(ngModel)]="form.isClosedStatus" />
-            <span>Is Closed Status</span>
-          </label>
-        </div>
-
-        <div class="form-field">
-          <label class="checkbox-label">
-            <input type="checkbox" name="isDefault" [(ngModel)]="form.isDefault" />
-            <span>Is Default</span>
-          </label>
-        </div>
-
-        <div class="form-field form-field-wide">
-          <label>DESCRIPTION</label>
-          <textarea name="description" placeholder="Enter description" [(ngModel)]="form.description"></textarea>
+          <label>STATUS COLOR</label>
+          <input type="text" name="statusColor" placeholder="e.g. #7030a0" [(ngModel)]="form.statusColor" />
         </div>
       </div>
 

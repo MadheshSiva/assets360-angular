@@ -40,7 +40,7 @@
               title="Add child location"
               (click)="$event.stopPropagation(); addChild(name)"
             >
-              +
+              <img src="addd.png" alt="Add" />
             </button>
             <button
               type="button"
@@ -48,7 +48,7 @@
               title="Rename"
               (click)="startEdit(name, $event)"
             >
-              ✎
+              <img src="edit.png" alt="Edit" />
             </button>
             <button
               type="button"
@@ -56,7 +56,7 @@
               title="Delete"
               (click)="deleteNode(name, $event)"
             >
-              🗑
+              <img src="del.png" alt="Delete" />
             </button>
             <span class="row-chevron" aria-hidden="true">
               <ng-container *ngIf="isActive(name); else chevDown">&rsaquo;</ng-container>

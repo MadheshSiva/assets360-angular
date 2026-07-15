@@ -25,12 +25,14 @@ export class MasterManagementResolutionStatus {
   searchTerm = '';
 
   columns: MasterManagementResolutionStatusColumn[] = [
-    { key: 'resolutionStatusId', label: 'Resolution Status ID', visible: true },
+    { key: 'resolutionStatusId', label: 'Status ID', visible: true },
     { key: 'statusName', label: 'Status Name', visible: true },
     { key: 'statusCode', label: 'Status Code', visible: true },
+    { key: 'description', label: 'Description', visible: true },
+    { key: 'isFinalStatus', label: 'Is Final Status', visible: true },
+    { key: 'statusCategory', label: 'Status Category', visible: true },
     { key: 'sequenceOrder', label: 'Sequence Order', visible: true },
-    { key: 'isClosedStatus', label: 'Is Closed Status', visible: true },
-    { key: 'isDefault', label: 'Is Default', visible: true }
+    { key: 'statusColor', label: 'Status Color', visible: true }
   ];
 
   showColumnPicker = false;
@@ -52,15 +54,24 @@ export class MasterManagementResolutionStatus {
     return this.service.statusNameSuggestions;
   }
 
+  get finalStatusMaster() {
+    return this.service.finalStatusMaster;
+  }
+
+  get categoryMaster() {
+    return this.service.categoryMaster;
+  }
+
   private emptyForm(): MasterManagementResolutionStatusItem {
     return {
       resolutionStatusId: '',
       statusName: '',
       statusCode: '',
+      description: '',
+      isFinalStatus: '',
+      statusCategory: '',
       sequenceOrder: null,
-      isClosedStatus: false,
-      isDefault: false,
-      description: ''
+      statusColor: ''
     };
   }
 

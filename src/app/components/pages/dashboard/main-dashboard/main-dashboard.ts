@@ -1,6 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MapComponent, MapPin } from '../../../shared/map/map';
+import { WidgetDragHandle } from '../../../shared/widget-drag-handle/widget-drag-handle';
+import { loadOrder, saveOrder, reorderByKey } from '../../../shared/dashboard-widgets/widget-order.util';
 
 interface StatCard {
   label: string;
@@ -75,12 +78,46 @@ interface DashboardData {
 @Component({
   standalone: true,
   selector: 'app-main-dashboard',
-  imports: [CommonModule, MapComponent],
+  imports: [CommonModule, DragDropModule, MapComponent, WidgetDragHandle],
   templateUrl: './main-dashboard.html',
   styleUrls: ['./main-dashboard.css'],
 })
 export class MainDashboard implements OnInit {
   statCards: StatCard[] = [];
+
+  // ===== Widget drag-and-drop ordering =====
+  readonly row2Order: string[] = loadOrder('piq.dashboard.main.row2Order', ['donutStatus', 'donutType']);
+  readonly alertsRowOrder: string[] = loadOrder('piq.dashboard.main.alertsRowOrder', ['alerts', 'topActive']);
+  readonly row3Order: string[] = loadOrder('piq.dashboard.main.row3Order', ['utilization', 'geofence']);
+  readonly row4Order: string[] = loadOrder('piq.dashboard.main.row4Order', ['activityTable', 'topDistance']);
+
+  trackByWidgetId = (_: number, id: string) => id;
+
+  private persistDrop(event: CdkDragDrop<string[]>, order: string[], storageKey: string): void {
+    moveItemInArray(order, event.previousIndex, event.currentIndex);
+    saveOrder(storageKey, order);
+  }
+
+  onStatCardDrop(event: CdkDragDrop<StatCard[]>): void {
+    moveItemInArray(this.statCards, event.previousIndex, event.currentIndex);
+    saveOrder('piq.dashboard.main.statOrder', this.statCards.map((c) => c.label));
+  }
+
+  onRow2Drop(event: CdkDragDrop<string[]>): void {
+    this.persistDrop(event, this.row2Order, 'piq.dashboard.main.row2Order');
+  }
+
+  onAlertsRowDrop(event: CdkDragDrop<string[]>): void {
+    this.persistDrop(event, this.alertsRowOrder, 'piq.dashboard.main.alertsRowOrder');
+  }
+
+  onRow3Drop(event: CdkDragDrop<string[]>): void {
+    this.persistDrop(event, this.row3Order, 'piq.dashboard.main.row3Order');
+  }
+
+  onRow4Drop(event: CdkDragDrop<string[]>): void {
+    this.persistDrop(event, this.row4Order, 'piq.dashboard.main.row4Order');
+  }
   mapPins: MapPin[] = [
     { lat: 40.7168, lng: -74.001, color: '#22c55e', label: 'Forklift FL-07' },
     { lat: 40.7118, lng: -74.012, color: '#2563eb', label: 'Generator GEN-12' },
@@ -108,7 +145,7 @@ export class MainDashboard implements OnInit {
 
     const data: DashboardData = await response.json();
     console.log('Dashboard data loaded:', data);
-    this.statCards = data?.statCards;
+    this.statCards = reorderByKey(data?.statCards ?? [], 'piq.dashboard.main.statOrder', (c) => c.label);
     this.assetStatusDonut = data?.assetStatusDonut;
     this.assetsByTypeDonut = data?.assetsByTypeDonut;
     this.recentAlerts = data?.recentAlerts;

@@ -93,7 +93,7 @@
   <div *ngIf="activeTab === 'assets'">
     <header class="dashboard-header">
       <div class="header-title">
-        <h1>Work Order Dashboard</h1>
+        <h1>Work Order</h1>
         <p>Overview of maintenance operations</p>
       </div>
 
@@ -202,10 +202,11 @@
       </div>
     </header>
 
-    <div class="stat-grid">
-      <article class="stat-card" *ngFor="let card of statCards" (click)="openCardPopup(card)"
+    <div class="stat-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onStatCardDrop($event)">
+      <article class="stat-card" *ngFor="let card of statCards" cdkDrag (click)="openCardPopup(card)"
         (keydown.enter)="openCardPopup(card)" (keydown.space.prevent)="openCardPopup(card)" tabindex="0" role="button"
         aria-haspopup="dialog" [attr.aria-label]="'Show ' + card.label + ' details'">
+        <app-widget-drag-handle class="stat-drag-handle" (click)="$event.stopPropagation()"></app-widget-drag-handle>
         <div class="stat-icon" [style.background]="card.iconBg">
           <svg *ngIf="card.icon === 'clipboard'" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
             <path d="M16 4h2a2 2 0 0 1 2 2v16H4V6a2 2 0 0 1 2-2h2" />
@@ -258,11 +259,11 @@
     </article>
     END Assets on Map -->
 
-    <div class="dashboard-grid">
+    <div class="dashboard-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onAssetsWidgetDrop($event)">
+    <ng-container *ngFor="let widgetId of assetsWidgetOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
-
-      <article class="panel timeline-panel">
-        <h2>Work Orders Over Time</h2>
+      <article *ngSwitchCase="'timeline'" cdkDrag class="panel timeline-panel">
+        <h2><app-widget-drag-handle></app-widget-drag-handle>Work Orders Over Time</h2>
         <div class="line-chart" aria-label="Work orders line chart">
           <div class="chart-legend">
             <span><i class="blue"></i>Created</span>
@@ -293,8 +294,8 @@
         <a href="#" class="panel-link">View full report <span>&gt;</span></a>
       </article>
 
-      <article class="panel compliance-panel">
-        <h2>PM Compliance</h2>
+      <article *ngSwitchCase="'compliance'" cdkDrag class="panel compliance-panel">
+        <h2><app-widget-drag-handle></app-widget-drag-handle>PM Compliance</h2>
         <div class="gauge">
           <div class="gauge-arc"></div>
           <div class="gauge-needle"></div>
@@ -304,8 +305,8 @@
         <p>Target: 90%</p>
         <a href="#" class="panel-link">View PM Dashboard <span>&gt;</span></a>
       </article>
-      <article class="panel work-status">
-        <h2>Work Order Status</h2>
+      <article *ngSwitchCase="'workStatus'" cdkDrag class="panel work-status">
+        <h2><app-widget-drag-handle></app-widget-drag-handle>Work Order Status</h2>
         <div class="donut-wrap">
           <div class="donut-chart">
             <div>
@@ -325,8 +326,8 @@
       </article>
 
 
-      <article class="panel recent-panel">
-        <h2>Recent Work Orders</h2>
+      <article *ngSwitchCase="'recent'" cdkDrag class="panel recent-panel">
+        <h2><app-widget-drag-handle></app-widget-drag-handle>Recent Work Orders</h2>
         <div class="work-order-list">
           <div class="work-order" *ngFor="let order of recentWorkOrders; index as i">
             <span class="order-rank">{{ i + 1 }}</span>
@@ -341,9 +342,9 @@
         <a href="#" class="panel-link">View all work orders <span>&gt;</span></a>
       </article>
 
-      <aside class="side-stack">
+      <aside *ngSwitchCase="'sideStack'" cdkDrag class="side-stack">
         <article class="panel">
-          <h2>Top Assets by Work Orders</h2>
+          <h2><app-widget-drag-handle></app-widget-drag-handle>Top Assets by Work Orders</h2>
           <div class="asset-bars">
             <div class="asset-bar" *ngFor="let asset of topAssets">
               <span>{{ asset.name }}</span>
@@ -375,8 +376,8 @@
         </article>
       </aside>
 
-      <article class="panel alerts-panel">
-        <h2>Alerts & Notifications</h2>
+      <article *ngSwitchCase="'alerts'" cdkDrag class="panel alerts-panel">
+        <h2><app-widget-drag-handle></app-widget-drag-handle>Alerts & Notifications</h2>
         <div class="alert-row" *ngFor="let alert of alerts">
           <span [ngClass]="alert.type">!</span>
           <div>
@@ -388,8 +389,8 @@
         <a href="#" class="panel-link">View all alerts <span>&gt;</span></a>
       </article>
 
-      <article class="panel workload-panel">
-        <h2>Technician Workload</h2>
+      <article *ngSwitchCase="'workload'" cdkDrag class="panel workload-panel">
+        <h2><app-widget-drag-handle></app-widget-drag-handle>Technician Workload</h2>
         <div class="load-row" *ngFor="let tech of technicians">
           <span>{{ tech.name }}</span>
           <div><i [style.width.%]="tech.load" [class.warn]="tech.load < 70"></i></div>
@@ -397,8 +398,8 @@
         </div>
         <a href="#" class="panel-link">View all technicians <span>&gt;</span></a>
       </article>
-      <article class="panel table-panel large-panel">
-        <h2>Upcoming Maintenance</h2>
+      <article *ngSwitchCase="'maintenance'" cdkDrag class="panel table-panel large-panel">
+        <h2><app-widget-drag-handle></app-widget-drag-handle>Upcoming Maintenance</h2>
         <div class="table-scroll">
           <table>
             <thead>
@@ -425,6 +426,8 @@
         </div>
         <a href="#" class="panel-link">View all scheduled maintenance <span>&gt;</span></a>
       </article>
+
+    </ng-container>
     </div>
   </div>
 

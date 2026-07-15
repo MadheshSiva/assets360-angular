@@ -22,8 +22,9 @@
              </div>
            </header>
            <div class="content-container">
-             <div class="stat-grid">
-                <div *ngFor="let card of statCards; let i = index" class="stat-card" role="button" tabindex="0" (click)="onStatCardClick(card, i)" (keydown.enter)="onStatCardClick(card, i)">
+             <div class="stat-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onStatCardDrop($event)">
+                <div *ngFor="let card of statCards; let i = index" class="stat-card" cdkDrag role="button" tabindex="0" (click)="onStatCardClick(card, i)" (keydown.enter)="onStatCardClick(card, i)">
+                    <app-widget-drag-handle (click)="$event.stopPropagation()"></app-widget-drag-handle>
                     <div class="stat-card-icon" [ngClass]="getStatIconClass(i)">
                         <ng-container [ngSwitch]="i">
                             <svg *ngSwitchCase="0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
@@ -80,11 +81,13 @@
             END ASSET MAP -->
 
             <!-- ROW 2: Asset Status Donut + Assets by Type Donut + Recent Alerts -->
-            <div class="row2-grid">
+            <div class="row2-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow2Drop($event)">
+            <ng-container *ngFor="let widgetId of row2Order; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
                 <!-- Asset Status Donut -->
-                <div class="panel donut-panel">
+                <div *ngSwitchCase="'donutStatus'" cdkDrag class="panel donut-panel">
                     <div class="panel-header">
+                        <app-widget-drag-handle></app-widget-drag-handle>
                         <h2>Asset Status</h2>
                     </div>
                     <div class="donut-wrap">
@@ -120,8 +123,9 @@
                 </div>
 
                 <!-- Assets by Type Donut -->
-                <div class="panel donut-panel">
+                <div *ngSwitchCase="'donutType'" cdkDrag class="panel donut-panel">
                     <div class="panel-header">
+                        <app-widget-drag-handle></app-widget-drag-handle>
                         <h2>Assets by Type</h2>
                     </div>
                     <div class="donut-wrap">
@@ -159,14 +163,17 @@
                     <a href="#" class="panel-link">View full report <span>›</span></a>
                 </div>
 
+            </ng-container>
             </div>
 
             <!-- Alerts (65%) + Top Active Assets (35%) side by side -->
-            <div class="alerts-row">
+            <div class="alerts-row" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onAlertsRowDrop($event)">
+            <ng-container *ngFor="let widgetId of alertsRowOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
                 <!-- Recent Alerts -->
-                <div class="panel alerts-panel">
+                <div *ngSwitchCase="'alerts'" cdkDrag class="panel alerts-panel">
                     <div class="panel-header">
+                        <app-widget-drag-handle></app-widget-drag-handle>
                         <h2>Alerts <span class="count-badge red-badge">{{ recentAlerts.length }}</span></h2>
                         <a href="#" class="view-all">View all</a>
                     </div>
@@ -212,8 +219,9 @@
                 </div>
 
                 <!-- Top Active Assets with speed bars -->
-                <div class="panel top-active-panel">
+                <div *ngSwitchCase="'topActive'" cdkDrag class="panel top-active-panel">
                     <div class="panel-header">
+                        <app-widget-drag-handle></app-widget-drag-handle>
                         <h2>Top Active Assets</h2>
                         <a href="#" class="view-all">View all</a>
                     </div>
@@ -240,15 +248,18 @@
                     </div>
                 </div>
 
+            </ng-container>
             </div>
             <!-- END ROW 2 -->
 
             <!-- ROW 3: Utilization Chart + Geofence Summary -->
-            <div class="row3-grid">
+            <div class="row3-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow3Drop($event)">
+            <ng-container *ngFor="let widgetId of row3Order; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
                 <!-- Utilization Chart -->
-                <div class="panel utilization-panel">
+                <div *ngSwitchCase="'utilization'" cdkDrag class="panel utilization-panel">
                     <div class="panel-header">
+                        <app-widget-drag-handle></app-widget-drag-handle>
                         <h2>Utilization <span class="subhead">(Today)</span></h2>
                         <a href="#" class="view-all">View report</a>
                     </div>
@@ -286,8 +297,9 @@
                 </div>
 
                 <!-- Geofence Summary -->
-                <div class="panel geofence-panel">
+                <div *ngSwitchCase="'geofence'" cdkDrag class="panel geofence-panel">
                     <div class="panel-header">
+                        <app-widget-drag-handle></app-widget-drag-handle>
                         <h2>Geofence Summary</h2>
                         <a href="#" class="view-all">View all</a>
                     </div>
@@ -309,15 +321,18 @@
                     </div>
                 </div>
 
+            </ng-container>
             </div>
             <!-- END ROW 3 -->
 
             <!-- ROW 4: Recent Activity Table + Top Active Assets + Top by Distance -->
-            <div class="row4-grid">
+            <div class="row4-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow4Drop($event)">
+            <ng-container *ngFor="let widgetId of row4Order; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
                 <!-- Recent Activity Table -->
-                <div class="panel table-panel">
+                <div *ngSwitchCase="'activityTable'" cdkDrag class="panel table-panel">
                     <div class="panel-header">
+                        <app-widget-drag-handle></app-widget-drag-handle>
                         <h2>Recent Activity</h2>
                         <a href="#" class="view-all">View all</a>
                     </div>
@@ -356,11 +371,12 @@
                 </div>
 
                 <!-- Right: Top by Distance -->
-                <div class="right-tables-col">
+                <div *ngSwitchCase="'topDistance'" cdkDrag class="right-tables-col">
 
                     <!-- Top Assets by Distance -->
                     <div class="panel top-dist-panel">
                         <div class="panel-header">
+                            <app-widget-drag-handle></app-widget-drag-handle>
                             <h2>Top Assets <span class="subhead">By Distance Today</span></h2>
                         </div>
                         <div class="top-dist-list">
@@ -377,6 +393,7 @@
 
                 </div><!-- /right-tables-col -->
 
+            </ng-container>
             </div>
             <!-- END ROW 4 -->
 

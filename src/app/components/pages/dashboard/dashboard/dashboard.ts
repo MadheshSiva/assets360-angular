@@ -1,9 +1,12 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MainDashboard } from '../main-dashboard/main-dashboard';
 import { WipDashboard } from '../wip-dashboard/wip-dashboard';
 import { MapComponent, MapPin } from '../../../shared/map/map';
+import { WidgetDragHandle } from '../../../shared/widget-drag-handle/widget-drag-handle';
+import { loadOrder, saveOrder, reorderByKey } from '../../../shared/dashboard-widgets/widget-order.util';
 
 interface AssetsStatCard {
   label: string;
@@ -72,13 +75,30 @@ interface AssetsData {
 @Component({
   standalone: true,
   selector: 'app-dashboard',
-  imports: [CommonModule, FormsModule, MainDashboard, WipDashboard, MapComponent],
+  imports: [CommonModule, FormsModule, DragDropModule, MainDashboard, WipDashboard, MapComponent, WidgetDragHandle],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
 })
 export class Dashboard implements OnInit {
   // ===== Tabs =====
   activeTab: ActiveTab = 'dashboard';
+
+  // ===== Widget drag-and-drop ordering (Assets tab) =====
+  readonly assetsWidgetOrder: string[] = loadOrder('piq.dashboard.assets.widgetOrder', [
+    'timeline', 'compliance', 'workStatus', 'recent', 'sideStack', 'alerts', 'workload', 'maintenance',
+  ]);
+
+  trackByWidgetId = (_: number, id: string) => id;
+
+  onAssetsWidgetDrop(event: CdkDragDrop<string[]>): void {
+    moveItemInArray(this.assetsWidgetOrder, event.previousIndex, event.currentIndex);
+    saveOrder('piq.dashboard.assets.widgetOrder', this.assetsWidgetOrder);
+  }
+
+  onStatCardDrop(event: CdkDragDrop<AssetsStatCard[]>): void {
+    moveItemInArray(this.statCards, event.previousIndex, event.currentIndex);
+    saveOrder('piq.dashboard.assets.statOrder', this.statCards.map((c) => c.label));
+  }
   cardPopup: CardPopup | null = null;
   mapPins: MapPin[] = [
     { lat: 40.7168, lng: -74.001, color: '#2563eb', label: 'WO-2456 · Air Compressor AC-04' },
@@ -361,7 +381,7 @@ export class Dashboard implements OnInit {
   async ngOnInit(): Promise<void> {
     const response = await fetch('/assets/data/assets-data.json');
     const data: AssetsData = await response.json();
-    this.statCards = data.statCards;
+    this.statCards = reorderByKey(data.statCards, 'piq.dashboard.assets.statOrder', (c) => c.label);
     this.workStatus = data.workStatus;
     this.chartGrid = data.chartGrid;
     this.weekLabels = data.weekLabels;

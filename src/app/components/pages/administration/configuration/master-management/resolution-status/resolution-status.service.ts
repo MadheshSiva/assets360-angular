@@ -1,55 +1,66 @@
 import { Injectable } from '@angular/core';
-import { MasterManagementResolutionStatusItem } from './resolution-status.model';
+import {
+  MasterManagementResolutionStatusItem,
+  ResolutionStatusCategory,
+  ResolutionStatusFinalFlag
+} from './resolution-status.model';
 
 @Injectable({ providedIn: 'root' })
 export class MasterManagementResolutionStatusService {
   readonly statusNameSuggestions: string[] = ['Open', 'Investigating', 'Resolved', 'Not Reproducible', 'Rejected', 'Closed'];
+  readonly finalStatusMaster: ResolutionStatusFinalFlag[] = ['Yes', 'No'];
+  readonly categoryMaster: ResolutionStatusCategory[] = ['Open', 'In Progress', 'Closed'];
 
   private readonly records: MasterManagementResolutionStatusItem[] = [
     {
       resolutionStatusId: 'RES-1001',
       statusName: 'Open',
       statusCode: 'OPEN',
+      description: 'Issue has been logged and is awaiting action',
+      isFinalStatus: 'No',
+      statusCategory: 'Open',
       sequenceOrder: 1,
-      isClosedStatus: false,
-      isDefault: true,
-      description: 'Issue has been logged and is awaiting action'
+      statusColor: '#1d4ed8'
     },
     {
       resolutionStatusId: 'RES-1002',
       statusName: 'Investigating',
       statusCode: 'INVESTIGATING',
+      description: 'Issue is being actively investigated',
+      isFinalStatus: 'No',
+      statusCategory: 'In Progress',
       sequenceOrder: 2,
-      isClosedStatus: false,
-      isDefault: false,
-      description: 'Issue is being actively investigated'
+      statusColor: '#b8860b'
     },
     {
       resolutionStatusId: 'RES-1003',
       statusName: 'Resolved',
       statusCode: 'RESOLVED',
+      description: 'Issue has been fixed and verified',
+      isFinalStatus: 'Yes',
+      statusCategory: 'Closed',
       sequenceOrder: 3,
-      isClosedStatus: true,
-      isDefault: false,
-      description: 'Issue has been fixed and verified'
+      statusColor: '#1e7e34'
     },
     {
       resolutionStatusId: 'RES-1004',
       statusName: 'Rejected',
       statusCode: 'REJECTED',
+      description: 'Issue was reviewed and rejected as invalid or out of scope',
+      isFinalStatus: 'Yes',
+      statusCategory: 'Closed',
       sequenceOrder: 4,
-      isClosedStatus: true,
-      isDefault: false,
-      description: 'Issue was reviewed and rejected as invalid or out of scope'
+      statusColor: '#c0221f'
     },
     {
       resolutionStatusId: 'RES-1005',
       statusName: 'Closed',
       statusCode: 'CLOSED',
+      description: 'Issue is fully closed with no further action required',
+      isFinalStatus: 'Yes',
+      statusCategory: 'Closed',
       sequenceOrder: 5,
-      isClosedStatus: true,
-      isDefault: false,
-      description: 'Issue is fully closed with no further action required'
+      statusColor: '#64748b'
     }
   ];
 

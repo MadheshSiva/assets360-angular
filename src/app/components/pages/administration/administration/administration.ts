@@ -101,6 +101,42 @@ export class Administration {
     { label: 'Role & Access', path: '/administration/configuration/wip/role-access' }
   ];
 
+  masterManagementOptions: BreadcrumbOption[] = [
+    { label: 'Master Maintenance', path: '/administration/configuration/master-management/master-maintenance' },
+    { label: 'Category / Sub-category', path: '/administration/configuration/master-management/category-subcategory' },
+    { label: 'Asset Type', path: '/administration/configuration/master-management/asset-type' },
+    { label: 'Assigned Custodian / Department', path: '/administration/configuration/master-management/assigned-custodian-department' },
+    { label: 'Current Location', path: '/administration/configuration/master-management/current-location' },
+    { label: 'Status Changes', path: '/administration/configuration/master-management/status-changes' },
+    { label: 'Tag IDs', path: '/administration/configuration/master-management/tag-ids' },
+    { label: 'Depreciation Method', path: '/administration/configuration/master-management/depreciation-method' },
+    { label: 'Cost Center', path: '/administration/configuration/master-management/cost-center' },
+    { label: 'Alert Type', path: '/administration/configuration/master-management/alert-type' },
+    { label: 'Resolution Status', path: '/administration/configuration/master-management/resolution-status' },
+    { label: 'Auditor Details', path: '/administration/configuration/master-management/auditor-details' },
+    { label: 'Physical Verification Result', path: '/administration/configuration/master-management/physical-verification-result' },
+    { label: 'Asset Type Fields', path: '/administration/configuration/master-management/asset-type-fields' },
+    { label: 'API Sync Status Master', path: '/administration/configuration/master-management/api-sync-status-master' },
+    { label: 'Certification Type Master', path: '/administration/configuration/master-management/certification-type-master' },
+    { label: 'Work Type', path: '/administration/configuration/master-management/work-type' },
+    { label: 'Priority', path: '/administration/configuration/master-management/priority' },
+    { label: 'Status', path: '/administration/configuration/master-management/status' },
+    { label: 'Resource Type', path: '/administration/configuration/master-management/resource-type' },
+    { label: 'Skill Master', path: '/administration/configuration/master-management/skill-master' },
+    { label: 'Shift Master', path: '/administration/configuration/master-management/shift-master' },
+    { label: 'Checklist Type Master', path: '/administration/configuration/master-management/checklist-type-master' },
+    { label: 'Response Type Master', path: '/administration/configuration/master-management/response-type-master' },
+    { label: 'Condition Master', path: '/administration/configuration/master-management/condition-master' },
+    { label: 'Issue Type Master', path: '/administration/configuration/master-management/issue-type-master' },
+    { label: 'Severity Master', path: '/administration/configuration/master-management/severity-master' },
+    { label: 'Unit Master', path: '/administration/configuration/master-management/unit-master' },
+    { label: 'Permit Type Master', path: '/administration/configuration/master-management/permit-type-master' },
+    { label: 'Update Source Master', path: '/administration/configuration/master-management/update-source-master' },
+    { label: 'Chart Type Master', path: '/administration/configuration/master-management/chart-type-master' },
+    { label: 'Permission Master', path: '/administration/configuration/master-management/permission-master' },
+    { label: 'Module Access Master', path: '/administration/configuration/master-management/module-access-master' }
+  ];
+
   // Maps URL slug -> breadcrumb label, used when building the trail
   private configSlugLabelMap: Record<string, string> = {
     'projects': 'Projects',
@@ -108,6 +144,7 @@ export class Administration {
     'assets': 'Assets',
     'maintenance': 'Maintenance',
     'wip': 'WIP',
+    'master-management': 'Master Management',
     'people': 'People',
     'attendance': 'Attendance',
     'access-control': 'Access Control',
@@ -172,6 +209,43 @@ export class Administration {
     'role-access': 'Role & Access'
   };
 
+  // Maps URL slug -> breadcrumb label for pages nested under Master Management
+  private masterManagementSlugLabelMap: Record<string, string> = {
+    'master-maintenance': 'Master Maintenance',
+    'category-subcategory': 'Category / Sub-category',
+    'asset-type': 'Asset Type',
+    'assigned-custodian-department': 'Assigned Custodian / Department',
+    'current-location': 'Current Location',
+    'status-changes': 'Status Changes',
+    'tag-ids': 'Tag IDs',
+    'depreciation-method': 'Depreciation Method',
+    'cost-center': 'Cost Center',
+    'alert-type': 'Alert Type',
+    'resolution-status': 'Resolution Status',
+    'auditor-details': 'Auditor Details',
+    'physical-verification-result': 'Physical Verification Result',
+    'asset-type-fields': 'Asset Type Fields',
+    'api-sync-status-master': 'API Sync Status Master',
+    'certification-type-master': 'Certification Type Master',
+    'work-type': 'Work Type',
+    'priority': 'Priority',
+    'status': 'Status',
+    'resource-type': 'Resource Type',
+    'skill-master': 'Skill Master',
+    'shift-master': 'Shift Master',
+    'checklist-type-master': 'Checklist Type Master',
+    'response-type-master': 'Response Type Master',
+    'condition-master': 'Condition Master',
+    'issue-type-master': 'Issue Type Master',
+    'severity-master': 'Severity Master',
+    'unit-master': 'Unit Master',
+    'permit-type-master': 'Permit Type Master',
+    'update-source-master': 'Update Source Master',
+    'chart-type-master': 'Chart Type Master',
+    'permission-master': 'Permission Master',
+    'module-access-master': 'Module Access Master'
+  };
+
   constructor(private router: Router) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -198,6 +272,7 @@ export class Administration {
     this.dropdownOptions.set('Assets', this.assetsOptions);
     this.dropdownOptions.set('Maintenance', this.maintenanceOptions);
     this.dropdownOptions.set('WIP', this.wipOptions);
+    this.dropdownOptions.set('Master Management', this.masterManagementOptions);
 
     const userMgmtIdx = segments.indexOf('user-management');
     const configIdx = segments.indexOf('configuration');
@@ -213,7 +288,8 @@ export class Administration {
           const grandchildSlugMap: Record<string, Record<string, string>> = {
             'assets': this.assetsSlugLabelMap,
             'maintenance': this.maintenanceSlugLabelMap,
-            'wip': this.wipSlugLabelMap
+            'wip': this.wipSlugLabelMap,
+            'master-management': this.masterManagementSlugLabelMap
           };
           const grandchildSlug = grandchildSlugMap[childSlug] ? segments[configIdx + 2] : undefined;
           const grandchildLabel = grandchildSlug ? grandchildSlugMap[childSlug][grandchildSlug] : undefined;

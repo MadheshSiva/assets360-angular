@@ -260,9 +260,9 @@ isStatVisible(key: string): boolean {
 }
   // ===== Tracked people summary (static) =====
   trackedPeople = [
-    { name: 'Ahmed Al-Rashid', location: 'Azy floor - Room 101', status: 'online' as const },
-    { name: 'Sara Mohammed', location: 'Azy floor - Room 102', status: 'online' as const },
-    { name: 'Khalid Hassan', location: 'Azy floor - Room 103', status: 'idle' as const },
-    { name: 'Fatima Ali', location: 'Azy floor - Room 101', status: 'offline' as const },
+    { name: 'Assets1', location: 'Azy floor - Room 101', status: 'online' as const },
+    { name: 'Assets2', location: 'Azy floor - Room 102', status: 'online' as const },
+    { name: 'Assets3', location: 'Azy floor - Room 103', status: 'idle' as const },
+    { name: 'Assets4', location: 'Azy floor - Room 101', status: 'offline' as const },
   ];
 }

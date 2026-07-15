@@ -119,12 +119,12 @@
 }
 
 .icon-btn--danger {
-  color: var(--danger);
+  color: var(--purple);
 }
 
 .icon-btn--danger:hover {
   background: #fee2e2;
-  color: #dc2626;
+  color: var(--pu);
 }
 
 /* ── Frequency filter tabs ── */

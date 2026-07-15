@@ -17,9 +17,10 @@
   </div>
 
   <!-- Stat Cards Row -->
-  <div class="wip-stat-grid">
-    <article class="wip-stat-card" *ngFor="let card of wipStatCards">
+  <div class="wip-stat-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onStatCardDrop($event)">
+    <article class="wip-stat-card" *ngFor="let card of wipStatCards" cdkDrag>
       <div class="wip-stat-top">
+        <app-widget-drag-handle></app-widget-drag-handle>
         <div class="wip-stat-icon-wrap" [ngClass]="getIconClass(card.icon)">
           <!-- Total Jobs icon -->
           <svg *ngIf="card.icon === 'jobs'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="22" height="22">
@@ -70,11 +71,13 @@
   </div>
 
   <!-- Middle Row: Donut + Area Chart + Alerts -->
-  <div class="wip-mid-grid">
+  <div class="wip-mid-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onMidDrop($event)">
+  <ng-container *ngFor="let widgetId of midOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
     <!-- Job Status Distribution -->
-    <article class="wip-panel wip-donut-panel">
+    <article *ngSwitchCase="'donut'" cdkDrag class="wip-panel wip-donut-panel">
       <div class="wip-panel-header">
+        <app-widget-drag-handle></app-widget-drag-handle>
         <div class="wip-panel-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
             <path d="M21.21 15.89A10 10 0 1 1 8 2.83"/>
@@ -107,8 +110,9 @@
     </article>
 
     <!-- Completion Trend -->
-    <article class="wip-panel wip-trend-panel">
+    <article *ngSwitchCase="'trend'" cdkDrag class="wip-panel wip-trend-panel">
       <div class="wip-panel-header">
+        <app-widget-drag-handle></app-widget-drag-handle>
         <div class="wip-panel-icon">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18">
             <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
@@ -158,14 +162,18 @@
       </div>
       <p class="wip-trend-label">Last 7 days</p>
     </article>
+
+  </ng-container>
   </div>
 
   <!-- Bottom Row: Alerts (narrow) + Active Jobs (wide) side by side -->
-  <div class="wip-bottom-row">
+  <div class="wip-bottom-row" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onBottomDrop($event)">
+  <ng-container *ngFor="let widgetId of bottomOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
     <!-- Alerts -->
-    <article class="wip-panel wip-alerts-panel">
+    <article *ngSwitchCase="'alerts'" cdkDrag class="wip-panel wip-alerts-panel">
       <div class="wip-panel-header">
+        <app-widget-drag-handle></app-widget-drag-handle>
         <h2>Alerts</h2>
         <button class="wip-more-btn" type="button">
           <svg viewBox="0 0 24 24" fill="currentColor" width="14" height="14">
@@ -195,8 +203,9 @@
     </article>
 
     <!-- Active Jobs Table -->
-    <article class="wip-panel wip-jobs-panel">
+    <article *ngSwitchCase="'jobs'" cdkDrag class="wip-panel wip-jobs-panel">
       <div class="wip-jobs-header">
+        <app-widget-drag-handle></app-widget-drag-handle>
         <h2>Active Jobs</h2>
         <a href="#" class="wip-view-all">View All &gt;</a>
       </div>
@@ -234,5 +243,7 @@
         </table>
       </div>
     </article>
+
+  </ng-container>
   </div>
 </section>

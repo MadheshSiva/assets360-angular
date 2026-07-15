@@ -132,7 +132,29 @@ export class Sidebar {
                 { label: 'Depreciation Method', path: '/administration/configuration/master-management/depreciation-method', icon: '' },
                 { label: 'Cost Center', path: '/administration/configuration/master-management/cost-center', icon: '' },
                 { label: 'Alert Type', path: '/administration/configuration/master-management/alert-type', icon: '' },
-                { label: 'Resolution Status', path: '/administration/configuration/master-management/resolution-status', icon: '' }
+                { label: 'Resolution Status', path: '/administration/configuration/master-management/resolution-status', icon: '' },
+                { label: 'Auditor Details', path: '/administration/configuration/master-management/auditor-details', icon: '' },
+                { label: 'Physical Verification Result', path: '/administration/configuration/master-management/physical-verification-result', icon: '' },
+                { label: 'Asset Type Fields', path: '/administration/configuration/master-management/asset-type-fields', icon: '' },
+                { label: 'API Sync Status Master', path: '/administration/configuration/master-management/api-sync-status-master', icon: '' },
+                { label: 'Certification Type Master', path: '/administration/configuration/master-management/certification-type-master', icon: '' },
+                { label: 'Work Type', path: '/administration/configuration/master-management/work-type', icon: '' },
+                { label: 'Priority', path: '/administration/configuration/master-management/priority', icon: '' },
+                { label: 'Status', path: '/administration/configuration/master-management/status', icon: '' },
+                { label: 'Resource Type', path: '/administration/configuration/master-management/resource-type', icon: '' },
+                { label: 'Skill Master', path: '/administration/configuration/master-management/skill-master', icon: '' },
+                { label: 'Shift Master', path: '/administration/configuration/master-management/shift-master', icon: '' },
+                { label: 'Checklist Type Master', path: '/administration/configuration/master-management/checklist-type-master', icon: '' },
+                { label: 'Response Type Master', path: '/administration/configuration/master-management/response-type-master', icon: '' },
+                { label: 'Condition Master', path: '/administration/configuration/master-management/condition-master', icon: '' },
+                { label: 'Issue Type Master', path: '/administration/configuration/master-management/issue-type-master', icon: '' },
+                { label: 'Severity Master', path: '/administration/configuration/master-management/severity-master', icon: '' },
+                { label: 'Unit Master', path: '/administration/configuration/master-management/unit-master', icon: '' },
+                { label: 'Permit Type Master', path: '/administration/configuration/master-management/permit-type-master', icon: '' },
+                { label: 'Update Source Master', path: '/administration/configuration/master-management/update-source-master', icon: '' },
+                { label: 'Chart Type Master', path: '/administration/configuration/master-management/chart-type-master', icon: '' },
+                { label: 'Permission Master', path: '/administration/configuration/master-management/permission-master', icon: '' },
+                { label: 'Module Access Master', path: '/administration/configuration/master-management/module-access-master', icon: '' }
               ]
             }
           ]
