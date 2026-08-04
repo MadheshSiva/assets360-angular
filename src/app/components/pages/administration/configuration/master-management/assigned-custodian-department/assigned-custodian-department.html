@@ -84,6 +84,7 @@
             <th *ngIf="isColumnVisible('status')">Status</th>
             <th *ngIf="isColumnVisible('role')">Role</th>
             <th *ngIf="isColumnVisible('departmentCode')">Department Code</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -102,10 +103,13 @@
             </td>
             <td *ngIf="isColumnVisible('role')">{{ r.role || '-' }}</td>
             <td *ngIf="isColumnVisible('departmentCode')">{{ r.departmentCode || '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No records found.</td>
           </tr>
         </tbody>
       </table>
@@ -194,3 +198,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="assigned-custodian-department"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

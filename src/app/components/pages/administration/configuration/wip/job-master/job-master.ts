@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { JobMaster } from './job-master.model';
 import { JobMasterService } from './job-master.service';
 
@@ -13,7 +16,7 @@ interface JobMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-job-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './job-master.html',
   styleUrls: ['./job-master.css']
 })
@@ -44,6 +47,33 @@ export class WipJobMaster {
     { key: 'safetyChecklistId', label: 'Safety Checklist ID', visible: false },
     { key: 'remarks', label: 'Remarks', visible: false }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'jobId', label: 'Job ID' },
+    { key: 'jobName', label: 'Job Name' },
+    { key: 'description', label: 'Description' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetCategory', label: 'Asset Category' },
+    { key: 'locationId', label: 'Location ID' },
+    { key: 'departmentId', label: 'Department ID' },
+    { key: 'workType', label: 'Work Type' },
+    { key: 'priority', label: 'Priority' },
+    { key: 'plannedStartDate', label: 'Planned Start Date' },
+    { key: 'plannedEndDate', label: 'Planned End Date' },
+    { key: 'actualStartDate', label: 'Actual Start Date' },
+    { key: 'actualEndDate', label: 'Actual End Date' },
+    { key: 'status', label: 'Status' },
+    { key: 'assignedTo', label: 'Assigned To' },
+    { key: 'supervisorId', label: 'Supervisor ID' },
+    { key: 'slaId', label: 'SLA ID' },
+    { key: 'progressPercentage', label: 'Progress %' },
+    { key: 'downtimeRequired', label: 'Downtime Required' },
+    { key: 'permitRequired', label: 'Permit Required' },
+    { key: 'safetyChecklistId', label: 'Safety Checklist ID' },
+    { key: 'remarks', label: 'Remarks' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -197,7 +227,10 @@ export class WipJobMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: JobMaster): void {
     this.isEditMode = true;
     this.editingRecord = record;
     this.form = { ...record, assignedTo: [...record.assignedTo] };
@@ -227,7 +260,47 @@ export class WipJobMaster {
     this.refresh();
   }
 
+  deleteRow(record: JobMaster): void {
+    this.service.deleteRecords([record.jobId]);
+    this.selectedJobIds.clear();
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const mapped: JobMaster[] = rows.map((row) => ({
+      jobId: row['jobId'] ?? '',
+      jobName: row['jobName'] ?? '',
+      description: row['description'] ?? '',
+      assetId: row['assetId'] ?? '',
+      assetCategory: row['assetCategory'] ?? '',
+      locationId: row['locationId'] ?? '',
+      departmentId: row['departmentId'] ?? '',
+      workType: (row['workType'] ?? '') as JobMaster['workType'],
+      priority: (row['priority'] ?? '') as JobMaster['priority'],
+      plannedStartDate: row['plannedStartDate'] ?? '',
+      plannedEndDate: row['plannedEndDate'] ?? '',
+      actualStartDate: row['actualStartDate'] ?? '',
+      actualEndDate: row['actualEndDate'] ?? '',
+      status: (row['status'] ?? '') as JobMaster['status'],
+      assignedTo: (row['assignedTo'] ?? '')
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean),
+      supervisorId: row['supervisorId'] ?? '',
+      slaId: row['slaId'] ?? '',
+      progressPercentage: row['progressPercentage'] ? Number(row['progressPercentage']) : null,
+      downtimeRequired: row['downtimeRequired']?.toLowerCase() === 'true' || row['downtimeRequired']?.toLowerCase() === 'yes',
+      permitRequired: row['permitRequired']?.toLowerCase() === 'true' || row['permitRequired']?.toLowerCase() === 'yes',
+      safetyChecklistId: row['safetyChecklistId'] ?? '',
+      remarks: row['remarks'] ?? ''
+    }));
+    this.records = [...this.records, ...mapped];
+    this.filteredRecords = [...this.filteredRecords, ...mapped];
+    this.showImportModal = false;
   }
 
   onDownload(): void {

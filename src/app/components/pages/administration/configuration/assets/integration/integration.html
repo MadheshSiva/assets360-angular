@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Integration</h1>
+    <h1 class="lh-title">Integration</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -50,6 +50,7 @@
           <th>WMS Reference</th>
           <th>API Sync Status</th>
           <th>Last Sync Timestamp</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -61,20 +62,37 @@
             <input type="text" class="cell-input" placeholder="e.g. WMS-REF-2201" [(ngModel)]="entry.wmsReference" />
           </td>
           <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.apiSyncStatus">
-                <option *ngFor="let s of syncStatusOptions" [value]="s">{{ s }}</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="select-wrap cell-select-wrap" style="flex: 1;">
+                <select class="cell-select" [(ngModel)]="entry.apiSyncStatus">
+                  <option *ngFor="let s of syncStatusOptions" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+              <app-master-link-icons
+                masterPath="/administration/configuration/master-management/api-sync-status-master"
+                [currentValue]="entry.apiSyncStatus"
+              ></app-master-link-icons>
             </div>
           </td>
           <td class="system-cell">{{ entry.lastSyncTimestamp }}</td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="4" class="empty-row">No integration records found.</td>
+          <td colspan="5" class="empty-row">No integration records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="integration"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

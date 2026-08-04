@@ -1,7 +1,7 @@
 export interface MaintenanceTaskRecord {
   taskChecklist: string[];
   instructions: string;
-  toolsRequired: string;
+  toolsRequired: string[];
   safetyProcedures: string;
   estimatedDuration: number | null;
   completionNotes: string;

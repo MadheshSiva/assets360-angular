@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Audit & Verification</h1>
+    <h1 class="lh-title">Audit & Verification</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -51,6 +51,7 @@
           <th>Physical Verification Result</th>
           <th>Discrepancies Found</th>
           <th>Audit History Logs</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -59,30 +60,53 @@
             <input type="date" class="cell-input" [(ngModel)]="entry.auditDate" />
           </td>
           <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.auditorDetails">
-                <option *ngFor="let a of auditorOptions" [value]="a">{{ a }}</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="select-wrap cell-select-wrap" style="flex: 1;">
+                <select class="cell-select" [(ngModel)]="entry.auditorDetails">
+                  <option *ngFor="let a of auditorOptions" [value]="a">{{ a }}</option>
+                </select>
+              </div>
+              <app-master-link-icons
+                masterPath="/administration/configuration/master-management/auditor-details"
+                [currentValue]="entry.auditorDetails"
+              ></app-master-link-icons>
             </div>
           </td>
           <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.physicalVerificationResult">
-                <option *ngFor="let r of verificationResultOptions" [value]="r">{{ r }}</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="select-wrap cell-select-wrap" style="flex: 1;">
+                <select class="cell-select" [(ngModel)]="entry.physicalVerificationResult">
+                  <option *ngFor="let r of verificationResultOptions" [value]="r">{{ r }}</option>
+                </select>
+              </div>
+              <app-master-link-icons
+                masterPath="/administration/configuration/master-management/physical-verification-result"
+                [currentValue]="entry.physicalVerificationResult"
+              ></app-master-link-icons>
             </div>
           </td>
           <td>
             <input type="text" class="cell-input" placeholder="e.g. Serial number mismatch" [(ngModel)]="entry.discrepanciesFound" />
           </td>
           <td class="system-cell">{{ entry.auditHistoryLogs }}</td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="5" class="empty-row">No audit &amp; verification records found.</td>
+          <td colspan="6" class="empty-row">No audit &amp; verification records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="audit-verification"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface CustomDomainFieldEntry {
   assetType: string;
@@ -18,11 +21,19 @@ const DYNAMIC_FIELD_MAP: Record<string, string[]> = {
 @Component({
   standalone: true,
   selector: 'app-asset-custom-domain-fields',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './custom-domain-fields.html',
   styleUrls: ['./custom-domain-fields.css']
 })
 export class AssetCustomDomainFields {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'assetType', label: 'Asset Type' },
+    { key: 'fieldName', label: 'Field Name' },
+    { key: 'fieldValue', label: 'Field Value' }
+  ];
+
+  showImportModal = false;
+
   // Master: asset types with domain-specific attribute sets
   assetTypeOptions: string[] = Object.keys(DYNAMIC_FIELD_MAP);
 
@@ -60,7 +71,19 @@ export class AssetCustomDomainFields {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        assetType: row['assetType'] ?? '',
+        fieldName: row['fieldName'] ?? '',
+        fieldValue: row['fieldValue'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -73,5 +96,16 @@ export class AssetCustomDomainFields {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  // No separate edit mode exists for this table — each row's fields (Asset Type, Field Name,
+  // Field Value) are already live, directly-editable inline controls, so there is no existing
+  // per-row "start editing" affordance to mirror here. Kept as a no-op to satisfy the Actions
+  // column contract.
+  editRow(entry: CustomDomainFieldEntry): void {
+  }
+
+  deleteRow(entry: CustomDomainFieldEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

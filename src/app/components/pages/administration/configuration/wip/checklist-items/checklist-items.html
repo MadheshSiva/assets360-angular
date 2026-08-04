@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - Checklist Items Master</h1>
+      <h1 class="page-title">Checklist Items Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -84,6 +84,7 @@
             <th *ngIf="isColumnVisible('thresholdValue')">Threshold Value</th>
             <th *ngIf="isColumnVisible('isCritical')">Is Critical</th>
             <th *ngIf="isColumnVisible('sequenceOrder')">Sequence Order</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -100,10 +101,13 @@
               <span class="badge" [attr.data-critical]="r.isCritical ? 'Yes' : 'No'">{{ r.isCritical ? 'Yes' : 'No' }}</span>
             </td>
             <td *ngIf="isColumnVisible('sequenceOrder')">{{ r.sequenceOrder ?? '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No checklist items found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No checklist items found.</td>
           </tr>
         </tbody>
       </table>
@@ -159,11 +163,17 @@
 
         <div class="form-field">
           <label>RESPONSE TYPE</label>
-          <div class="select-wrap">
-            <select name="responseType" [(ngModel)]="form.responseType">
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let r of responseTypeMaster" [value]="r">{{ r }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="responseType" [(ngModel)]="form.responseType">
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let r of responseTypeMaster" [value]="r">{{ r }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/response-type-master"
+              [currentValue]="form.responseType"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -195,3 +205,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="checklist-items"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Compliance & Certification</h1>
+    <h1 class="lh-title">Compliance & Certification</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -50,15 +50,22 @@
           <th>Issued Date</th>
           <th>Expiry Date</th>
           <th>Inspection Logs</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
           <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.certificationType">
-                <option *ngFor="let c of certificationTypeOptions" [value]="c">{{ c }}</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="select-wrap cell-select-wrap" style="flex: 1;">
+                <select class="cell-select" [(ngModel)]="entry.certificationType">
+                  <option *ngFor="let c of certificationTypeOptions" [value]="c">{{ c }}</option>
+                </select>
+              </div>
+              <app-master-link-icons
+                masterPath="/administration/configuration/master-management/certification-type-master"
+                [currentValue]="entry.certificationType"
+              ></app-master-link-icons>
             </div>
           </td>
           <td>
@@ -68,13 +75,24 @@
             <input type="date" class="cell-input" [(ngModel)]="entry.expiryDate" />
           </td>
           <td class="system-cell">{{ entry.inspectionLogs }}</td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="4" class="empty-row">No compliance &amp; certification records found.</td>
+          <td colspan="5" class="empty-row">No compliance &amp; certification records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="compliance-certification"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

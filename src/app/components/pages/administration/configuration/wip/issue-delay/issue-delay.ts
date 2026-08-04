@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { IssueDelay } from './issue-delay.model';
 import { IssueDelayService } from './issue-delay.service';
 
@@ -17,7 +20,7 @@ interface IssueDelayRow extends IssueDelay {
 @Component({
   standalone: true,
   selector: 'app-wip-issue-delay',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './issue-delay.html',
   styleUrls: ['./issue-delay.css']
 })
@@ -37,6 +40,22 @@ export class WipIssueDelay {
     { key: 'resolutionRemarks', label: 'Resolution Remarks', visible: true },
     { key: 'closedDate', label: 'Closed Date', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'issueId', label: 'Issue ID' },
+    { key: 'jobId', label: 'Job ID' },
+    { key: 'taskId', label: 'Task ID' },
+    { key: 'issueType', label: 'Issue Type' },
+    { key: 'description', label: 'Description' },
+    { key: 'reportedBy', label: 'Reported By' },
+    { key: 'reportedDate', label: 'Reported Date' },
+    { key: 'severity', label: 'Severity' },
+    { key: 'statusId', label: 'Status' },
+    { key: 'resolutionRemarks', label: 'Resolution Remarks' },
+    { key: 'closedDate', label: 'Closed Date' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -145,7 +164,10 @@ export class WipIssueDelay {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: IssueDelayRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -174,7 +196,32 @@ export class WipIssueDelay {
     this.refresh();
   }
 
+  deleteRow(record: IssueDelayRow): void {
+    this.service.deleteRecords([record.issueId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const mapped: IssueDelayRow[] = rows.map((row) => ({
+      issueId: row['issueId'] ?? '',
+      jobId: row['jobId'] ?? '',
+      taskId: row['taskId'] ?? '',
+      issueType: (row['issueType'] ?? '') as IssueDelay['issueType'],
+      description: row['description'] ?? '',
+      reportedBy: row['reportedBy'] ?? '',
+      reportedDate: row['reportedDate'] ?? '',
+      severity: (row['severity'] ?? '') as IssueDelay['severity'],
+      statusId: row['statusId'] ?? '',
+      resolutionRemarks: row['resolutionRemarks'] ?? '',
+      closedDate: row['closedDate'] ?? ''
+    }));
+    this.records = [...this.records, ...mapped];
+    this.filteredRecords = [...this.filteredRecords, ...mapped];
+    this.showImportModal = false;
   }
 
   onDownload(): void {

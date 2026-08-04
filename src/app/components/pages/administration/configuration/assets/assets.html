@@ -35,7 +35,7 @@
           </svg>
         </button>
 
-        <button class="icon-btn" title="Upload" (click)="onUpload()">
+        <button class="icon-btn" title="Bulk upload" (click)="onUpload()">
           <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M12 19V5M6 11l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
@@ -82,6 +82,7 @@
             <th *ngIf="isColumnVisible('tagIds')">Tag IDs</th>
             <th *ngIf="isColumnVisible('assetType')">Asset Type</th>
             <th *ngIf="isColumnVisible('parentAsset')">Parent Asset</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -97,10 +98,13 @@
             <td *ngIf="isColumnVisible('tagIds')">{{ asset.tagIds }}</td>
             <td *ngIf="isColumnVisible('assetType')">{{ asset.assetType }}</td>
             <td *ngIf="isColumnVisible('parentAsset')">{{ asset.parentAsset }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(asset)" (delete)="deleteRow(asset)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredAssets.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No assets found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No assets found.</td>
           </tr>
         </tbody>
       </table>
@@ -169,11 +173,17 @@
 
         <div class="form-field">
           <label>CATEGORY / SUB-CATEGORY <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="categorySub" [(ngModel)]="form.categorySub" required>
-              <option value="" disabled selected>-- Select Category / Sub-category --</option>
-              <option *ngFor="let c of categorySubOptions" [value]="c">{{ c }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="categorySub" [(ngModel)]="form.categorySub" required>
+                <option value="" disabled selected>-- Select Category / Sub-category --</option>
+                <option *ngFor="let c of categorySubOptions" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/category-subcategory"
+              [currentValue]="form.categorySub"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -189,21 +199,33 @@
 
         <div class="form-field">
           <label>TAG IDS (QR / RFID / BLE / GPS)</label>
-          <div class="select-wrap">
-            <select name="tagIds" [(ngModel)]="form.tagIds">
-              <option value="" disabled selected>-- Select Tag Technology --</option>
-              <option *ngFor="let t of tagTechnologyOptions" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="tagIds" [(ngModel)]="form.tagIds">
+                <option value="" disabled selected>-- Select Tag Technology --</option>
+                <option *ngFor="let t of tagTechnologyOptions" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/tag-ids"
+              [currentValue]="form.tagIds"
+            ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
           <label>ASSET TYPE <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="assetType" [(ngModel)]="form.assetType" required>
-              <option value="" disabled selected>-- Select Type --</option>
-              <option *ngFor="let t of assetTypeOptions" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="assetType" [(ngModel)]="form.assetType" required>
+                <option value="" disabled selected>-- Select Type --</option>
+                <option *ngFor="let t of assetTypeOptions" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/asset-type"
+              [currentValue]="form.assetType"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -227,3 +249,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="assets"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

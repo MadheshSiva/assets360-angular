@@ -1,7 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MasterManagementConditionMasterItem } from './condition-master.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { ConditionName, MasterManagementConditionMasterItem } from './condition-master.model';
 import { MasterManagementConditionMasterService } from './condition-master.service';
 
 interface MasterManagementConditionMasterRow extends MasterManagementConditionMasterItem {
@@ -17,7 +20,7 @@ interface MasterManagementConditionMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-condition-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './condition-master.html',
   styleUrls: ['./condition-master.css']
 })
@@ -33,6 +36,15 @@ export class MasterManagementConditionMaster {
 
   showColumnPicker = false;
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'conditionId', label: 'Condition ID' },
+    { key: 'conditionName', label: 'Condition Name' },
+    { key: 'thresholdValue', label: 'Threshold Value' },
+    { key: 'colorCode', label: 'Color Code' }
+  ];
+
+  showImportModal = false;
+
   records: MasterManagementConditionMasterRow[] = [];
   filteredRecords: MasterManagementConditionMasterRow[] = [];
 
@@ -42,8 +54,37 @@ export class MasterManagementConditionMaster {
 
   form: MasterManagementConditionMasterItem = this.emptyForm();
 
-  constructor(private service: MasterManagementConditionMasterService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementConditionMasterService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.conditionName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get conditionNameMaster() {
@@ -115,7 +156,10 @@ export class MasterManagementConditionMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementConditionMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -126,6 +170,9 @@ export class MasterManagementConditionMaster {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -144,7 +191,27 @@ export class MasterManagementConditionMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementConditionMasterRow): void {
+    this.service.deleteRecords([record.conditionId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.records = [
+      ...this.records,
+      ...rows.map((row) => ({
+        conditionId: row['conditionId'] ?? '',
+        conditionName: (row['conditionName'] ?? '') as ConditionName | '',
+        thresholdValue: row['thresholdValue'] ? Number(row['thresholdValue']) : null,
+        colorCode: row['colorCode'] ?? ''
+      }))
+    ];
+    this.onSearch();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

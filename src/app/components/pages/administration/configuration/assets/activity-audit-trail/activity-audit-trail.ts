@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface ActivityAuditTrailEntry {
   whoCreatedUpdatedAsset: string;
@@ -11,7 +12,7 @@ export interface ActivityAuditTrailEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-activity-audit-trail',
-  imports: [CommonModule],
+  imports: [CommonModule, RowActions],
   templateUrl: './activity-audit-trail.html',
   styleUrls: ['./activity-audit-trail.css']
 })
@@ -42,5 +43,13 @@ export class AssetActivityAuditTrail {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: ActivityAuditTrailEntry): void {
+    // TODO: open edit form for this activity / audit trail entry
+  }
+
+  deleteRow(entry: ActivityAuditTrailEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

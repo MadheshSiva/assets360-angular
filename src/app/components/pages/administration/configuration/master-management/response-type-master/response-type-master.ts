@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementResponseTypeMasterItem } from './response-type-master.model';
 import { MasterManagementResponseTypeMasterService } from './response-type-master.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementResponseTypeMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-response-type-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './response-type-master.html',
   styleUrls: ['./response-type-master.css']
 })
@@ -31,6 +34,15 @@ export class MasterManagementResponseTypeMaster {
     { key: 'isActive', label: 'Is Active', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'typeId', label: 'Type ID' },
+    { key: 'typeName', label: 'Type Name' },
+    { key: 'validationType', label: 'Validation Type' },
+    { key: 'isActive', label: 'Is Active' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementResponseTypeMasterRow[] = [];
@@ -42,8 +54,37 @@ export class MasterManagementResponseTypeMaster {
 
   form: MasterManagementResponseTypeMasterItem = this.emptyForm();
 
-  constructor(private service: MasterManagementResponseTypeMasterService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementResponseTypeMasterService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.typeName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get typeNameMaster() {
@@ -119,7 +160,10 @@ export class MasterManagementResponseTypeMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementResponseTypeMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -130,6 +174,9 @@ export class MasterManagementResponseTypeMaster {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -148,7 +195,27 @@ export class MasterManagementResponseTypeMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementResponseTypeMasterRow): void {
+    this.service.deleteRecords([record.typeId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const toBool = (v?: string) => ['true', 'yes', '1'].includes((v ?? '').trim().toLowerCase());
+    rows.forEach((row) => {
+      this.service.addRecord({
+        typeId: row['typeId'] ?? '',
+        typeName: (row['typeName'] as MasterManagementResponseTypeMasterItem['typeName']) || '',
+        validationType: (row['validationType'] as MasterManagementResponseTypeMasterItem['validationType']) || '',
+        isActive: toBool(row['isActive'])
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

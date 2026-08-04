@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface DocumentAttachmentEntry {
   purchaseInvoice: string;
@@ -12,11 +14,21 @@ export interface DocumentAttachmentEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-document-attachment',
-  imports: [CommonModule],
+  imports: [CommonModule, ImportFileModal, RowActions],
   templateUrl: './document-attachment.html',
   styleUrls: ['./document-attachment.css']
 })
 export class AssetDocumentAttachment {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'purchaseInvoice', label: 'Purchase Invoice' },
+    { key: 'warrantyCertificate', label: 'Warranty Certificate' },
+    { key: 'manuals', label: 'Manuals' },
+    { key: 'images', label: 'Images' },
+    { key: 'complianceCertificates', label: 'Compliance Certificates' }
+  ];
+
+  showImportModal = false;
+
   entries: DocumentAttachmentEntry[] = [
     {
       purchaseInvoice: 'invoice_88213.pdf',
@@ -39,7 +51,21 @@ export class AssetDocumentAttachment {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        purchaseInvoice: row['purchaseInvoice'] ?? '',
+        warrantyCertificate: row['warrantyCertificate'] ?? '',
+        manuals: row['manuals'] ?? '',
+        images: row['images'] ?? '',
+        complianceCertificates: row['complianceCertificates'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -52,5 +78,13 @@ export class AssetDocumentAttachment {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: DocumentAttachmentEntry): void {
+    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+  }
+
+  deleteRow(entry: DocumentAttachmentEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

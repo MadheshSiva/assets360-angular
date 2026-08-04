@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Financial</h1>
+    <h1 class="lh-title">Financial</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -54,6 +54,7 @@
           <th>Current Book Value</th>
           <th>Residual Value</th>
           <th>Cost Center Allocation</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -66,13 +67,24 @@
           <td>{{ entry.currentBookValue }}</td>
           <td>{{ entry.residualValue }}</td>
           <td>{{ entry.costCenterAllocation }}</td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="8" class="empty-row">No financial records found.</td>
+          <td colspan="9" class="empty-row">No financial records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="financial"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

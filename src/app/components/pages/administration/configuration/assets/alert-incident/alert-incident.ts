@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface AlertIncidentEntry {
   alertType: string;
@@ -13,11 +16,21 @@ export interface AlertIncidentEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-alert-incident',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './alert-incident.html',
   styleUrls: ['./alert-incident.css']
 })
 export class AssetAlertIncident {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'alertType', label: 'Alert Type' },
+    { key: 'incidentReports', label: 'Incident Reports' },
+    { key: 'damageReports', label: 'Damage Reports' },
+    { key: 'theftLossRecords', label: 'Theft / Loss Records' },
+    { key: 'resolutionStatus', label: 'Resolution Status' }
+  ];
+
+  showImportModal = false;
+
   // Master: alert type (geofence breach, low battery, etc.)
   alertTypeOptions: string[] = [
     'Geofence Breach',
@@ -63,7 +76,21 @@ export class AssetAlertIncident {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        alertType: row['alertType'] ?? '',
+        incidentReports: row['incidentReports'] ?? '',
+        damageReports: row['damageReports'] ?? '',
+        theftLossRecords: row['theftLossRecords'] ?? '',
+        resolutionStatus: row['resolutionStatus'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -76,5 +103,13 @@ export class AssetAlertIncident {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: AlertIncidentEntry): void {
+    // TODO: open edit form for this alert / incident entry (fields are already inline-editable)
+  }
+
+  deleteRow(entry: AlertIncidentEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

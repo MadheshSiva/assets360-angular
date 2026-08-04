@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - Asset Linking Master</h1>
+      <h1 class="page-title">Asset Linking Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,6 +87,7 @@
             <th *ngIf="isColumnVisible('utilizationStatus')">Utilization Status</th>
             <th *ngIf="isColumnVisible('lastMaintenanceDate')">Last Maintenance Date</th>
             <th *ngIf="isColumnVisible('condition')">Condition</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -108,10 +109,13 @@
             <td *ngIf="isColumnVisible('condition')">
               <span class="badge" [attr.data-condition]="r.condition">{{ r.condition }}</span>
             </td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No assets found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No assets found.</td>
           </tr>
         </tbody>
       </table>
@@ -157,11 +161,17 @@
 
         <div class="form-field">
           <label>ASSET TYPE <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="assetType" [(ngModel)]="form.assetType" required>
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let t of assetTypeMaster" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="assetType" [(ngModel)]="form.assetType" required>
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let t of assetTypeMaster" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/asset-type"
+              [currentValue]="form.assetType"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -207,11 +217,17 @@
 
         <div class="form-field">
           <label>CONDITION</label>
-          <div class="select-wrap">
-            <select name="condition" [(ngModel)]="form.condition">
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let c of conditionMaster" [value]="c">{{ c }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="condition" [(ngModel)]="form.condition">
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let c of conditionMaster" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/condition-master"
+              [currentValue]="form.condition"
+            ></app-master-link-icons>
           </div>
         </div>
       </div>
@@ -225,3 +241,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="asset-linking"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

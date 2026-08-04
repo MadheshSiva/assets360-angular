@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PreventiveMaintenanceRecord, PreventiveMaintenanceForm } from './preventive-maintenance.model';
 import { PreventiveMaintenanceService } from './preventive-maintenance.service';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 interface PmColumn {
   key: string;
@@ -13,7 +16,7 @@ interface PmColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-preventive',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './preventive-maintenance.html',
   styleUrls: ['./preventive-maintenance.css']
 })
@@ -28,6 +31,17 @@ export class MaintenancePreventive {
     { key: 'nextDueDate', label: 'Next Due Date', visible: true },
     { key: 'autoCreateWorkOrder', label: 'Auto-create Work Order', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'pmScheduleId', label: 'PM Schedule ID' },
+    { key: 'frequency', label: 'Frequency' },
+    { key: 'triggerType', label: 'Trigger Type' },
+    { key: 'lastMaintenanceDate', label: 'Last Maintenance Date' },
+    { key: 'nextDueDate', label: 'Next Due Date' },
+    { key: 'autoCreateWorkOrder', label: 'Auto-create Work Order' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -127,7 +141,10 @@ export class MaintenancePreventive {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: PreventiveMaintenanceRecord): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -156,8 +173,29 @@ export class MaintenancePreventive {
     this.refresh();
   }
 
+  deleteRow(record: PreventiveMaintenanceRecord): void {
+    this.pmService.deleteRecords([record]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      const autoCreateWorkOrder = row['autoCreateWorkOrder'] ?? '';
+      this.pmService.addRecord({
+        pmScheduleId: row['pmScheduleId'] ?? '',
+        frequency: row['frequency'] ?? '',
+        triggerType: row['triggerType'] ?? '',
+        lastMaintenanceDate: row['lastMaintenanceDate'] ?? '',
+        nextDueDate: row['nextDueDate'] ?? '',
+        autoCreateWorkOrder: autoCreateWorkOrder === 'Yes' || autoCreateWorkOrder === 'No' ? autoCreateWorkOrder : ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

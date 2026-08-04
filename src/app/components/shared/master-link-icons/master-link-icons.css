@@ -1,0 +1,42 @@
+:host {
+  display: inline-flex;
+  flex-shrink: 0;
+}
+
+.master-link-icons {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.link-icon-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1.5px solid #7030a0;
+  background: #fff;
+  color: #7030a0;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.link-icon-btn svg {
+  width: 14px;
+  height: 14px;
+}
+
+.link-icon-btn:hover:not(:disabled) {
+  background: #7030a0;
+  color: #fff;
+}
+
+.link-icon-btn:disabled {
+  border-color: #d8d7e6;
+  color: #c3c2d4;
+  cursor: not-allowed;
+}

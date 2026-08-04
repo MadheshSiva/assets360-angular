@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MaterialConsumption } from './material-consumption.model';
 import { MaterialConsumptionService } from './material-consumption.service';
 
@@ -13,7 +16,7 @@ interface MaterialConsumptionColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-material-consumption',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './material-consumption.html',
   styleUrls: ['./material-consumption.css']
 })
@@ -32,6 +35,21 @@ export class WipMaterialConsumption {
     { key: 'cost', label: 'Cost', visible: true },
     { key: 'vendorId', label: 'Vendor ID', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'materialId', label: 'Material ID' },
+    { key: 'jobId', label: 'Job ID' },
+    { key: 'taskId', label: 'Task ID' },
+    { key: 'itemName', label: 'Item Name' },
+    { key: 'itemCode', label: 'Item Code' },
+    { key: 'quantityPlanned', label: 'Quantity Planned' },
+    { key: 'quantityUsed', label: 'Quantity Used' },
+    { key: 'unit', label: 'Unit' },
+    { key: 'cost', label: 'Cost' },
+    { key: 'vendorId', label: 'Vendor ID' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -149,7 +167,10 @@ export class WipMaterialConsumption {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MaterialConsumption): void {
     this.isEditMode = true;
     this.editingRecord = record;
     this.form = { ...record };
@@ -183,7 +204,32 @@ export class WipMaterialConsumption {
     this.refresh();
   }
 
+  deleteRow(record: MaterialConsumption): void {
+    this.service.deleteRecords([record.materialId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        materialId: row['materialId'] ?? '',
+        jobId: row['jobId'] ?? '',
+        taskId: row['taskId'] ?? '',
+        itemName: row['itemName'] ?? '',
+        itemCode: row['itemCode'] ?? '',
+        quantityPlanned: row['quantityPlanned'] ? Number(row['quantityPlanned']) : null,
+        quantityUsed: row['quantityUsed'] ? Number(row['quantityUsed']) : null,
+        unit: row['unit'] ?? '',
+        cost: row['cost'] ? Number(row['cost']) : null,
+        vendorId: row['vendorId'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

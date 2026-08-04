@@ -1,0 +1,49 @@
+:host {
+  display: inline-flex;
+}
+
+.row-actions {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  white-space: nowrap;
+}
+
+.row-action-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 26px;
+  height: 26px;
+  border-radius: 50%;
+  background: #fff;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.row-action-btn svg {
+  width: 15px;
+  height: 15px;
+}
+
+.row-action-btn.edit {
+  border: 1.5px solid #7030a0;
+  color: #7030a0;
+}
+
+.row-action-btn.edit:hover {
+  background: #7030a0;
+  color: #fff;
+}
+
+.row-action-btn.delete {
+  border: 1.5px solid #d64545;
+  color: #d64545;
+}
+
+.row-action-btn.delete:hover {
+  background: #d64545;
+  color: #fff;
+}

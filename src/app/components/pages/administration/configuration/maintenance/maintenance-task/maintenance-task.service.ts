@@ -23,7 +23,7 @@ export class MaintenanceTaskService {
     {
       taskChecklist: ['Visual Inspection', 'Lubrication Check'],
       instructions: 'Inspect belts and lubricate bearings as per OEM guidelines.',
-      toolsRequired: 'Grease Gun',
+      toolsRequired: ['Grease Gun'],
       safetyProcedures: 'Lock out / tag out the equipment before servicing.',
       estimatedDuration: 45,
       completionNotes: ''
@@ -31,7 +31,7 @@ export class MaintenanceTaskService {
     {
       taskChecklist: ['Filter Replacement'],
       instructions: 'Replace the primary intake filter and check air flow.',
-      toolsRequired: 'Vacuum Cleaner',
+      toolsRequired: ['Vacuum Cleaner'],
       safetyProcedures: 'Wear a dust mask while handling used filters.',
       estimatedDuration: 30,
       completionNotes: ''
@@ -60,7 +60,7 @@ export class MaintenanceTaskService {
     const value = term.trim().toLowerCase();
     if (!value) return this.tasksSubject.value;
     return this.tasksSubject.value.filter((t) =>
-      [t.taskChecklist.join(', '), t.instructions, t.toolsRequired, t.safetyProcedures, t.completionNotes].some(
+      [t.taskChecklist.join(', '), t.instructions, t.toolsRequired.join(', '), t.safetyProcedures, t.completionNotes].some(
         (v) => v.toLowerCase().includes(value)
       )
     );

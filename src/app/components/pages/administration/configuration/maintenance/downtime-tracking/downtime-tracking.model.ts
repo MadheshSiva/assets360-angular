@@ -1,4 +1,5 @@
 export interface DowntimeTrackingRecord {
+  assetId: string;
   downtimeStart: string;
   downtimeEnd: string;
   totalDowntime: string;

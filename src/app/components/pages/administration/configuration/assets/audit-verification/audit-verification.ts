@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface AuditVerificationEntry {
   auditDate: string;
@@ -13,11 +16,21 @@ export interface AuditVerificationEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-audit-verification',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './audit-verification.html',
   styleUrls: ['./audit-verification.css']
 })
 export class AssetAuditVerification {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'auditDate', label: 'Audit Date' },
+    { key: 'auditorDetails', label: 'Auditor Details' },
+    { key: 'physicalVerificationResult', label: 'Physical Verification Result' },
+    { key: 'discrepanciesFound', label: 'Discrepancies Found' },
+    { key: 'auditHistoryLogs', label: 'Audit History Logs' }
+  ];
+
+  showImportModal = false;
+
   // Master: auditor details
   auditorOptions: string[] = ['J. Fernando', 'A. Perera', 'N. Silva', 'External Auditor - KPMG'];
 
@@ -57,7 +70,21 @@ export class AssetAuditVerification {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        auditDate: row['auditDate'] ?? '',
+        auditorDetails: row['auditorDetails'] ?? '',
+        physicalVerificationResult: row['physicalVerificationResult'] ?? '',
+        discrepanciesFound: row['discrepanciesFound'] ?? '',
+        auditHistoryLogs: row['auditHistoryLogs'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -70,5 +97,13 @@ export class AssetAuditVerification {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: AuditVerificationEntry): void {
+    // TODO: open edit flow for a single row (rows here are already inline-editable; no separate edit flow to mirror)
+  }
+
+  deleteRow(entry: AuditVerificationEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

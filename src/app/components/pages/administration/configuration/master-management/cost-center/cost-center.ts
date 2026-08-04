@@ -1,7 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MasterManagementCostCenterItem } from './cost-center.model';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { CostCenterStatus, MasterManagementCostCenterItem } from './cost-center.model';
 import { MasterManagementCostCenterService } from './cost-center.service';
 
 interface MasterManagementCostCenterRow extends MasterManagementCostCenterItem {
@@ -17,7 +19,7 @@ interface MasterManagementCostCenterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-cost-center',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './cost-center.html',
   styleUrls: ['./cost-center.css']
 })
@@ -37,6 +39,20 @@ export class MasterManagementCostCenter {
   ];
 
   showColumnPicker = false;
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'costCenterId', label: 'Cost Center ID' },
+    { key: 'costCenterName', label: 'Cost Center Name' },
+    { key: 'costCenterCode', label: 'Cost Center Code' },
+    { key: 'description', label: 'Description' },
+    { key: 'departmentId', label: 'Department' },
+    { key: 'parentCostCenterId', label: 'Parent Cost Center' },
+    { key: 'manager', label: 'Manager' },
+    { key: 'budgetAmount', label: 'Budget Amount' },
+    { key: 'status', label: 'Status' }
+  ];
+
+  showImportModal = false;
 
   records: MasterManagementCostCenterRow[] = [];
   filteredRecords: MasterManagementCostCenterRow[] = [];
@@ -138,7 +154,10 @@ export class MasterManagementCostCenter {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementCostCenterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -167,7 +186,32 @@ export class MasterManagementCostCenter {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementCostCenterRow): void {
+    this.service.deleteRecords([record.costCenterId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.records = [
+      ...this.records,
+      ...rows.map((row) => ({
+        costCenterId: row['costCenterId'] ?? '',
+        costCenterName: row['costCenterName'] ?? '',
+        costCenterCode: row['costCenterCode'] ?? '',
+        description: row['description'] ?? '',
+        departmentId: row['departmentId'] ?? '',
+        parentCostCenterId: row['parentCostCenterId'] ?? '',
+        manager: row['manager'] ?? '',
+        budgetAmount: row['budgetAmount'] ? Number(row['budgetAmount']) : null,
+        status: (row['status'] ?? '') as CostCenterStatus | ''
+      }))
+    ];
+    this.onSearch();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

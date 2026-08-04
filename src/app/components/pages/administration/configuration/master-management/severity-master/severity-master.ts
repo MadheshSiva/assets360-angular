@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementSeverityMasterItem } from './severity-master.model';
 import { MasterManagementSeverityMasterService } from './severity-master.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementSeverityMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-severity-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './severity-master.html',
   styleUrls: ['./severity-master.css']
 })
@@ -30,6 +33,14 @@ export class MasterManagementSeverityMaster {
     { key: 'colorCode', label: 'Color Code', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'severityId', label: 'Severity ID' },
+    { key: 'severityName', label: 'Severity Name' },
+    { key: 'colorCode', label: 'Color Code' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementSeverityMasterRow[] = [];
@@ -41,8 +52,37 @@ export class MasterManagementSeverityMaster {
 
   form: MasterManagementSeverityMasterItem = this.emptyForm();
 
-  constructor(private service: MasterManagementSeverityMasterService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementSeverityMasterService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.severityName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get severityNameMaster() {
@@ -113,7 +153,10 @@ export class MasterManagementSeverityMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementSeverityMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -124,6 +167,9 @@ export class MasterManagementSeverityMaster {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -142,7 +188,25 @@ export class MasterManagementSeverityMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementSeverityMasterRow): void {
+    this.service.deleteRecords([record.severityId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        severityId: row['severityId'] ?? '',
+        severityName: (row['severityName'] as MasterManagementSeverityMasterItem['severityName']) || '',
+        colorCode: row['colorCode'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

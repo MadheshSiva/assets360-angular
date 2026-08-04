@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementWorkTypeItem } from './work-type.model';
 import { MasterManagementWorkTypeService } from './work-type.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementWorkTypeColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-work-type',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './work-type.html',
   styleUrls: ['./work-type.css']
 })
@@ -33,6 +36,10 @@ export class MasterManagementWorkType {
 
   showColumnPicker = false;
 
+  readonly importColumns: ImportColumn[] = this.columns.map(({ key, label }) => ({ key, label }));
+
+  showImportModal = false;
+
   records: MasterManagementWorkTypeRow[] = [];
   filteredRecords: MasterManagementWorkTypeRow[] = [];
 
@@ -42,8 +49,37 @@ export class MasterManagementWorkType {
 
   form: MasterManagementWorkTypeItem = this.emptyForm();
 
-  constructor(private service: MasterManagementWorkTypeService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementWorkTypeService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.workTypeName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   private emptyForm(): MasterManagementWorkTypeItem {
@@ -111,7 +147,10 @@ export class MasterManagementWorkType {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementWorkTypeRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -122,6 +161,9 @@ export class MasterManagementWorkType {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -140,7 +182,26 @@ export class MasterManagementWorkType {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementWorkTypeRow): void {
+    this.service.deleteRecords([record.workTypeId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        workTypeId: row['workTypeId'] ?? '',
+        workTypeName: row['workTypeName'] ?? '',
+        description: row['description'] ?? '',
+        isActive: /^(true|yes|1)$/i.test((row['isActive'] ?? '').trim())
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

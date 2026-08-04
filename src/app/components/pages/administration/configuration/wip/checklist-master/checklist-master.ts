@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { ChecklistMaster } from './checklist-master.model';
 import { ChecklistMasterService } from './checklist-master.service';
 
@@ -13,7 +16,7 @@ interface ChecklistMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-checklist-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './checklist-master.html',
   styleUrls: ['./checklist-master.css']
 })
@@ -28,6 +31,17 @@ export class WipChecklistMaster {
     { key: 'versionNumber', label: 'Version Number', visible: true },
     { key: 'isMandatory', label: 'Is Mandatory', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'checklistId', label: 'Checklist ID' },
+    { key: 'checklistName', label: 'Checklist Name' },
+    { key: 'checklistType', label: 'Checklist Type' },
+    { key: 'applicableWorkType', label: 'Applicable Work Type' },
+    { key: 'versionNumber', label: 'Version Number' },
+    { key: 'isMandatory', label: 'Is Mandatory' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -142,7 +156,10 @@ export class WipChecklistMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: ChecklistMaster): void {
     this.isEditMode = true;
     this.editingRecord = record;
     this.form = { ...record, applicableWorkType: [...record.applicableWorkType] };
@@ -182,7 +199,31 @@ export class WipChecklistMaster {
     this.refresh();
   }
 
+  deleteRow(record: ChecklistMaster): void {
+    this.service.deleteRecords([record.checklistId]);
+    this.selectedIds.clear();
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const mapped: ChecklistMaster[] = rows.map((row) => ({
+      checklistId: row['checklistId'] ?? '',
+      checklistName: row['checklistName'] ?? '',
+      checklistType: row['checklistType'] ?? '',
+      applicableWorkType: (row['applicableWorkType'] ?? '')
+        .split(',')
+        .map((v) => v.trim())
+        .filter(Boolean),
+      versionNumber: row['versionNumber'] ? Number(row['versionNumber']) : null,
+      isMandatory: row['isMandatory']?.toLowerCase() === 'true' || row['isMandatory']?.toLowerCase() === 'yes'
+    }));
+    this.records = [...this.records, ...mapped];
+    this.filteredRecords = [...this.filteredRecords, ...mapped];
+    this.showImportModal = false;
   }
 
   onDownload(): void {

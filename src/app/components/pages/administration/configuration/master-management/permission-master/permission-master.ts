@@ -1,7 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MasterManagementPermissionMasterItem } from './permission-master.model';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterManagementPermissionMasterItem, PermissionAction } from './permission-master.model';
 import { MasterManagementPermissionMasterService } from './permission-master.service';
 
 interface MasterManagementPermissionMasterRow extends MasterManagementPermissionMasterItem {
@@ -17,7 +19,7 @@ interface MasterManagementPermissionMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-permission-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './permission-master.html',
   styleUrls: ['./permission-master.css']
 })
@@ -29,6 +31,14 @@ export class MasterManagementPermissionMaster {
     { key: 'permissionName', label: 'Permission Name', visible: true },
     { key: 'module', label: 'Module', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'permissionId', label: 'Permission ID' },
+    { key: 'permissionName', label: 'Permission Name' },
+    { key: 'module', label: 'Module' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -117,7 +127,10 @@ export class MasterManagementPermissionMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementPermissionMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -146,7 +159,25 @@ export class MasterManagementPermissionMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementPermissionMasterRow): void {
+    this.service.deleteRecords([record.permissionId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        permissionId: row['permissionId'] ?? '',
+        permissionName: (row['permissionName'] ?? '') as PermissionAction | '',
+        module: row['module'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

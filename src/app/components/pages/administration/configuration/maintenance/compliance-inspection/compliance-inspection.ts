@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { ComplianceInspectionRecord, ComplianceInspectionForm } from './compliance-inspection.model';
 import { ComplianceInspectionService } from './compliance-inspection.service';
 
@@ -13,7 +15,7 @@ interface InspectionColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-compliance-inspection',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './compliance-inspection.html',
   styleUrls: ['./compliance-inspection.css']
 })
@@ -29,6 +31,18 @@ export class MaintenanceComplianceInspection {
     { key: 'nextInspectionDate', label: 'Next Inspection Date', visible: true },
     { key: 'remarks', label: 'Remarks', visible: false }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'inspectionId', label: 'Inspection ID' },
+    { key: 'inspectionType', label: 'Inspection Type' },
+    { key: 'checklist', label: 'Checklist' },
+    { key: 'inspectorName', label: 'Inspector Name' },
+    { key: 'result', label: 'Result' },
+    { key: 'nextInspectionDate', label: 'Next Inspection Date' },
+    { key: 'remarks', label: 'Remarks' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -129,7 +143,10 @@ export class MaintenanceComplianceInspection {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: ComplianceInspectionRecord): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -158,8 +175,29 @@ export class MaintenanceComplianceInspection {
     this.refresh();
   }
 
+  deleteRow(record: ComplianceInspectionRecord): void {
+    this.inspectionService.deleteRecords([record.inspectionId]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.inspectionService.addRecord({
+        inspectionId: row['inspectionId'] ?? '',
+        inspectionType: row['inspectionType'] ?? '',
+        checklist: row['checklist'] ?? '',
+        inspectorName: row['inspectorName'] ?? '',
+        result: (row['result'] ?? '') as 'Pass' | 'Fail' | '',
+        nextInspectionDate: row['nextInspectionDate'] ?? '',
+        remarks: row['remarks'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

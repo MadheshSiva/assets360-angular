@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface AssetLifecycleEntry {
   procurementDate: string;
@@ -12,11 +14,21 @@ export interface AssetLifecycleEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-lifecycle',
-  imports: [CommonModule],
+  imports: [CommonModule, ImportFileModal, RowActions],
   templateUrl: './asset-lifecycle.html',
   styleUrls: ['./asset-lifecycle.css']
 })
 export class AssetLifecycle {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'procurementDate', label: 'Procurement Date' },
+    { key: 'deploymentDate', label: 'Deployment Date' },
+    { key: 'status', label: 'Status' },
+    { key: 'disposalDetails', label: 'Disposal Details' },
+    { key: 'reasonForRetirement', label: 'Reason for Retirement' }
+  ];
+
+  showImportModal = false;
+
   entries: AssetLifecycleEntry[] = [
     {
       procurementDate: '2025-02-14',
@@ -39,7 +51,21 @@ export class AssetLifecycle {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        procurementDate: row['procurementDate'] ?? '',
+        deploymentDate: row['deploymentDate'] ?? '',
+        status: row['status'] ?? '',
+        disposalDetails: row['disposalDetails'] ?? '',
+        reasonForRetirement: row['reasonForRetirement'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -52,5 +78,13 @@ export class AssetLifecycle {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: AssetLifecycleEntry): void {
+    // TODO: open edit asset lifecycle entry flow for this entry
+  }
+
+  deleteRow(entry: AssetLifecycleEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

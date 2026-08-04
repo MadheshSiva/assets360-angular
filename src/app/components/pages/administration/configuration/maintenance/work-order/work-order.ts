@@ -1,7 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { WorkOrder, WorkOrderForm } from './work-order.model';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { WorkOrder, WorkOrderForm, WorkOrderType, WorkOrderPriority, WorkOrderStatus } from './work-order.model';
 import { WorkOrderService } from './work-order.service';
 
 interface WorkOrderColumn {
@@ -13,7 +16,7 @@ interface WorkOrderColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-work-order',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './work-order.html',
   styleUrls: ['./work-order.css']
 })
@@ -36,6 +39,25 @@ export class MaintenanceWorkOrder {
     { key: 'department', label: 'Department', visible: false },
     { key: 'location', label: 'Location', visible: false }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'workOrderId', label: 'Work Order ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'workType', label: 'Work Type' },
+    { key: 'title', label: 'Title / Description' },
+    { key: 'priority', label: 'Priority' },
+    { key: 'status', label: 'Status' },
+    { key: 'createdDate', label: 'Created Date' },
+    { key: 'scheduledDate', label: 'Scheduled Date' },
+    { key: 'startTime', label: 'Start Time' },
+    { key: 'endTime', label: 'End Time' },
+    { key: 'downtimeDuration', label: 'Downtime Duration' },
+    { key: 'assignedTechnician', label: 'Assigned Technician' },
+    { key: 'department', label: 'Department' },
+    { key: 'location', label: 'Location' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -83,8 +105,8 @@ export class MaintenanceWorkOrder {
   private emptyForm(): WorkOrderForm {
     return {
       workOrderId: '',
-      assetId: '',
-      workType: '',
+      assetId: [],
+      workType: [],
       title: '',
       priority: '',
       status: '',
@@ -93,10 +115,49 @@ export class MaintenanceWorkOrder {
       startTime: '',
       endTime: '',
       downtimeDuration: null,
-      assignedTechnician: '',
+      assignedTechnician: [],
       department: '',
       location: ''
     };
+  }
+
+  addFormAssetId(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const value = select.value;
+    select.value = '';
+    if (value && !this.form.assetId.includes(value)) {
+      this.form.assetId = [...this.form.assetId, value];
+    }
+  }
+
+  removeFormAssetId(assetId: string): void {
+    this.form.assetId = this.form.assetId.filter((id) => id !== assetId);
+  }
+
+  addFormWorkType(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const value = select.value as WorkOrderType | '';
+    select.value = '';
+    if (value && !this.form.workType.includes(value)) {
+      this.form.workType = [...this.form.workType, value];
+    }
+  }
+
+  removeFormWorkType(workType: WorkOrderType): void {
+    this.form.workType = this.form.workType.filter((t) => t !== workType);
+  }
+
+  addFormTechnician(event: Event): void {
+    const select = event.target as HTMLSelectElement;
+    const value = select.value;
+    select.value = '';
+    if (value && !this.form.assignedTechnician.includes(value)) {
+      this.form.assignedTechnician = [...this.form.assignedTechnician, value];
+    }
+  }
+
+  removeFormTechnician(technician: string): void {
+    this.form.assignedTechnician = this.form.assignedTechnician.filter((t) => t !== technician);
   }
 
   private refresh(): void {
@@ -106,6 +167,10 @@ export class MaintenanceWorkOrder {
 
   assetName(assetId: string): string {
     return this.assetMaster.find((a) => a.id === assetId)?.name ?? assetId;
+  }
+
+  assetNames(assetIds: string[]): string {
+    return assetIds.map((id) => this.assetName(id)).join(', ');
   }
 
   isColumnVisible(key: string): boolean {
@@ -159,11 +224,19 @@ export class MaintenanceWorkOrder {
 
   onEdit(): void {
     if (this.selectedWorkOrders.length !== 1) return;
-    const workOrder = this.selectedWorkOrders[0];
+    this.editRow(this.selectedWorkOrders[0]);
+  }
+
+  editRow(workOrder: WorkOrder): void {
     this.isEditMode = true;
     this.editingWorkOrder = workOrder;
     const { selected, ...rest } = workOrder;
-    this.form = { ...rest };
+    this.form = {
+      ...rest,
+      assetId: [...rest.assetId],
+      workType: [...rest.workType],
+      assignedTechnician: [...rest.assignedTechnician]
+    };
     this.showFormModal = true;
   }
 
@@ -188,8 +261,39 @@ export class MaintenanceWorkOrder {
     this.refresh();
   }
 
+  deleteRow(workOrder: WorkOrder): void {
+    this.workOrderService.deleteWorkOrders([workOrder.workOrderId]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.workOrderService.addWorkOrder({
+        workOrderId: row['workOrderId'] ?? '',
+        assetId: (row['assetId'] ?? '').split(',').map((s) => s.trim()).filter(Boolean),
+        workType: (row['workType'] ?? '')
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean) as WorkOrderType[],
+        title: row['title'] ?? '',
+        priority: (row['priority'] ?? '') as WorkOrderPriority | '',
+        status: (row['status'] ?? '') as WorkOrderStatus | '',
+        createdDate: row['createdDate'] ?? '',
+        scheduledDate: row['scheduledDate'] ?? '',
+        startTime: row['startTime'] ?? '',
+        endTime: row['endTime'] ?? '',
+        downtimeDuration: row['downtimeDuration'] ? Number(row['downtimeDuration']) : null,
+        assignedTechnician: (row['assignedTechnician'] ?? '').split(',').map((s) => s.trim()).filter(Boolean),
+        department: row['department'] ?? '',
+        location: row['location'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

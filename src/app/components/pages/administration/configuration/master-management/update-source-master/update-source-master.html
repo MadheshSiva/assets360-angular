@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Master Management - Update Source Master</h1>
+      <h1 class="page-title">Update Source Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -80,6 +80,7 @@
             <th *ngIf="isColumnVisible('sourceId')">Source ID</th>
             <th *ngIf="isColumnVisible('sourceName')">Source Name</th>
             <th *ngIf="isColumnVisible('description')">Description</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -90,10 +91,13 @@
             <td *ngIf="isColumnVisible('sourceId')" class="mono">{{ r.sourceId }}</td>
             <td *ngIf="isColumnVisible('sourceName')">{{ r.sourceName || '-' }}</td>
             <td *ngIf="isColumnVisible('description')">{{ r.description || '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No records found.</td>
           </tr>
         </tbody>
       </table>
@@ -157,3 +161,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="update-source-master"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

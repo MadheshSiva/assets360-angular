@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { ProgressLog, ProgressLogForm } from './progress-log.model';
 import { ProgressLogService } from './progress-log.service';
 
@@ -13,7 +16,7 @@ interface ProgressLogColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-progress-log',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './progress-log.html',
   styleUrls: ['./progress-log.css']
 })
@@ -32,6 +35,21 @@ export class WipProgressLog {
     { key: 'remarks', label: 'Remarks', visible: true },
     { key: 'sensorData', label: 'Sensor Data', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'logId', label: 'Log ID' },
+    { key: 'jobId', label: 'Job ID' },
+    { key: 'taskId', label: 'Task ID' },
+    { key: 'timestamp', label: 'Timestamp' },
+    { key: 'progressPercentage', label: 'Progress %' },
+    { key: 'statusId', label: 'Status' },
+    { key: 'updatedBy', label: 'Updated By' },
+    { key: 'updateSource', label: 'Update Source' },
+    { key: 'remarks', label: 'Remarks' },
+    { key: 'sensorData', label: 'Sensor Data' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -135,7 +153,10 @@ export class WipProgressLog {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: ProgressLog): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -174,7 +195,32 @@ export class WipProgressLog {
     this.refresh();
   }
 
+  deleteRow(record: ProgressLog): void {
+    this.service.deleteRecords([record.logId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        logId: row['logId'] ?? '',
+        jobId: row['jobId'] ?? '',
+        taskId: row['taskId'] ?? '',
+        timestamp: row['timestamp'] ?? '',
+        progressPercentage: row['progressPercentage'] ? Number(row['progressPercentage']) : null,
+        statusId: row['statusId'] ?? '',
+        updatedBy: row['updatedBy'] ?? '',
+        updateSource: (row['updateSource'] ?? '') as ProgressLog['updateSource'],
+        remarks: row['remarks'] ?? '',
+        sensorData: row['sensorData'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

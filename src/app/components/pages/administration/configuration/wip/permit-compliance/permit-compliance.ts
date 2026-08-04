@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { PermitCompliance, PermitComplianceForm } from './permit-compliance.model';
 import { PermitComplianceService } from './permit-compliance.service';
 
@@ -13,7 +16,7 @@ interface PermitComplianceColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-permit-compliance',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './permit-compliance.html',
   styleUrls: ['./permit-compliance.css']
 })
@@ -31,6 +34,20 @@ export class WipPermitCompliance {
     { key: 'status', label: 'Status', visible: true },
     { key: 'documentAttachment', label: 'Document Attachment', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'permitId', label: 'Permit ID' },
+    { key: 'jobId', label: 'Job ID' },
+    { key: 'permitType', label: 'Permit Type' },
+    { key: 'issuedBy', label: 'Issued By' },
+    { key: 'approvedBy', label: 'Approved By' },
+    { key: 'validFrom', label: 'Valid From' },
+    { key: 'validTo', label: 'Valid To' },
+    { key: 'status', label: 'Status' },
+    { key: 'documentAttachment', label: 'Document Attachment' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -133,7 +150,10 @@ export class WipPermitCompliance {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: PermitCompliance): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -167,7 +187,31 @@ export class WipPermitCompliance {
     this.refresh();
   }
 
+  deleteRow(record: PermitCompliance): void {
+    this.service.deleteRecords([record.permitId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        permitId: row['permitId'] ?? '',
+        jobId: row['jobId'] ?? '',
+        permitType: (row['permitType'] ?? '') as PermitCompliance['permitType'],
+        issuedBy: row['issuedBy'] ?? '',
+        approvedBy: row['approvedBy'] ?? '',
+        validFrom: row['validFrom'] ?? '',
+        validTo: row['validTo'] ?? '',
+        status: (row['status'] ?? '') as PermitCompliance['status'],
+        documentAttachment: row['documentAttachment'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

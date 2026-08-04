@@ -1,7 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MasterManagementDepreciationMethodItem } from './depreciation-method.model';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { DepreciationCalculationType, DepreciationMethodStatus, MasterManagementDepreciationMethodItem } from './depreciation-method.model';
 import { MasterManagementDepreciationMethodService } from './depreciation-method.service';
 
 interface MasterManagementDepreciationMethodRow extends MasterManagementDepreciationMethodItem {
@@ -17,7 +19,7 @@ interface MasterManagementDepreciationMethodColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-depreciation-method',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './depreciation-method.html',
   styleUrls: ['./depreciation-method.css']
 })
@@ -36,6 +38,19 @@ export class MasterManagementDepreciationMethod {
   ];
 
   showColumnPicker = false;
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'methodId', label: 'Method ID' },
+    { key: 'methodName', label: 'Method Name' },
+    { key: 'methodCode', label: 'Method Code' },
+    { key: 'description', label: 'Description' },
+    { key: 'calculationType', label: 'Calculation Type' },
+    { key: 'ratePercent', label: 'Rate (%)' },
+    { key: 'usefulLifeYears', label: 'Useful Life (Years)' },
+    { key: 'status', label: 'Status' }
+  ];
+
+  showImportModal = false;
 
   records: MasterManagementDepreciationMethodRow[] = [];
   filteredRecords: MasterManagementDepreciationMethodRow[] = [];
@@ -127,7 +142,10 @@ export class MasterManagementDepreciationMethod {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementDepreciationMethodRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -156,7 +174,31 @@ export class MasterManagementDepreciationMethod {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementDepreciationMethodRow): void {
+    this.service.deleteRecords([record.methodId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.records = [
+      ...this.records,
+      ...rows.map((row) => ({
+        methodId: row['methodId'] ?? '',
+        methodName: row['methodName'] ?? '',
+        methodCode: row['methodCode'] ?? '',
+        description: row['description'] ?? '',
+        calculationType: (row['calculationType'] ?? '') as DepreciationCalculationType | '',
+        ratePercent: row['ratePercent'] ? Number(row['ratePercent']) : null,
+        usefulLifeYears: row['usefulLifeYears'] ? Number(row['usefulLifeYears']) : null,
+        status: (row['status'] ?? '') as DepreciationMethodStatus | ''
+      }))
+    ];
+    this.onSearch();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

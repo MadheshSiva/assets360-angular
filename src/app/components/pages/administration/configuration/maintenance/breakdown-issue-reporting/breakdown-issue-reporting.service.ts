@@ -9,6 +9,12 @@ import { BreakdownIssueRecord } from './breakdown-issue-reporting.model';
  */
 @Injectable({ providedIn: 'root' })
 export class BreakdownIssueReportingService {
+  readonly assetMaster: { id: string; name: string }[] = [
+    { id: 'AST-1001', name: 'HVAC Unit 1' },
+    { id: 'AST-1002', name: 'Fire Panel A' },
+    { id: 'AST-1003', name: 'Chiller Pump 2' }
+  ];
+
   readonly userMaster: string[] = ['John Mathew', 'Ali Hassan', 'Priya Nair', 'Site Supervisor'];
   readonly issueTypeMaster: string[] = [
     'Mechanical Failure',
@@ -22,6 +28,7 @@ export class BreakdownIssueReportingService {
   private readonly issuesSubject = new BehaviorSubject<BreakdownIssueRecord[]>([
     {
       issueId: 'ISS-3001',
+      assetId: 'AST-1002',
       reportedBy: 'Ali Hassan',
       issueType: 'Electrical Fault',
       severity: 'Critical',
@@ -32,6 +39,7 @@ export class BreakdownIssueReportingService {
     },
     {
       issueId: 'ISS-3002',
+      assetId: 'AST-1003',
       reportedBy: 'Priya Nair',
       issueType: 'Mechanical Failure',
       severity: 'Medium',
@@ -71,6 +79,7 @@ export class BreakdownIssueReportingService {
     return this.issuesSubject.value.filter((i) =>
       [
         i.issueId,
+        i.assetId,
         i.reportedBy,
         i.issueType,
         i.severity,

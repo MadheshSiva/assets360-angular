@@ -1,7 +1,7 @@
 <section class="mt-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Maintenance Task</h1>
+      <h1 class="page-title">Maintenance Task</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -93,6 +93,7 @@
             <th *ngIf="isColumnVisible('safetyProcedures')">Safety Procedures</th>
             <th *ngIf="isColumnVisible('estimatedDuration')">Estimated Duration</th>
             <th *ngIf="isColumnVisible('completionNotes')">Completion Notes</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -102,14 +103,17 @@
             </td>
             <td *ngIf="isColumnVisible('taskChecklist')">{{ task.taskChecklist.join(', ') || '-' }}</td>
             <td *ngIf="isColumnVisible('instructions')">{{ task.instructions }}</td>
-            <td *ngIf="isColumnVisible('toolsRequired')">{{ task.toolsRequired }}</td>
+            <td *ngIf="isColumnVisible('toolsRequired')">{{ task.toolsRequired.join(', ') || '-' }}</td>
             <td *ngIf="isColumnVisible('safetyProcedures')">{{ task.safetyProcedures }}</td>
             <td *ngIf="isColumnVisible('estimatedDuration')">{{ task.estimatedDuration ?? '-' }} min</td>
             <td *ngIf="isColumnVisible('completionNotes')">{{ task.completionNotes || '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(task)" (delete)="deleteRow(task)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredTasks.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No maintenance tasks found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No maintenance tasks found.</td>
           </tr>
         </tbody>
       </table>
@@ -162,14 +166,12 @@
           />
         </div>
 
-        <div class="form-field">
+        <div class="form-field form-field-wide">
           <label>TOOLS REQUIRED</label>
-          <div class="select-wrap">
-            <select name="toolsRequired" [(ngModel)]="form.toolsRequired">
-              <option value="" disabled selected>-- Select Tool --</option>
-              <option *ngFor="let t of toolsMaster" [value]="t">{{ t }}</option>
-            </select>
-          </div>
+          <select name="toolsRequired" class="multi-select" [(ngModel)]="form.toolsRequired" multiple>
+            <option *ngFor="let t of toolsMaster" [ngValue]="t">{{ t }}</option>
+          </select>
+          <span class="field-hint">Hold Ctrl (Cmd on Mac) to select multiple tools.</span>
         </div>
 
         <div class="form-field">
@@ -207,3 +209,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="maintenance-task"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

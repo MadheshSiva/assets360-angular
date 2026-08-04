@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementModuleAccessMasterItem } from './module-access-master.model';
 import { MasterManagementModuleAccessMasterService } from './module-access-master.service';
 
@@ -17,7 +19,7 @@ interface MasterManagementModuleAccessMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-module-access-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './module-access-master.html',
   styleUrls: ['./module-access-master.css']
 })
@@ -30,6 +32,15 @@ export class MasterManagementModuleAccessMaster {
     { key: 'routePath', label: 'Route Path', visible: true },
     { key: 'icon', label: 'Icon', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'moduleId', label: 'Module ID' },
+    { key: 'moduleName', label: 'Module Name' },
+    { key: 'routePath', label: 'Route Path' },
+    { key: 'icon', label: 'Icon' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -111,7 +122,10 @@ export class MasterManagementModuleAccessMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementModuleAccessMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -140,7 +154,26 @@ export class MasterManagementModuleAccessMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementModuleAccessMasterRow): void {
+    this.service.deleteRecords([record.moduleId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        moduleId: row['moduleId'] ?? '',
+        moduleName: row['moduleName'] ?? '',
+        routePath: row['routePath'] ?? '',
+        icon: row['icon'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

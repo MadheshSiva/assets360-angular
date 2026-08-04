@@ -115,15 +115,7 @@
               }">{{ report.status }}</span>
             </td>
             <td>
-              <div class="action-icons">
-                <button class="action-btn" title="Edit" (click)="editReport(report)">
-                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M11 4h-7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-7"></path>
-                    <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
-                  </svg>
-                </button>
-               
-              </div>
+              <app-row-actions (edit)="editReport(report)" (delete)="deleteRow(report)"></app-row-actions>
             </td>
           </tr>
           <tr *ngIf="filteredReports.length === 0">
@@ -138,3 +130,11 @@
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="reports"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

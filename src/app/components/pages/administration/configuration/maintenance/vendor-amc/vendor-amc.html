@@ -1,7 +1,7 @@
 <section class="va-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Vendor / AMC</h1>
+      <h1 class="page-title">Vendor / AMC</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -89,11 +89,13 @@
             </th>
             <th *ngIf="isColumnVisible('vendorName')">Vendor Name</th>
             <th *ngIf="isColumnVisible('contractId')">Contract ID</th>
+            <th *ngIf="isColumnVisible('assetIds')">Assets Covered</th>
             <th *ngIf="isColumnVisible('startDate')">Start Date</th>
             <th *ngIf="isColumnVisible('endDate')">End Date</th>
             <th *ngIf="isColumnVisible('slaTerms')">SLA Terms</th>
             <th *ngIf="isColumnVisible('responseTime')">Response Time</th>
             <th *ngIf="isColumnVisible('contactDetails')">Contact Details</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -103,15 +105,19 @@
             </td>
             <td *ngIf="isColumnVisible('vendorName')">{{ r.vendorName }}</td>
             <td *ngIf="isColumnVisible('contractId')" class="mono">{{ r.contractId }}</td>
+            <td *ngIf="isColumnVisible('assetIds')">{{ assetNames(r.assetIds) || '-' }}</td>
             <td *ngIf="isColumnVisible('startDate')">{{ r.startDate }}</td>
             <td *ngIf="isColumnVisible('endDate')">{{ r.endDate }}</td>
             <td *ngIf="isColumnVisible('slaTerms')">{{ r.slaTerms }}</td>
             <td *ngIf="isColumnVisible('responseTime')">{{ r.responseTime ?? '-' }} hrs</td>
             <td *ngIf="isColumnVisible('contactDetails')">{{ r.contactDetails }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No vendor / AMC contracts found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No vendor / AMC contracts found.</td>
           </tr>
         </tbody>
       </table>
@@ -166,6 +172,29 @@
           </div>
         </div>
 
+        <div class="form-field form-field-wide">
+          <label>ASSETS COVERED</label>
+          <div class="multi-select-wrap">
+            <button
+              type="button"
+              class="multi-select-trigger"
+              (click)="$event.stopPropagation(); toggleAssetDropdown()"
+            >
+              <span [class.placeholder]="form.assetIds.length === 0">
+                {{ form.assetIds.length ? assetNames(form.assetIds) : '-- Select Assets --' }}
+              </span>
+            </button>
+
+            <div class="multi-select-panel" *ngIf="showAssetDropdown" (click)="$event.stopPropagation()">
+              <label class="multi-select-item" *ngFor="let a of assetMaster">
+                <input type="checkbox" [checked]="isAssetSelected(a.id)" (change)="selectFormAsset(a.id)" />
+                <span>{{ a.name }} ({{ a.id }})</span>
+              </label>
+            </div>
+          </div>
+          <span class="field-hint">Select which assets this AMC contract covers.</span>
+        </div>
+
         <div class="form-field">
           <label>START DATE</label>
           <input type="date" name="startDate" [(ngModel)]="form.startDate" />
@@ -206,3 +235,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="vendor-amc"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

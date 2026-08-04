@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { DowntimeTrackingRecord, DowntimeTrackingForm } from './downtime-tracking.model';
 import { DowntimeTrackingService } from './downtime-tracking.service';
 
@@ -13,7 +16,7 @@ interface DowntimeColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-downtime-tracking',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './downtime-tracking.html',
   styleUrls: ['./downtime-tracking.css']
 })
@@ -21,12 +24,24 @@ export class MaintenanceDowntimeTracking {
   searchTerm = '';
 
   columns: DowntimeColumn[] = [
+    { key: 'assetId', label: 'Asset', visible: true },
     { key: 'downtimeStart', label: 'Downtime Start', visible: true },
     { key: 'downtimeEnd', label: 'Downtime End', visible: true },
     { key: 'totalDowntime', label: 'Total Downtime', visible: true },
     { key: 'reasonForDowntime', label: 'Reason for Downtime', visible: true },
     { key: 'impactLevel', label: 'Impact Level', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset' },
+    { key: 'downtimeStart', label: 'Downtime Start' },
+    { key: 'downtimeEnd', label: 'Downtime End' },
+    { key: 'totalDowntime', label: 'Total Downtime' },
+    { key: 'reasonForDowntime', label: 'Reason for Downtime' },
+    { key: 'impactLevel', label: 'Impact Level' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -43,8 +58,16 @@ export class MaintenanceDowntimeTracking {
     this.refresh();
   }
 
+  get assetMaster() {
+    return this.downtimeService.assetMaster;
+  }
+
   get reasonMaster() {
     return this.downtimeService.reasonMaster;
+  }
+
+  assetName(assetId: string): string {
+    return this.assetMaster.find((a) => a.id === assetId)?.name ?? assetId;
   }
 
   get impactLevelMaster() {
@@ -57,6 +80,7 @@ export class MaintenanceDowntimeTracking {
 
   private emptyForm(): DowntimeTrackingForm {
     return {
+      assetId: '',
       downtimeStart: '',
       downtimeEnd: '',
       reasonForDowntime: '',
@@ -120,7 +144,10 @@ export class MaintenanceDowntimeTracking {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: DowntimeTrackingRecord): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, totalDowntime, ...rest } = record;
@@ -150,8 +177,28 @@ export class MaintenanceDowntimeTracking {
     this.refresh();
   }
 
+  deleteRow(record: DowntimeTrackingRecord): void {
+    this.downtimeService.deleteRecords([record]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.downtimeService.addRecord({
+        assetId: row['assetId'] ?? '',
+        downtimeStart: row['downtimeStart'] ?? '',
+        downtimeEnd: row['downtimeEnd'] ?? '',
+        totalDowntime: row['totalDowntime'] ?? '',
+        reasonForDowntime: row['reasonForDowntime'] ?? '',
+        impactLevel: row['impactLevel'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

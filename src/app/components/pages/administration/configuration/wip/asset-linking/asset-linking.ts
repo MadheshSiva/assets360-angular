@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { AssetLinking } from './asset-linking.model';
 import { AssetLinkingService } from './asset-linking.service';
 
@@ -13,7 +16,7 @@ interface AssetLinkingColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-asset-linking',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './asset-linking.html',
   styleUrls: ['./asset-linking.css']
 })
@@ -32,6 +35,21 @@ export class WipAssetLinking {
     { key: 'lastMaintenanceDate', label: 'Last Maintenance Date', visible: true },
     { key: 'condition', label: 'Condition', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
+    { key: 'assetType', label: 'Asset Type' },
+    { key: 'serialNumber', label: 'Serial Number' },
+    { key: 'rfidTag', label: 'RFID Tag' },
+    { key: 'iotDeviceId', label: 'IoT Device ID' },
+    { key: 'currentStatus', label: 'Current Status' },
+    { key: 'utilizationStatus', label: 'Utilization Status' },
+    { key: 'lastMaintenanceDate', label: 'Last Maintenance Date' },
+    { key: 'condition', label: 'Condition' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -149,7 +167,10 @@ export class WipAssetLinking {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: AssetLinking): void {
     this.isEditMode = true;
     this.editingRecord = record;
     this.form = { ...record };
@@ -179,7 +200,32 @@ export class WipAssetLinking {
     this.refresh();
   }
 
+  deleteRow(record: AssetLinking): void {
+    this.service.deleteRecords([record.assetId]);
+    this.selectedIds.delete(record.assetId);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const mapped: AssetLinking[] = rows.map((row) => ({
+      assetId: row['assetId'] ?? '',
+      assetName: row['assetName'] ?? '',
+      assetType: row['assetType'] ?? '',
+      serialNumber: row['serialNumber'] ?? '',
+      rfidTag: row['rfidTag'] ?? '',
+      iotDeviceId: row['iotDeviceId'] ?? '',
+      currentStatus: row['currentStatus'] ?? '',
+      utilizationStatus: row['utilizationStatus'] ?? '',
+      lastMaintenanceDate: row['lastMaintenanceDate'] ?? '',
+      condition: row['condition'] ?? ''
+    }));
+    this.records = [...this.records, ...mapped];
+    this.filteredRecords = [...this.filteredRecords, ...mapped];
+    this.showImportModal = false;
   }
 
   onDownload(): void {

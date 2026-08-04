@@ -1,6 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import * as XLSX from 'xlsx';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface Asset {
   assetId: string;
@@ -35,7 +39,7 @@ interface NewAssetForm {
 @Component({
   standalone: true,
   selector: 'app-assets',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, MasterLinkIcons, ImportFileModal, RowActions],
   templateUrl: './assets.html',
   styleUrls: ['./assets.css']
 })
@@ -54,6 +58,10 @@ export class Assets {
   ];
 
   showColumnPicker = false;
+
+  readonly importColumns: ImportColumn[] = this.columns.map(({ key, label }) => ({ key, label }));
+
+  showImportModal = false;
 
   assets: Asset[] = [
     {
@@ -191,7 +199,10 @@ export class Assets {
 
   onEdit(): void {
     if (this.selectedAssets.length !== 1) return;
-    const asset = this.selectedAssets[0];
+    this.editRow(this.selectedAssets[0]);
+  }
+
+  editRow(asset: Asset): void {
     this.isEditMode = true;
     this.editingAsset = asset;
     this.form = {
@@ -205,6 +216,11 @@ export class Assets {
       parentAsset: asset.parentAsset
     };
     this.showFormModal = true;
+  }
+
+  deleteRow(asset: Asset): void {
+    this.assets = this.assets.filter((a) => a !== asset);
+    this.onSearch();
   }
 
   closeFormModal(): void {
@@ -241,11 +257,55 @@ export class Assets {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      const [category, subCategory] = (row['category'] ?? '').split(' / ');
+      const nextId = this.assets.length + 1001;
+      this.assets = [
+        ...this.assets,
+        {
+          assetId: row['assetId'] || `AST-${nextId}`,
+          assetName: row['assetName'] ?? '',
+          description: row['description'] ?? '',
+          category: category ?? '',
+          subCategory: subCategory ?? '',
+          serialNumber: row['serialNumber'] ?? '',
+          tagIds: row['tagIds'] ?? '',
+          assetType: row['assetType'] ?? '',
+          parentAsset: row['parentAsset'] || '-',
+          selected: false
+        }
+      ];
+    });
+    this.onSearch();
+    this.showImportModal = false;
   }
 
   onDownload(): void {
-    // TODO: export current asset list
+    if (this.selectedAssets.length === 0) {
+      this.filteredAssets.forEach((a) => (a.selected = true));
+    }
+
+    const rows = this.selectedAssets;
+    if (rows.length === 0) return;
+
+    const visibleColumns = this.columns.filter((c) => c.visible);
+    const data = rows.map((asset) => {
+      const record: Record<string, string> = {};
+      visibleColumns.forEach((col) => {
+        record[col.label] =
+          col.key === 'category' ? `${asset.category} / ${asset.subCategory}` : String((asset as any)[col.key] ?? '');
+      });
+      return record;
+    });
+
+    const worksheet = XLSX.utils.json_to_sheet(data);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Assets');
+    XLSX.writeFile(workbook, `assets-export-${new Date().toISOString().slice(0, 10)}.xlsx`);
   }
 
   @HostListener('document:click')

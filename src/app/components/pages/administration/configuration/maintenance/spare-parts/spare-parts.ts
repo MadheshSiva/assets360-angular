@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SparePartRecord, SparePartForm } from './spare-parts.model';
 import { SparePartsService } from './spare-parts.service';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 interface SparePartColumn {
   key: string;
@@ -13,7 +15,7 @@ interface SparePartColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-spare-parts',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './spare-parts.html',
   styleUrls: ['./spare-parts.css']
 })
@@ -30,6 +32,19 @@ export class MaintenanceSpareParts {
     { key: 'supplier', label: 'Supplier', visible: true },
     { key: 'usagePerWorkOrder', label: 'Usage per Work Order', visible: false }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'partId', label: 'Part ID' },
+    { key: 'partName', label: 'Part Name' },
+    { key: 'category', label: 'Category' },
+    { key: 'quantityInStock', label: 'Quantity in Stock' },
+    { key: 'minimumStockLevel', label: 'Minimum Stock Level' },
+    { key: 'unitCost', label: 'Unit Cost' },
+    { key: 'supplier', label: 'Supplier' },
+    { key: 'usagePerWorkOrder', label: 'Usage per Work Order' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -135,7 +150,10 @@ export class MaintenanceSpareParts {
 
   onEdit(): void {
     if (this.selectedParts.length !== 1) return;
-    const part = this.selectedParts[0];
+    this.editRow(this.selectedParts[0]);
+  }
+
+  editRow(part: SparePartRecord): void {
     this.isEditMode = true;
     this.editingPart = part;
     const { selected, ...rest } = part;
@@ -164,8 +182,36 @@ export class MaintenanceSpareParts {
     this.refresh();
   }
 
+  deleteRow(part: SparePartRecord): void {
+    this.partsService.deleteParts([part]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.partsService.addPart({
+        partId: row['partId'] ?? '',
+        partName: row['partName'] ?? '',
+        category: row['category'] ?? '',
+        quantityInStock: this.toNumber(row['quantityInStock']),
+        minimumStockLevel: this.toNumber(row['minimumStockLevel']),
+        unitCost: this.toNumber(row['unitCost']),
+        supplier: row['supplier'] ?? '',
+        usagePerWorkOrder: this.toNumber(row['usagePerWorkOrder'])
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
+  }
+
+  private toNumber(value: string | undefined): number | null {
+    if (value === undefined || value === '') return null;
+    const n = Number(value);
+    return Number.isNaN(n) ? null : n;
   }
 
   onDownload(): void {

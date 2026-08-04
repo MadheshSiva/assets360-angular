@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface MaintenanceServiceEntry {
   maintenanceSchedule: string;
@@ -14,11 +16,23 @@ export interface MaintenanceServiceEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-maintenance-service',
-  imports: [CommonModule],
+  imports: [CommonModule, ImportFileModal, RowActions],
   templateUrl: './maintenance-service.html',
   styleUrls: ['./maintenance-service.css']
 })
 export class AssetMaintenanceService {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'maintenanceSchedule', label: 'Maintenance Schedule' },
+    { key: 'workOrders', label: 'Work Orders' },
+    { key: 'serviceHistory', label: 'Service History' },
+    { key: 'repairLogs', label: 'Repair Logs' },
+    { key: 'downtimeDuration', label: 'Downtime Duration' },
+    { key: 'sparePartsUsed', label: 'Spare Parts Used' },
+    { key: 'vendorServiceProvider', label: 'Vendor / Service Provider Details' }
+  ];
+
+  showImportModal = false;
+
   entries: MaintenanceServiceEntry[] = [
     {
       maintenanceSchedule: '2026-08-15',
@@ -45,7 +59,23 @@ export class AssetMaintenanceService {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        maintenanceSchedule: row['maintenanceSchedule'] ?? '',
+        workOrders: row['workOrders'] ?? '',
+        serviceHistory: row['serviceHistory'] ?? '',
+        repairLogs: row['repairLogs'] ?? '',
+        downtimeDuration: row['downtimeDuration'] ?? '',
+        sparePartsUsed: row['sparePartsUsed'] ?? '',
+        vendorServiceProvider: row['vendorServiceProvider'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -58,5 +88,13 @@ export class AssetMaintenanceService {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: MaintenanceServiceEntry): void {
+    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+  }
+
+  deleteRow(entry: MaintenanceServiceEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

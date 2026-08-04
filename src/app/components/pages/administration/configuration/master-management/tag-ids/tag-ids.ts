@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementTagIdItem } from './tag-ids.model';
 import { MasterManagementTagIdService } from './tag-ids.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementTagIdColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-tag-ids',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './tag-ids.html',
   styleUrls: ['./tag-ids.css']
 })
@@ -35,6 +38,10 @@ export class MasterManagementTagIds {
 
   showColumnPicker = false;
 
+  readonly importColumns: ImportColumn[] = this.columns.map(({ key, label }) => ({ key, label }));
+
+  showImportModal = false;
+
   records: MasterManagementTagIdRow[] = [];
   filteredRecords: MasterManagementTagIdRow[] = [];
 
@@ -44,8 +51,37 @@ export class MasterManagementTagIds {
 
   form: MasterManagementTagIdItem = this.emptyForm();
 
-  constructor(private service: MasterManagementTagIdService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementTagIdService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.tagType === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get tagTypeMaster() {
@@ -119,7 +155,10 @@ export class MasterManagementTagIds {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementTagIdRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -130,6 +169,9 @@ export class MasterManagementTagIds {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -148,7 +190,28 @@ export class MasterManagementTagIds {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementTagIdRow): void {
+    this.service.deleteRecords([record.tagId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        tagId: row['tagId'] ?? '',
+        tagCode: row['tagCode'] ?? '',
+        tagType: row['tagType'] ?? '',
+        assignedAssetCode: row['assignedAssetCode'] ?? '',
+        issueDate: row['issueDate'] ?? '',
+        isActive: /^(true|yes|1)$/i.test((row['isActive'] ?? '').trim())
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

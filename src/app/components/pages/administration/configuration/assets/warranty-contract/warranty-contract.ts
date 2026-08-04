@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface WarrantyContractEntry {
   warrantyPeriod: string;
@@ -11,11 +13,20 @@ export interface WarrantyContractEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-warranty-contract',
-  imports: [CommonModule],
+  imports: [CommonModule, ImportFileModal, RowActions],
   templateUrl: './warranty-contract.html',
   styleUrls: ['./warranty-contract.css']
 })
 export class AssetWarrantyContract {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'warrantyPeriod', label: 'Warranty Start & End Date' },
+    { key: 'amc', label: 'AMC (Annual Maintenance Contract)' },
+    { key: 'slaDetails', label: 'SLA Details' },
+    { key: 'vendorContractDocuments', label: 'Vendor Contract Documents' }
+  ];
+
+  showImportModal = false;
+
   entries: WarrantyContractEntry[] = [
     {
       warrantyPeriod: '2025-02-14 to 2027-02-13',
@@ -36,7 +47,20 @@ export class AssetWarrantyContract {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        warrantyPeriod: row['warrantyPeriod'] ?? '',
+        amc: row['amc'] ?? '',
+        slaDetails: row['slaDetails'] ?? '',
+        vendorContractDocuments: row['vendorContractDocuments'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -49,5 +73,13 @@ export class AssetWarrantyContract {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: WarrantyContractEntry): void {
+    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+  }
+
+  deleteRow(entry: WarrantyContractEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

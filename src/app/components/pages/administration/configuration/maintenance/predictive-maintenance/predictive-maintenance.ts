@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PredictiveMaintenanceRecord, PredictiveMaintenanceForm } from './predictive-maintenance.model';
 import { PredictiveMaintenanceService } from './predictive-maintenance.service';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 interface PredictiveColumn {
   key: string;
@@ -13,7 +16,7 @@ interface PredictiveColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-predictive',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './predictive-maintenance.html',
   styleUrls: ['./predictive-maintenance.css']
 })
@@ -28,6 +31,17 @@ export class MaintenancePredictive {
     { key: 'predictionModelOutput', label: 'Prediction Model Output', visible: true },
     { key: 'riskLevel', label: 'Risk Level', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'sensorType', label: 'Sensor Type' },
+    { key: 'thresholdValue', label: 'Threshold Value' },
+    { key: 'alertCondition', label: 'Alert Condition' },
+    { key: 'dataSource', label: 'Data Source (Device ID)' },
+    { key: 'predictionModelOutput', label: 'Prediction Model Output' },
+    { key: 'riskLevel', label: 'Risk Level' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -127,7 +141,10 @@ export class MaintenancePredictive {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: PredictiveMaintenanceRecord): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -156,8 +173,34 @@ export class MaintenancePredictive {
     this.refresh();
   }
 
+  deleteRow(record: PredictiveMaintenanceRecord): void {
+    this.predictiveService.deleteRecords([record]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.predictiveService.addRecord({
+        sensorType: row['sensorType'] ?? '',
+        thresholdValue: this.toNumber(row['thresholdValue']),
+        alertCondition: row['alertCondition'] ?? '',
+        dataSource: row['dataSource'] ?? '',
+        predictionModelOutput: row['predictionModelOutput'] ?? '',
+        riskLevel: row['riskLevel'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
+  }
+
+  private toNumber(value: string | undefined): number | null {
+    if (value === undefined || value === '') return null;
+    const n = Number(value);
+    return Number.isNaN(n) ? null : n;
   }
 
   onDownload(): void {

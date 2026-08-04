@@ -1,7 +1,7 @@
 <section class="dt-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Downtime Tracking</h1>
+      <h1 class="page-title">Downtime Tracking</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,11 +87,13 @@
             <th class="selection-col">
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
+            <th *ngIf="isColumnVisible('assetId')">Asset</th>
             <th *ngIf="isColumnVisible('downtimeStart')">Downtime Start</th>
             <th *ngIf="isColumnVisible('downtimeEnd')">Downtime End</th>
             <th *ngIf="isColumnVisible('totalDowntime')">Total Downtime</th>
             <th *ngIf="isColumnVisible('reasonForDowntime')">Reason for Downtime</th>
             <th *ngIf="isColumnVisible('impactLevel')">Impact Level</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -99,6 +101,7 @@
             <td class="selection-col">
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
+            <td *ngIf="isColumnVisible('assetId')">{{ assetName(r.assetId) }} ({{ r.assetId }})</td>
             <td *ngIf="isColumnVisible('downtimeStart')">{{ r.downtimeStart }}</td>
             <td *ngIf="isColumnVisible('downtimeEnd')">{{ r.downtimeEnd }}</td>
             <td *ngIf="isColumnVisible('totalDowntime')" class="mono">{{ r.totalDowntime }}</td>
@@ -106,10 +109,13 @@
             <td *ngIf="isColumnVisible('impactLevel')">
               <span class="badge" [attr.data-impact]="r.impactLevel">{{ r.impactLevel }}</span>
             </td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No downtime records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No downtime records found.</td>
           </tr>
         </tbody>
       </table>
@@ -144,6 +150,16 @@
 
     <form class="modal-form" (ngSubmit)="submitForm()" #downtimeForm="ngForm">
       <div class="form-grid">
+        <div class="form-field form-field-wide">
+          <label>ASSET <span class="required">*</span></label>
+          <div class="select-wrap">
+            <select name="assetId" [(ngModel)]="form.assetId" required>
+              <option value="" disabled selected>-- Select Asset --</option>
+              <option *ngFor="let a of assetMaster" [value]="a.id">{{ a.name }} ({{ a.id }})</option>
+            </select>
+          </div>
+        </div>
+
         <div class="form-field">
           <label>DOWNTIME START <span class="required">*</span></label>
           <input type="datetime-local" name="downtimeStart" [(ngModel)]="form.downtimeStart" required />
@@ -162,11 +178,17 @@
 
         <div class="form-field">
           <label>IMPACT LEVEL <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="impactLevel" [(ngModel)]="form.impactLevel" required>
-              <option value="" disabled selected>-- Select Impact Level --</option>
-              <option *ngFor="let i of impactLevelMaster" [value]="i">{{ i }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="impactLevel" [(ngModel)]="form.impactLevel" required>
+                <option value="" disabled selected>-- Select Impact Level --</option>
+                <option *ngFor="let i of impactLevelMaster" [value]="i">{{ i }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/severity-master"
+              [currentValue]="form.impactLevel"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -190,3 +212,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="downtime-tracking"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

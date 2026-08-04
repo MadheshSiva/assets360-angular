@@ -1,7 +1,7 @@
 <section class="pm-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Preventive Maintenance</h1>
+      <h1 class="page-title">Preventive Maintenance</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -93,6 +93,7 @@
             <th *ngIf="isColumnVisible('lastMaintenanceDate')">Last Maintenance Date</th>
             <th *ngIf="isColumnVisible('nextDueDate')">Next Due Date</th>
             <th *ngIf="isColumnVisible('autoCreateWorkOrder')">Auto-create Work Order</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -108,10 +109,13 @@
             <td *ngIf="isColumnVisible('autoCreateWorkOrder')">
               <span class="badge" [attr.data-flag]="r.autoCreateWorkOrder">{{ r.autoCreateWorkOrder }}</span>
             </td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No preventive maintenance schedules found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No preventive maintenance schedules found.</td>
           </tr>
         </tbody>
       </table>
@@ -148,11 +152,17 @@
       <div class="form-grid">
         <div class="form-field">
           <label>PM SCHEDULE ID <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="pmScheduleId" [(ngModel)]="form.pmScheduleId" required>
-              <option value="" disabled selected>-- Select PM Schedule --</option>
-              <option *ngFor="let p of pmScheduleMaster" [value]="p">{{ p }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="pmScheduleId" [(ngModel)]="form.pmScheduleId" required>
+                <option value="" disabled selected>-- Select PM Schedule --</option>
+                <option *ngFor="let p of pmScheduleMaster" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/master-maintenance"
+              [currentValue]="form.pmScheduleId"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -206,3 +216,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="preventive-maintenance"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

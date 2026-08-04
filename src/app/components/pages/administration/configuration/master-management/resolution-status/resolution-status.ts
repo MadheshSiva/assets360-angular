@@ -1,7 +1,14 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MasterManagementResolutionStatusItem } from './resolution-status.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import {
+  MasterManagementResolutionStatusItem,
+  ResolutionStatusCategory,
+  ResolutionStatusFinalFlag
+} from './resolution-status.model';
 import { MasterManagementResolutionStatusService } from './resolution-status.service';
 
 interface MasterManagementResolutionStatusRow extends MasterManagementResolutionStatusItem {
@@ -17,7 +24,7 @@ interface MasterManagementResolutionStatusColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-resolution-status',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './resolution-status.html',
   styleUrls: ['./resolution-status.css']
 })
@@ -35,6 +42,19 @@ export class MasterManagementResolutionStatus {
     { key: 'statusColor', label: 'Status Color', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'resolutionStatusId', label: 'Status ID' },
+    { key: 'statusName', label: 'Status Name' },
+    { key: 'statusCode', label: 'Status Code' },
+    { key: 'description', label: 'Description' },
+    { key: 'isFinalStatus', label: 'Is Final Status' },
+    { key: 'statusCategory', label: 'Status Category' },
+    { key: 'sequenceOrder', label: 'Sequence Order' },
+    { key: 'statusColor', label: 'Status Color' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementResolutionStatusRow[] = [];
@@ -46,8 +66,37 @@ export class MasterManagementResolutionStatus {
 
   form: MasterManagementResolutionStatusItem = this.emptyForm();
 
-  constructor(private service: MasterManagementResolutionStatusService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementResolutionStatusService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.statusName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get statusNameSuggestions() {
@@ -131,7 +180,10 @@ export class MasterManagementResolutionStatus {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementResolutionStatusRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -142,6 +194,9 @@ export class MasterManagementResolutionStatus {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -160,7 +215,32 @@ export class MasterManagementResolutionStatus {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementResolutionStatusRow): void {
+    this.service.deleteRecords([record.resolutionStatusId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      const sequenceOrderRaw = (row['sequenceOrder'] ?? '').trim();
+      const parsedSequenceOrder = sequenceOrderRaw ? Number(sequenceOrderRaw) : NaN;
+      this.service.addRecord({
+        resolutionStatusId: row['resolutionStatusId'] ?? '',
+        statusName: row['statusName'] ?? '',
+        statusCode: row['statusCode'] ?? '',
+        description: row['description'] ?? '',
+        isFinalStatus: (row['isFinalStatus'] ?? '') as ResolutionStatusFinalFlag | '',
+        statusCategory: (row['statusCategory'] ?? '') as ResolutionStatusCategory | '',
+        sequenceOrder: Number.isFinite(parsedSequenceOrder) ? parsedSequenceOrder : null,
+        statusColor: row['statusColor'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Custom / Domain-specific Asset Type Fields</h1>
+    <h1 class="lh-title">Custom / Domain-specific Asset Type Fields</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -49,34 +49,58 @@
           <th>Asset Type</th>
           <th>Field Name</th>
           <th>Field Value</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
           <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.assetType" (ngModelChange)="onRowAssetTypeChange(entry)">
-                <option *ngFor="let t of assetTypeOptions" [value]="t">{{ t }}</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="select-wrap cell-select-wrap" style="flex: 1;">
+                <select class="cell-select" [(ngModel)]="entry.assetType" (ngModelChange)="onRowAssetTypeChange(entry)">
+                  <option *ngFor="let t of assetTypeOptions" [value]="t">{{ t }}</option>
+                </select>
+              </div>
+              <app-master-link-icons
+                masterPath="/administration/configuration/master-management/asset-type"
+                [currentValue]="entry.assetType"
+              ></app-master-link-icons>
             </div>
           </td>
           <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.fieldName">
-                <option *ngFor="let f of fieldNameOptionsFor(entry.assetType)" [value]="f">{{ f }}</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="select-wrap cell-select-wrap" style="flex: 1;">
+                <select class="cell-select" [(ngModel)]="entry.fieldName">
+                  <option *ngFor="let f of fieldNameOptionsFor(entry.assetType)" [value]="f">{{ f }}</option>
+                </select>
+              </div>
+              <app-master-link-icons
+                masterPath="/administration/configuration/master-management/asset-type-fields"
+                [currentValue]="entry.fieldName"
+              ></app-master-link-icons>
             </div>
           </td>
           <td>
             <input type="text" class="cell-input" placeholder="Enter value" [(ngModel)]="entry.fieldValue" />
           </td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="3" class="empty-row">No custom / domain-specific field records found.</td>
+          <td colspan="4" class="empty-row">No custom / domain-specific field records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="custom-domain-fields"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

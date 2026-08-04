@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementChecklistTypeMasterItem } from './checklist-type-master.model';
 import { MasterManagementChecklistTypeMasterService } from './checklist-type-master.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementChecklistTypeMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-checklist-type-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './checklist-type-master.html',
   styleUrls: ['./checklist-type-master.css']
 })
@@ -31,6 +34,15 @@ export class MasterManagementChecklistTypeMaster {
     { key: 'isActive', label: 'Is Active', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'typeId', label: 'Type ID' },
+    { key: 'typeName', label: 'Type Name' },
+    { key: 'applicableModule', label: 'Applicable Module' },
+    { key: 'isActive', label: 'Is Active' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementChecklistTypeMasterRow[] = [];
@@ -42,8 +54,37 @@ export class MasterManagementChecklistTypeMaster {
 
   form: MasterManagementChecklistTypeMasterItem = this.emptyForm();
 
-  constructor(private service: MasterManagementChecklistTypeMasterService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementChecklistTypeMasterService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.typeName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get applicableModuleMaster() {
@@ -115,7 +156,10 @@ export class MasterManagementChecklistTypeMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementChecklistTypeMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -126,6 +170,9 @@ export class MasterManagementChecklistTypeMaster {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -144,7 +191,26 @@ export class MasterManagementChecklistTypeMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementChecklistTypeMasterRow): void {
+    this.service.deleteRecords([record.typeId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        typeId: row['typeId'] ?? '',
+        typeName: row['typeName'] ?? '',
+        applicableModule: (row['applicableModule'] ?? '') as MasterManagementChecklistTypeMasterItem['applicableModule'],
+        isActive: ['true', 'yes', 'active'].includes((row['isActive'] ?? '').trim().toLowerCase())
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

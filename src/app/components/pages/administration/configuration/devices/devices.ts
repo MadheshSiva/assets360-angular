@@ -1,6 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface Device {
   model: string;
@@ -31,11 +33,25 @@ interface NewDeviceForm {
 @Component({
   standalone: true,
   selector: 'app-devices',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './devices.html',
   styleUrls: ['./devices.css']
 })
 export class Devices {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'model', label: 'Model' },
+    { key: 'type', label: 'Type' },
+    { key: 'macId', label: 'Unique ID (MAC)' },
+    { key: 'project', label: 'Project' },
+    { key: 'country', label: 'Country' },
+    { key: 'area', label: 'Area' },
+    { key: 'building', label: 'Building' },
+    { key: 'floor', label: 'Floor' },
+    { key: 'zone', label: 'Zone' }
+  ];
+
+  showImportModal = false;
+
   searchTerm = '';
 
   devices: Device[] = [
@@ -189,7 +205,26 @@ export class Devices {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.devices = [
+      ...this.devices,
+      ...rows.map((row) => ({
+        model: row['model'] ?? '',
+        type: (row['type'] ?? '') as 'Fixed' | 'Mobile',
+        macId: row['macId'] ?? '',
+        project: row['project'] ?? '',
+        country: row['country'] ?? '',
+        area: row['area'] ?? '',
+        building: row['building'] ?? '',
+        floor: row['floor'] ?? '',
+        zone: row['zone'] ?? ''
+      }))
+    ];
+    this.onSearch();
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -200,11 +235,11 @@ export class Devices {
     // TODO: open additional options menu
   }
 
-  onEdit(device: Device): void {
+  editRow(device: Device): void {
     // TODO: open edit dialog / navigate to edit form
   }
 
-  onDelete(device: Device): void {
+  deleteRow(device: Device): void {
     this.devices = this.devices.filter((d) => d !== device);
     this.onSearch();
   }

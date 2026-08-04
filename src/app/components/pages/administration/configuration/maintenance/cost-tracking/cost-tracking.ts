@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { CostTrackingRecord, CostTrackingForm } from './cost-tracking.model';
 import { CostTrackingService } from './cost-tracking.service';
 
@@ -13,7 +15,7 @@ interface CostColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-cost-tracking',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './cost-tracking.html',
   styleUrls: ['./cost-tracking.css']
 })
@@ -27,6 +29,16 @@ export class MaintenanceCostTracking {
     { key: 'budgetAllocation', label: 'Budget Allocation', visible: true },
     { key: 'costPerAsset', label: 'Cost per Asset', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'laborCost', label: 'Labor Cost' },
+    { key: 'sparePartsCost', label: 'Spare Parts Cost' },
+    { key: 'totalMaintenanceCost', label: 'Total Maintenance Cost' },
+    { key: 'budgetAllocation', label: 'Budget Allocation' },
+    { key: 'costPerAsset', label: 'Cost per Asset' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -112,7 +124,10 @@ export class MaintenanceCostTracking {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: CostTrackingRecord): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, totalMaintenanceCost, ...rest } = record;
@@ -142,8 +157,27 @@ export class MaintenanceCostTracking {
     this.refresh();
   }
 
+  deleteRow(record: CostTrackingRecord): void {
+    this.costService.deleteRecords([record]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.costService.addRecord({
+        laborCost: row['laborCost'] ? Number(row['laborCost']) : null,
+        sparePartsCost: row['sparePartsCost'] ? Number(row['sparePartsCost']) : null,
+        totalMaintenanceCost: row['totalMaintenanceCost'] ? Number(row['totalMaintenanceCost']) : null,
+        budgetAllocation: row['budgetAllocation'] ? Number(row['budgetAllocation']) : null,
+        costPerAsset: row['costPerAsset'] ? Number(row['costPerAsset']) : null
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

@@ -3,6 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TechnicianRecord, TechnicianForm } from './technician.model';
 import { TechnicianService } from './technician.service';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 interface TechnicianColumn {
   key: string;
@@ -13,7 +16,7 @@ interface TechnicianColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-technician',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './technician.html',
   styleUrls: ['./technician.css']
 })
@@ -28,6 +31,17 @@ export class MaintenanceTechnician {
     { key: 'availability', label: 'Availability', visible: true },
     { key: 'assignedTasks', label: 'Assigned Tasks', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'technicianId', label: 'Technician ID' },
+    { key: 'name', label: 'Name' },
+    { key: 'skillSet', label: 'Skill Set' },
+    { key: 'certification', label: 'Certification' },
+    { key: 'availability', label: 'Availability' },
+    { key: 'assignedTasks', label: 'Assigned Tasks' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -130,7 +144,10 @@ export class MaintenanceTechnician {
 
   onEdit(): void {
     if (this.selectedTechnicians.length !== 1) return;
-    const technician = this.selectedTechnicians[0];
+    this.editRow(this.selectedTechnicians[0]);
+  }
+
+  editRow(technician: TechnicianRecord): void {
     this.isEditMode = true;
     this.editingTechnician = technician;
     const { selected, assignedTasks, ...rest } = technician;
@@ -159,8 +176,34 @@ export class MaintenanceTechnician {
     this.refresh();
   }
 
+  deleteRow(technician: TechnicianRecord): void {
+    this.technicianService.deleteTechnicians([technician]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.technicianService.addTechnician({
+        technicianId: row['technicianId'] ?? '',
+        name: row['name'] ?? '',
+        skillSet: row['skillSet'] ?? '',
+        certification: row['certification'] ?? '',
+        availability: row['availability'] ?? '',
+        assignedTasks: this.toNumber(row['assignedTasks']) ?? 0
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
+  }
+
+  private toNumber(value: string | undefined): number | null {
+    if (value === undefined || value === '') return null;
+    const n = Number(value);
+    return Number.isNaN(n) ? null : n;
   }
 
   onDownload(): void {

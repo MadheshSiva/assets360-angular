@@ -1,7 +1,7 @@
 <section class="ci-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Compliance & Inspection</h1>
+      <h1 class="page-title">Compliance & Inspection</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -94,6 +94,7 @@
             <th *ngIf="isColumnVisible('result')">Result</th>
             <th *ngIf="isColumnVisible('nextInspectionDate')">Next Inspection Date</th>
             <th *ngIf="isColumnVisible('remarks')">Remarks</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -110,10 +111,13 @@
             </td>
             <td *ngIf="isColumnVisible('nextInspectionDate')">{{ r.nextInspectionDate }}</td>
             <td *ngIf="isColumnVisible('remarks')">{{ r.remarks || '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No compliance & inspection records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No compliance & inspection records found.</td>
           </tr>
         </tbody>
       </table>
@@ -224,3 +228,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="compliance-inspection"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

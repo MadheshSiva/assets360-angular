@@ -1,7 +1,7 @@
 <section class="bi-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Breakdown / Issue Reporting</h1>
+      <h1 class="page-title">Breakdown / Issue Reporting</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -88,6 +88,7 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('issueId')">Issue ID</th>
+            <th *ngIf="isColumnVisible('assetId')">Asset</th>
             <th *ngIf="isColumnVisible('reportedBy')">Reported By</th>
             <th *ngIf="isColumnVisible('issueType')">Issue Type</th>
             <th *ngIf="isColumnVisible('severity')">Severity</th>
@@ -95,6 +96,7 @@
             <th *ngIf="isColumnVisible('attachments')">Images / Attachments</th>
             <th *ngIf="isColumnVisible('rootCause')">Root Cause</th>
             <th *ngIf="isColumnVisible('resolutionAction')">Resolution Action</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -103,6 +105,7 @@
               <input type="checkbox" [checked]="issue.selected" (change)="toggleSelectIssue(issue)" />
             </td>
             <td *ngIf="isColumnVisible('issueId')" class="mono">{{ issue.issueId }}</td>
+            <td *ngIf="isColumnVisible('assetId')">{{ assetName(issue.assetId) }}</td>
             <td *ngIf="isColumnVisible('reportedBy')">{{ issue.reportedBy }}</td>
             <td *ngIf="isColumnVisible('issueType')">{{ issue.issueType }}</td>
             <td *ngIf="isColumnVisible('severity')">
@@ -112,10 +115,13 @@
             <td *ngIf="isColumnVisible('attachments')">{{ issue.attachments.join(', ') || '-' }}</td>
             <td *ngIf="isColumnVisible('rootCause')">{{ issue.rootCause || '-' }}</td>
             <td *ngIf="isColumnVisible('resolutionAction')">{{ issue.resolutionAction || '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(issue)" (delete)="deleteRow(issue)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredIssues.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No breakdown / issue reports found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No breakdown / issue reports found.</td>
           </tr>
         </tbody>
       </table>
@@ -162,6 +168,16 @@
         </div>
 
         <div class="form-field">
+          <label>ASSET ID <span class="required">*</span></label>
+          <div class="select-wrap">
+            <select name="assetId" [(ngModel)]="form.assetId" required>
+              <option value="" disabled selected>-- Select Asset --</option>
+              <option *ngFor="let a of assetMaster" [value]="a.id">{{ a.name }} ({{ a.id }})</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-field">
           <label>REPORTED BY <span class="required">*</span></label>
           <div class="select-wrap">
             <select name="reportedBy" [(ngModel)]="form.reportedBy" required>
@@ -173,21 +189,33 @@
 
         <div class="form-field">
           <label>ISSUE TYPE <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="issueType" [(ngModel)]="form.issueType" required>
-              <option value="" disabled selected>-- Select Issue Type --</option>
-              <option *ngFor="let t of issueTypeMaster" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="issueType" [(ngModel)]="form.issueType" required>
+                <option value="" disabled selected>-- Select Issue Type --</option>
+                <option *ngFor="let t of issueTypeMaster" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/issue-type-master"
+              [currentValue]="form.issueType"
+            ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
           <label>SEVERITY <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="severity" [(ngModel)]="form.severity" required>
-              <option value="" disabled selected>-- Select Severity --</option>
-              <option *ngFor="let s of severityMaster" [value]="s">{{ s }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="severity" [(ngModel)]="form.severity" required>
+                <option value="" disabled selected>-- Select Severity --</option>
+                <option *ngFor="let s of severityMaster" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/severity-master"
+              [currentValue]="form.severity"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -238,3 +266,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="breakdown-issue-reporting"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

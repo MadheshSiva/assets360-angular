@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { SlaMaster } from './sla-master.model';
 import { SlaMasterService } from './sla-master.service';
 
@@ -15,7 +18,7 @@ interface SlaMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-sla-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './sla-master.html',
   styleUrls: ['./sla-master.css']
 })
@@ -35,6 +38,9 @@ export class WipSlaMaster {
   ];
 
   showColumnPicker = false;
+
+  readonly importColumns: ImportColumn[] = this.columns.map(({ key, label }) => ({ key, label }));
+  showImportModal = false;
 
   records: SlaRow[] = [];
   filteredRecords: SlaRow[] = [];
@@ -131,7 +137,10 @@ export class WipSlaMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: SlaRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -160,7 +169,31 @@ export class WipSlaMaster {
     this.refresh();
   }
 
+  deleteRow(record: SlaRow): void {
+    this.service.deleteRecords([record.slaId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        slaId: row['slaId'] ?? '',
+        slaName: row['slaName'] ?? '',
+        workType: row['workType'] ?? '',
+        priority: row['priority'] ?? '',
+        responseTimeMins: row['responseTimeMins'] ? Number(row['responseTimeMins']) : null,
+        resolutionTimeMins: row['resolutionTimeMins'] ? Number(row['resolutionTimeMins']) : null,
+        escalationLevel1: row['escalationLevel1'] ?? '',
+        escalationLevel2: row['escalationLevel2'] ?? '',
+        escalationLevel3: row['escalationLevel3'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

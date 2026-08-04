@@ -1,7 +1,7 @@
 <section class="tc-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Technician</h1>
+      <h1 class="page-title">Technician</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -93,6 +93,7 @@
             <th *ngIf="isColumnVisible('certification')">Certification</th>
             <th *ngIf="isColumnVisible('availability')">Availability</th>
             <th *ngIf="isColumnVisible('assignedTasks')">Assigned Tasks</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -108,10 +109,13 @@
               <span class="badge" [attr.data-availability]="t.availability">{{ t.availability }}</span>
             </td>
             <td *ngIf="isColumnVisible('assignedTasks')">{{ t.assignedTasks }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(t)" (delete)="deleteRow(t)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredTechnicians.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No technicians found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No technicians found.</td>
           </tr>
         </tbody>
       </table>
@@ -163,21 +167,33 @@
 
         <div class="form-field">
           <label>SKILL SET <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="skillSet" [(ngModel)]="form.skillSet" required>
-              <option value="" disabled selected>-- Select Skill --</option>
-              <option *ngFor="let s of skillMaster" [value]="s">{{ s }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="skillSet" [(ngModel)]="form.skillSet" required>
+                <option value="" disabled selected>-- Select Skill --</option>
+                <option *ngFor="let s of skillMaster" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/skill-master"
+              [currentValue]="form.skillSet"
+            ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
           <label>CERTIFICATION</label>
-          <div class="select-wrap">
-            <select name="certification" [(ngModel)]="form.certification">
-              <option value="">-- Select Certification --</option>
-              <option *ngFor="let c of certificationMaster" [value]="c">{{ c }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="certification" [(ngModel)]="form.certification">
+                <option value="">-- Select Certification --</option>
+                <option *ngFor="let c of certificationMaster" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/certification-type-master"
+              [currentValue]="form.certification"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -201,3 +217,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="technician"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

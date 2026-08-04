@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { BreakdownIssueRecord, BreakdownIssueForm } from './breakdown-issue-reporting.model';
 import { BreakdownIssueReportingService } from './breakdown-issue-reporting.service';
 
@@ -13,7 +16,7 @@ interface IssueColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-breakdown-issue-reporting',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './breakdown-issue-reporting.html',
   styleUrls: ['./breakdown-issue-reporting.css']
 })
@@ -22,6 +25,7 @@ export class MaintenanceBreakdownIssueReporting {
 
   columns: IssueColumn[] = [
     { key: 'issueId', label: 'Issue ID', visible: true },
+    { key: 'assetId', label: 'Asset', visible: true },
     { key: 'reportedBy', label: 'Reported By', visible: true },
     { key: 'issueType', label: 'Issue Type', visible: true },
     { key: 'severity', label: 'Severity', visible: true },
@@ -30,6 +34,20 @@ export class MaintenanceBreakdownIssueReporting {
     { key: 'rootCause', label: 'Root Cause', visible: false },
     { key: 'resolutionAction', label: 'Resolution Action', visible: false }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'issueId', label: 'Issue ID' },
+    { key: 'assetId', label: 'Asset' },
+    { key: 'reportedBy', label: 'Reported By' },
+    { key: 'issueType', label: 'Issue Type' },
+    { key: 'severity', label: 'Severity' },
+    { key: 'description', label: 'Description' },
+    { key: 'attachments', label: 'Images / Attachments' },
+    { key: 'rootCause', label: 'Root Cause' },
+    { key: 'resolutionAction', label: 'Resolution Action' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -44,6 +62,14 @@ export class MaintenanceBreakdownIssueReporting {
 
   constructor(private issueService: BreakdownIssueReportingService) {
     this.refresh();
+  }
+
+  get assetMaster() {
+    return this.issueService.assetMaster;
+  }
+
+  assetName(assetId: string): string {
+    return this.assetMaster.find((a) => a.id === assetId)?.name ?? assetId;
   }
 
   get userMaster() {
@@ -61,6 +87,7 @@ export class MaintenanceBreakdownIssueReporting {
   private emptyForm(): BreakdownIssueForm {
     return {
       issueId: '',
+      assetId: '',
       reportedBy: '',
       issueType: '',
       severity: '',
@@ -127,7 +154,10 @@ export class MaintenanceBreakdownIssueReporting {
 
   onEdit(): void {
     if (this.selectedIssues.length !== 1) return;
-    const issue = this.selectedIssues[0];
+    this.editRow(this.selectedIssues[0]);
+  }
+
+  editRow(issue: BreakdownIssueRecord): void {
     this.isEditMode = true;
     this.editingIssue = issue;
     const { selected, ...rest } = issue;
@@ -161,8 +191,33 @@ export class MaintenanceBreakdownIssueReporting {
     this.refresh();
   }
 
+  deleteRow(issue: BreakdownIssueRecord): void {
+    this.issueService.deleteIssues([issue.issueId]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.issueService.addIssue({
+        issueId: row['issueId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        reportedBy: row['reportedBy'] ?? '',
+        issueType: row['issueType'] ?? '',
+        severity: row['severity'] ?? '',
+        description: row['description'] ?? '',
+        attachments: row['attachments']
+          ? row['attachments'].split(',').map((a) => a.trim()).filter(Boolean)
+          : [],
+        rootCause: row['rootCause'] ?? '',
+        resolutionAction: row['resolutionAction'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

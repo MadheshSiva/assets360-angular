@@ -1,7 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MasterManagementAssetTypeItem } from './asset-type.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterManagementAssetTypeItem, AssetTypeStatus } from './asset-type.model';
 import { MasterManagementAssetTypeService } from './asset-type.service';
 
 interface MasterManagementAssetTypeRow extends MasterManagementAssetTypeItem {
@@ -17,7 +20,7 @@ interface MasterManagementAssetTypeColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-asset-type',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './asset-type.html',
   styleUrls: ['./asset-type.css']
 })
@@ -32,6 +35,16 @@ export class MasterManagementAssetType {
     { key: 'status', label: 'Status', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'assetTypeId', label: 'Asset Type ID' },
+    { key: 'assetTypeName', label: 'Asset Type Name' },
+    { key: 'assetTypeCode', label: 'Asset Type Code' },
+    { key: 'description', label: 'Description' },
+    { key: 'status', label: 'Status' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementAssetTypeRow[] = [];
@@ -43,8 +56,37 @@ export class MasterManagementAssetType {
 
   form: MasterManagementAssetTypeItem = this.emptyForm();
 
-  constructor(private service: MasterManagementAssetTypeService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementAssetTypeService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.assetTypeName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get statusMaster() {
@@ -117,7 +159,10 @@ export class MasterManagementAssetType {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementAssetTypeRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -128,6 +173,9 @@ export class MasterManagementAssetType {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -146,7 +194,27 @@ export class MasterManagementAssetType {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementAssetTypeRow): void {
+    this.service.deleteRecords([record.assetTypeId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        assetTypeId: row['assetTypeId'] ?? '',
+        assetTypeName: row['assetTypeName'] ?? '',
+        assetTypeCode: row['assetTypeCode'] ?? '',
+        description: row['description'] ?? '',
+        status: (row['status'] ?? '') as AssetTypeStatus | ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

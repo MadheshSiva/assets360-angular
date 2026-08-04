@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementStatusChangeItem } from './status-changes.model';
 import { MasterManagementStatusChangeService } from './status-changes.service';
 
@@ -17,7 +19,7 @@ interface MasterManagementStatusChangeColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-status-changes',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './status-changes.html',
   styleUrls: ['./status-changes.css']
 })
@@ -34,6 +36,19 @@ export class MasterManagementStatusChanges {
     { key: 'requiresApproval', label: 'Requires Approval', visible: true },
     { key: 'isDefault', label: 'Is Default', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'statusChangeId', label: 'Status Change ID' },
+    { key: 'statusName', label: 'Status Name' },
+    { key: 'statusCode', label: 'Status Code' },
+    { key: 'sequenceOrder', label: 'Sequence Order' },
+    { key: 'isClosedStatus', label: 'Is Closed Status' },
+    { key: 'allowedTransitions', label: 'Allowed Transitions' },
+    { key: 'requiresApproval', label: 'Requires Approval' },
+    { key: 'isDefault', label: 'Is Default' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -124,7 +139,10 @@ export class MasterManagementStatusChanges {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementStatusChangeRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -153,7 +171,36 @@ export class MasterManagementStatusChanges {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementStatusChangeRow): void {
+    this.service.deleteRecords([record.statusChangeId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const toBool = (v?: string) => ['true', 'yes', '1'].includes((v ?? '').trim().toLowerCase());
+    rows.forEach((row) => {
+      const sequenceRaw = Number(row['sequenceOrder']);
+      this.service.addRecord({
+        statusChangeId: row['statusChangeId'] ?? '',
+        statusName: row['statusName'] ?? '',
+        statusCode: row['statusCode'] ?? '',
+        sequenceOrder: Number.isFinite(sequenceRaw) && row['sequenceOrder'] ? sequenceRaw : null,
+        isClosedStatus: toBool(row['isClosedStatus']),
+        requiresApproval: toBool(row['requiresApproval']),
+        isDefault: toBool(row['isDefault']),
+        allowedTransitions: (row['allowedTransitions'] ?? '')
+          .split(',')
+          .map((id) => id.trim())
+          .filter((id) => id.length > 0),
+        description: ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

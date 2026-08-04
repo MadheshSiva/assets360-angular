@@ -1,6 +1,9 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface AssetIntegrationEntry {
   erpId: string;
@@ -12,11 +15,20 @@ export interface AssetIntegrationEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-integration',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './integration.html',
   styleUrls: ['./integration.css']
 })
 export class AssetIntegration {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'erpId', label: 'ERP ID (SAP/Oracle)' },
+    { key: 'wmsReference', label: 'WMS Reference' },
+    { key: 'apiSyncStatus', label: 'API Sync Status' },
+    { key: 'lastSyncTimestamp', label: 'Last Sync Timestamp' }
+  ];
+
+  showImportModal = false;
+
   // Master: API sync status values
   syncStatusOptions: string[] = ['Synced', 'Pending', 'Failed', 'Not Configured'];
 
@@ -50,7 +62,20 @@ export class AssetIntegration {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        erpId: row['erpId'] ?? '',
+        wmsReference: row['wmsReference'] ?? '',
+        apiSyncStatus: row['apiSyncStatus'] ?? '',
+        lastSyncTimestamp: row['lastSyncTimestamp'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -63,5 +88,16 @@ export class AssetIntegration {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  // No separate edit mode exists on this page — every cell is already a live,
+  // directly-editable input/select. Kept as a no-op to satisfy the shared
+  // row-actions contract without inventing a modal/edit flow that isn't here.
+  editRow(entry: AssetIntegrationEntry): void {
+    // TODO: no per-row edit affordance exists yet; rows are inline-editable.
+  }
+
+  deleteRow(entry: AssetIntegrationEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

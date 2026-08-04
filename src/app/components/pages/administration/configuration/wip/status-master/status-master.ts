@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { StatusMaster } from './status-master.model';
 import { StatusMasterService } from './status-master.service';
 
@@ -17,7 +19,7 @@ interface StatusMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-status-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './status-master.html',
   styleUrls: ['./status-master.css']
 })
@@ -37,6 +39,9 @@ export class WipStatusMaster {
   ];
 
   showColumnPicker = false;
+
+  readonly importColumns: ImportColumn[] = this.columns.map(({ key, label }) => ({ key, label }));
+  showImportModal = false;
 
   records: StatusMasterRow[] = [];
   filteredRecords: StatusMasterRow[] = [];
@@ -125,7 +130,10 @@ export class WipStatusMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: StatusMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -154,7 +162,36 @@ export class WipStatusMaster {
     this.refresh();
   }
 
+  deleteRow(record: StatusMasterRow): void {
+    this.service.deleteRecords([record.statusId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const truthy = (value: string | undefined) =>
+      ['true', 'yes', '1'].includes((value ?? '').trim().toLowerCase());
+
+    rows.forEach((row) => {
+      this.service.addRecord({
+        statusId: row['statusId'] ?? '',
+        statusName: row['statusName'] ?? '',
+        statusCode: row['statusCode'] ?? '',
+        sequenceOrder: row['sequenceOrder'] ? Number(row['sequenceOrder']) : null,
+        isClosedStatus: truthy(row['isClosedStatus']),
+        colorCode: row['colorCode'] ?? '',
+        allowedTransitions: row['allowedTransitions']
+          ? row['allowedTransitions'].split(',').map((v) => v.trim()).filter(Boolean)
+          : [],
+        requiresApproval: truthy(row['requiresApproval']),
+        isDefault: truthy(row['isDefault'])
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

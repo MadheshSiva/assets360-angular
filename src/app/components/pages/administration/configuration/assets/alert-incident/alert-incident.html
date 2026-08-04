@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Alert & Incident</h1>
+    <h1 class="lh-title">Alert & Incident</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -51,15 +51,22 @@
           <th>Damage Reports</th>
           <th>Theft / Loss Records</th>
           <th>Resolution Status</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
           <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.alertType">
-                <option *ngFor="let a of alertTypeOptions" [value]="a">{{ a }}</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="select-wrap cell-select-wrap" style="flex: 1;">
+                <select class="cell-select" [(ngModel)]="entry.alertType">
+                  <option *ngFor="let a of alertTypeOptions" [value]="a">{{ a }}</option>
+                </select>
+              </div>
+              <app-master-link-icons
+                masterPath="/administration/configuration/master-management/alert-type"
+                [currentValue]="entry.alertType"
+              ></app-master-link-icons>
             </div>
           </td>
           <td>
@@ -72,19 +79,36 @@
             <input type="text" class="cell-input" placeholder="Describe theft/loss, if any" [(ngModel)]="entry.theftLossRecords" />
           </td>
           <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.resolutionStatus">
-                <option *ngFor="let s of resolutionStatusOptions" [value]="s">{{ s }}</option>
-              </select>
+            <div style="display: flex; align-items: center; gap: 8px;">
+              <div class="select-wrap cell-select-wrap" style="flex: 1;">
+                <select class="cell-select" [(ngModel)]="entry.resolutionStatus">
+                  <option *ngFor="let s of resolutionStatusOptions" [value]="s">{{ s }}</option>
+                </select>
+              </div>
+              <app-master-link-icons
+                masterPath="/administration/configuration/master-management/resolution-status"
+                [currentValue]="entry.resolutionStatus"
+              ></app-master-link-icons>
             </div>
+          </td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
           </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="5" class="empty-row">No alert &amp; incident records found.</td>
+          <td colspan="6" class="empty-row">No alert &amp; incident records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="alert-incident"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

@@ -1,7 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Alert, AlertForm } from './alerts.model';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { Alert, AlertForm, AlertNotificationChannel, AlertType } from './alerts.model';
 import { AlertService } from './alerts.service';
 
 interface AlertColumn {
@@ -13,7 +15,7 @@ interface AlertColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-alerts',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './alerts.html',
   styleUrls: ['./alerts.css']
 })
@@ -30,6 +32,10 @@ export class WipAlerts {
   ];
 
   showColumnPicker = false;
+
+  readonly importColumns: ImportColumn[] = this.columns.map(({ key, label }) => ({ key, label }));
+
+  showImportModal = false;
 
   records: Alert[] = [];
   filteredRecords: Alert[] = [];
@@ -123,7 +129,10 @@ export class WipAlerts {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: Alert): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -162,7 +171,34 @@ export class WipAlerts {
     this.refresh();
   }
 
+  deleteRow(record: Alert): void {
+    this.service.deleteRecords([record.alertId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      const notificationChannel = (row['notificationChannel'] ?? '')
+        .split(',')
+        .map((c) => c.trim())
+        .filter((c) => c.length > 0) as AlertNotificationChannel[];
+      const escalationLevelRaw = (row['escalationLevel'] ?? '').trim();
+      const escalationLevel = escalationLevelRaw === '' ? null : Number(escalationLevelRaw);
+      this.service.addRecord({
+        alertId: row['alertId'] ?? '',
+        alertType: (row['alertType'] ?? '') as AlertType | '',
+        triggerCondition: row['triggerCondition'] ?? '',
+        notificationChannel,
+        recipientRole: row['recipientRole'] ?? '',
+        escalationLevel: escalationLevel !== null && isNaN(escalationLevel) ? null : escalationLevel
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

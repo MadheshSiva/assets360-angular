@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - Status Master</h1>
+      <h1 class="page-title">Status Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -86,6 +86,7 @@
             <th *ngIf="isColumnVisible('allowedTransitions')">Allowed Transitions</th>
             <th *ngIf="isColumnVisible('requiresApproval')">Requires Approval</th>
             <th *ngIf="isColumnVisible('isDefault')">Is Default</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -113,10 +114,13 @@
             <td *ngIf="isColumnVisible('isDefault')">
               <span class="badge" [attr.data-flag]="r.isDefault">{{ r.isDefault ? 'Yes' : 'No' }}</span>
             </td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No statuses found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No statuses found.</td>
           </tr>
         </tbody>
       </table>
@@ -225,3 +229,11 @@
 <datalist id="statusNameSuggestions">
   <option *ngFor="let s of statusNameSuggestions" [value]="s"></option>
 </datalist>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="status-master"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

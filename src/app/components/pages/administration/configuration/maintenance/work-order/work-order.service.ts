@@ -30,8 +30,8 @@ export class WorkOrderService {
   private readonly workOrdersSubject = new BehaviorSubject<WorkOrder[]>([
     {
       workOrderId: 'WO-2001',
-      assetId: 'AST-1001',
-      workType: 'Preventive',
+      assetId: ['AST-1001'],
+      workType: ['Preventive'],
       title: 'Quarterly HVAC filter replacement',
       priority: 'Medium',
       status: 'Open',
@@ -40,14 +40,14 @@ export class WorkOrderService {
       startTime: '09:00',
       endTime: '11:00',
       downtimeDuration: 120,
-      assignedTechnician: 'John Mathew',
+      assignedTechnician: ['John Mathew'],
       department: 'Facilities',
       location: 'Dubai Mall - Ground Floor'
     },
     {
       workOrderId: 'WO-2002',
-      assetId: 'AST-1002',
-      workType: 'Corrective',
+      assetId: ['AST-1002'],
+      workType: ['Corrective'],
       title: 'Fire panel fault reset',
       priority: 'Critical',
       status: 'In Progress',
@@ -56,7 +56,7 @@ export class WorkOrderService {
       startTime: '14:00',
       endTime: '15:30',
       downtimeDuration: 90,
-      assignedTechnician: 'Ali Hassan',
+      assignedTechnician: ['Ali Hassan'],
       department: 'Electrical',
       location: 'Marina Mall - Tower A'
     }

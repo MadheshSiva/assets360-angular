@@ -9,6 +9,12 @@ import { DowntimeTrackingRecord } from './downtime-tracking.model';
  */
 @Injectable({ providedIn: 'root' })
 export class DowntimeTrackingService {
+  readonly assetMaster: { id: string; name: string }[] = [
+    { id: 'AST-1001', name: 'HVAC Unit 1' },
+    { id: 'AST-1002', name: 'Fire Panel A' },
+    { id: 'AST-1003', name: 'Chiller Pump 2' }
+  ];
+
   readonly reasonMaster: string[] = [
     'Equipment Failure',
     'Scheduled Maintenance',
@@ -20,6 +26,7 @@ export class DowntimeTrackingService {
 
   private readonly recordsSubject = new BehaviorSubject<DowntimeTrackingRecord[]>([
     {
+      assetId: 'AST-1001',
       downtimeStart: '2026-06-15T14:00',
       downtimeEnd: '2026-06-15T15:30',
       totalDowntime: this.formatDuration('2026-06-15T14:00', '2026-06-15T15:30'),
@@ -27,6 +34,7 @@ export class DowntimeTrackingService {
       impactLevel: 'High'
     },
     {
+      assetId: 'AST-1002',
       downtimeStart: '2026-06-20T09:00',
       downtimeEnd: '2026-06-20T09:45',
       totalDowntime: this.formatDuration('2026-06-20T09:00', '2026-06-20T09:45'),

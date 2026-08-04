@@ -4,8 +4,8 @@ export type WorkOrderStatus = 'Open' | 'In Progress' | 'Completed' | 'Closed';
 
 export interface WorkOrder {
   workOrderId: string;
-  assetId: string;
-  workType: WorkOrderType | '';
+  assetId: string[];
+  workType: WorkOrderType[];
   title: string;
   priority: WorkOrderPriority | '';
   status: WorkOrderStatus | '';
@@ -14,7 +14,7 @@ export interface WorkOrder {
   startTime: string;
   endTime: string;
   downtimeDuration: number | null;
-  assignedTechnician: string;
+  assignedTechnician: string[];
   department: string;
   location: string;
   selected?: boolean;

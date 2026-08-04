@@ -128,7 +128,7 @@ export const routes: Routes = [
               { path: '', redirectTo: 'projects', pathMatch: 'full' },
               { path: 'projects', component: Projects },
               { path: 'devices', component: Devices },
-              { path: 'assets', component: Assets },
+              { path: 'assets', redirectTo: 'assets/asset-registry', pathMatch: 'full' },
               { path: 'assets/asset-registry', component: Assets },
               { path: 'assets/location-history', component: AssetLocationHistory },
               { path: 'assets/assignment-ownership', component: AssetAssignmentOwnership },

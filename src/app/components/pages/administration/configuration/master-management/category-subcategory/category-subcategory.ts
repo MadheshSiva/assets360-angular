@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementCategorySubcategoryItem } from './category-subcategory.model';
 import { MasterManagementCategorySubcategoryService } from './category-subcategory.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementCategorySubcategoryColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-category-subcategory',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './category-subcategory.html',
   styleUrls: ['./category-subcategory.css']
 })
@@ -34,6 +37,18 @@ export class MasterManagementCategorySubcategory {
     { key: 'relatedAssetId', label: 'Related Asset', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'categoryId', label: 'Category ID' },
+    { key: 'categoryName', label: 'Category Name' },
+    { key: 'categoryCode', label: 'Category Code' },
+    { key: 'description', label: 'Description' },
+    { key: 'level', label: 'Level' },
+    { key: 'status', label: 'Status' },
+    { key: 'relatedAssetId', label: 'Related Asset' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementCategorySubcategoryRow[] = [];
@@ -45,8 +60,37 @@ export class MasterManagementCategorySubcategory {
 
   form: MasterManagementCategorySubcategoryItem = this.emptyForm();
 
-  constructor(private service: MasterManagementCategorySubcategoryService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementCategorySubcategoryService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.categoryName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get levelMaster() {
@@ -129,7 +173,10 @@ export class MasterManagementCategorySubcategory {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementCategorySubcategoryRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -140,6 +187,9 @@ export class MasterManagementCategorySubcategory {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   onLevelChange(): void {
@@ -164,7 +214,29 @@ export class MasterManagementCategorySubcategory {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementCategorySubcategoryRow): void {
+    this.service.deleteRecords([record.categoryId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        categoryId: row['categoryId'] ?? '',
+        categoryName: row['categoryName'] ?? '',
+        categoryCode: row['categoryCode'] ?? '',
+        description: row['description'] ?? '',
+        level: (row['level'] ?? '') as MasterManagementCategorySubcategoryItem['level'],
+        status: (row['status'] ?? '') as MasterManagementCategorySubcategoryItem['status'],
+        relatedAssetId: row['relatedAssetId'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

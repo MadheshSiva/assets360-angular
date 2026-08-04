@@ -1,7 +1,7 @@
 <section class="pd-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Predictive Maintenance</h1>
+      <h1 class="page-title">Predictive Maintenance</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -93,6 +93,7 @@
             <th *ngIf="isColumnVisible('dataSource')">Data Source (Device ID)</th>
             <th *ngIf="isColumnVisible('predictionModelOutput')">Prediction Model Output</th>
             <th *ngIf="isColumnVisible('riskLevel')">Risk Level</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -108,10 +109,13 @@
             <td *ngIf="isColumnVisible('riskLevel')">
               <span class="badge" [attr.data-risk]="r.riskLevel">{{ r.riskLevel }}</span>
             </td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No predictive maintenance records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No predictive maintenance records found.</td>
           </tr>
         </tbody>
       </table>
@@ -183,11 +187,17 @@
 
         <div class="form-field">
           <label>RISK LEVEL <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="riskLevel" [(ngModel)]="form.riskLevel" required>
-              <option value="" disabled selected>-- Select Risk Level --</option>
-              <option *ngFor="let r of riskLevelMaster" [value]="r">{{ r }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="riskLevel" [(ngModel)]="form.riskLevel" required>
+                <option value="" disabled selected>-- Select Risk Level --</option>
+                <option *ngFor="let r of riskLevelMaster" [value]="r">{{ r }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/severity-master"
+              [currentValue]="form.riskLevel"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -211,3 +221,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="predictive-maintenance"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

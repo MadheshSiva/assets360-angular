@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { PerformanceMetricRecord, PerformanceMetricForm } from './performance.model';
 import { PerformanceService } from './performance.service';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 interface PerformanceColumn {
   key: string;
@@ -13,7 +15,7 @@ interface PerformanceColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-performance',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './performance.html',
   styleUrls: ['./performance.css']
 })
@@ -27,6 +29,16 @@ export class MaintenancePerformance {
     { key: 'assetUptimePercent', label: 'Asset Uptime %', visible: true },
     { key: 'maintenanceFrequency', label: 'Maintenance Frequency', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset' },
+    { key: 'mtbf', label: 'MTBF (Mean Time Between Failures)' },
+    { key: 'mttr', label: 'MTTR (Mean Time To Repair)' },
+    { key: 'assetUptimePercent', label: 'Asset Uptime %' },
+    { key: 'maintenanceFrequency', label: 'Maintenance Frequency' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -117,7 +129,10 @@ export class MaintenancePerformance {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: PerformanceMetricRecord): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -146,8 +161,33 @@ export class MaintenancePerformance {
     this.refresh();
   }
 
+  deleteRow(record: PerformanceMetricRecord): void {
+    this.performanceService.deleteRecords([record]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.performanceService.addRecord({
+        assetId: row['assetId'] ?? '',
+        mtbf: this.toNumber(row['mtbf']),
+        mttr: this.toNumber(row['mttr']),
+        assetUptimePercent: this.toNumber(row['assetUptimePercent']),
+        maintenanceFrequency: this.toNumber(row['maintenanceFrequency'])
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
+  }
+
+  private toNumber(value: string | undefined): number | null {
+    if (value === undefined || value === '') return null;
+    const n = Number(value);
+    return Number.isNaN(n) ? null : n;
   }
 
   onDownload(): void {

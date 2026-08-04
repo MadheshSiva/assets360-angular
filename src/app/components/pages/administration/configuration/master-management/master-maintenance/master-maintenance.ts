@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementMasterItem } from './master-maintenance.model';
 import { MasterManagementMasterService } from './master-maintenance.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './master-maintenance.html',
   styleUrls: ['./master-maintenance.css']
 })
@@ -36,6 +39,18 @@ export class MasterManagementMaster {
 
   showColumnPicker = false;
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'maintenanceId', label: 'Maintenance ID' },
+    { key: 'maintenanceCode', label: 'Maintenance Code' },
+    { key: 'maintenanceName', label: 'Maintenance Name' },
+    { key: 'maintenanceCategory', label: 'Category' },
+    { key: 'frequency', label: 'Frequency' },
+    { key: 'standardDurationHours', label: 'Standard Duration (Hrs)' },
+    { key: 'isActive', label: 'Active' }
+  ];
+
+  showImportModal = false;
+
   records: MasterManagementMasterRow[] = [];
   filteredRecords: MasterManagementMasterRow[] = [];
 
@@ -45,8 +60,37 @@ export class MasterManagementMaster {
 
   form: MasterManagementMasterItem = this.emptyForm();
 
-  constructor(private service: MasterManagementMasterService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementMasterService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.maintenanceName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get categoryMaster() {
@@ -126,7 +170,10 @@ export class MasterManagementMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -137,6 +184,9 @@ export class MasterManagementMaster {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -155,7 +205,31 @@ export class MasterManagementMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementMasterRow): void {
+    this.service.deleteRecords([record.maintenanceId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.records = [
+      ...this.records,
+      ...rows.map((row) => ({
+        maintenanceId: row['maintenanceId'] ?? '',
+        maintenanceCode: row['maintenanceCode'] ?? '',
+        maintenanceName: row['maintenanceName'] ?? '',
+        maintenanceCategory: row['maintenanceCategory'] ?? '',
+        frequency: row['frequency'] ?? '',
+        standardDurationHours: row['standardDurationHours'] ? Number(row['standardDurationHours']) : null,
+        description: '',
+        isActive: /^(true|yes|1)$/i.test(row['isActive'] ?? '')
+      }))
+    ];
+    this.onSearch();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

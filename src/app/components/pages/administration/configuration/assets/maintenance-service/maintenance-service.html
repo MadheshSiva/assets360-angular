@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Maintenance & Service</h1>
+    <h1 class="lh-title">Maintenance & Service</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -53,6 +53,7 @@
           <th>Downtime Duration</th>
           <th>Spare Parts Used</th>
           <th>Vendor / Service Provider Details</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -64,13 +65,24 @@
           <td>{{ entry.downtimeDuration }}</td>
           <td>{{ entry.sparePartsUsed }}</td>
           <td>{{ entry.vendorServiceProvider }}</td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="7" class="empty-row">No maintenance & service records found.</td>
+          <td colspan="8" class="empty-row">No maintenance & service records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="maintenance-service"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Document & Attachment</h1>
+    <h1 class="lh-title">Document & Attachment</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -51,6 +51,7 @@
           <th>Manuals</th>
           <th>Images</th>
           <th>Compliance Certificates</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -60,13 +61,24 @@
           <td>{{ entry.manuals }}</td>
           <td>{{ entry.images }}</td>
           <td>{{ entry.complianceCertificates }}</td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="5" class="empty-row">No document & attachment records found.</td>
+          <td colspan="6" class="empty-row">No document & attachment records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="document-attachment"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

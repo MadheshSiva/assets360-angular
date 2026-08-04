@@ -12,11 +12,17 @@ import { VendorAmcRecord } from './vendor-amc.model';
 export class VendorAmcService {
   readonly vendorMaster: string[] = ['ABC Traders', 'Gulf Spares Co.', 'Prime Industrial Supplies'];
   readonly amcMaster: string[] = ['AMC-2026-001', 'AMC-2026-002', 'AMC-2026-003'];
+  readonly assetMaster: { id: string; name: string }[] = [
+    { id: 'AST-1001', name: 'HVAC Unit 1' },
+    { id: 'AST-1002', name: 'Fire Panel A' },
+    { id: 'AST-1003', name: 'Chiller Pump 2' }
+  ];
 
   private readonly recordsSubject = new BehaviorSubject<VendorAmcRecord[]>([
     {
       vendorName: 'ABC Traders',
       contractId: 'AMC-2026-001',
+      assetIds: ['AST-1001', 'AST-1003'],
       startDate: '2026-01-01',
       endDate: '2026-12-31',
       slaTerms: '24-hour response for critical faults',
@@ -26,6 +32,7 @@ export class VendorAmcService {
     {
       vendorName: 'Gulf Spares Co.',
       contractId: 'AMC-2026-002',
+      assetIds: ['AST-1002'],
       startDate: '2026-03-01',
       endDate: '2027-02-28',
       slaTerms: 'Next business day for standard requests',

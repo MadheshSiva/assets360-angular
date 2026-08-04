@@ -1,7 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MasterManagementAssetTypeFieldsItem } from './asset-type-fields.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterManagementAssetTypeFieldsItem, AssetTypeFieldDataType, AssetTypeFieldRequired } from './asset-type-fields.model';
 import { MasterManagementAssetTypeFieldsService } from './asset-type-fields.service';
 
 interface MasterManagementAssetTypeFieldsRow extends MasterManagementAssetTypeFieldsItem {
@@ -17,7 +20,7 @@ interface MasterManagementAssetTypeFieldsColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-asset-type-fields',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './asset-type-fields.html',
   styleUrls: ['./asset-type-fields.css']
 })
@@ -32,6 +35,16 @@ export class MasterManagementAssetTypeFields {
     { key: 'isRequired', label: 'Is Required', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'fieldId', label: 'Field ID' },
+    { key: 'assetType', label: 'Asset Type' },
+    { key: 'fieldName', label: 'Field Name' },
+    { key: 'fieldType', label: 'Field Type' },
+    { key: 'isRequired', label: 'Is Required' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementAssetTypeFieldsRow[] = [];
@@ -43,8 +56,37 @@ export class MasterManagementAssetTypeFields {
 
   form: MasterManagementAssetTypeFieldsItem = this.emptyForm();
 
-  constructor(private service: MasterManagementAssetTypeFieldsService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementAssetTypeFieldsService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.fieldName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get assetTypeMaster() {
@@ -125,7 +167,10 @@ export class MasterManagementAssetTypeFields {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementAssetTypeFieldsRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -136,6 +181,9 @@ export class MasterManagementAssetTypeFields {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -154,7 +202,27 @@ export class MasterManagementAssetTypeFields {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementAssetTypeFieldsRow): void {
+    this.service.deleteRecords([record.fieldId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        fieldId: row['fieldId'] ?? '',
+        assetType: row['assetType'] ?? '',
+        fieldName: row['fieldName'] ?? '',
+        fieldType: (row['fieldType'] ?? '') as AssetTypeFieldDataType | '',
+        isRequired: (row['isRequired'] ?? '') as AssetTypeFieldRequired | ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - Resource Master</h1>
+      <h1 class="page-title">Resource Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -89,6 +89,7 @@
             <th *ngIf="isColumnVisible('costPerHour')">Cost Per Hour</th>
             <th *ngIf="isColumnVisible('certificationDetails')">Certification Details</th>
             <th *ngIf="isColumnVisible('status')">Status</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -112,10 +113,13 @@
             <td *ngIf="isColumnVisible('status')">
               <span class="badge" [attr.data-status]="r.status ? 'Active' : 'Inactive'">{{ r.status ? 'Active' : 'Inactive' }}</span>
             </td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No resources found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No resources found.</td>
           </tr>
         </tbody>
       </table>
@@ -161,11 +165,17 @@
 
         <div class="form-field">
           <label>RESOURCE TYPE <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="resourceType" [(ngModel)]="form.resourceType" required>
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let t of resourceTypeMaster" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="resourceType" [(ngModel)]="form.resourceType" required>
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let t of resourceTypeMaster" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/resource-type"
+              [currentValue]="form.resourceType"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -185,11 +195,17 @@
 
         <div class="form-field">
           <label>DEPARTMENT ID</label>
-          <div class="select-wrap">
-            <select name="departmentId" [(ngModel)]="form.departmentId">
-              <option value="">-- Select --</option>
-              <option *ngFor="let d of departmentMaster" [value]="d">{{ d }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="departmentId" [(ngModel)]="form.departmentId">
+                <option value="">-- Select --</option>
+                <option *ngFor="let d of departmentMaster" [value]="d">{{ d }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/assigned-custodian-department"
+              [currentValue]="form.departmentId"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -215,11 +231,17 @@
 
         <div class="form-field">
           <label>SHIFT ID</label>
-          <div class="select-wrap">
-            <select name="shiftId" [(ngModel)]="form.shiftId">
-              <option value="">-- Select --</option>
-              <option *ngFor="let s of shiftMaster" [value]="s.id">{{ s.name }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="shiftId" [(ngModel)]="form.shiftId">
+                <option value="">-- Select --</option>
+                <option *ngFor="let s of shiftMaster" [value]="s.id">{{ s.name }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/shift-master"
+              [currentValue]="form.shiftId"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -250,3 +272,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="resource-master"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

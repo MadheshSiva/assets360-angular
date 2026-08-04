@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Tracking & Telemetry</h1>
+    <h1 class="lh-title">Tracking & Telemetry</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Add" (click)="onAdd()">
@@ -52,6 +52,7 @@
           <th>Last Seen Timestamp</th>
           <th>Speed / Route (Vehicles)</th>
           <th>Sensor Data (Temp / Vibration / Battery)</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -62,13 +63,24 @@
           <td>{{ entry.lastSeenTimestamp }}</td>
           <td>{{ entry.speedRoute }}</td>
           <td>{{ entry.sensorData }}</td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="6" class="empty-row">No tracking &amp; telemetry records found.</td>
+          <td colspan="7" class="empty-row">No tracking &amp; telemetry records found.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="tracking-telemetry"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

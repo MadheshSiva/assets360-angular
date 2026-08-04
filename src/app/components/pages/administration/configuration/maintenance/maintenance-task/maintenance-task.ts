@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { MaintenanceTaskRecord, MaintenanceTaskForm } from './maintenance-task.model';
 import { MaintenanceTaskService } from './maintenance-task.service';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 interface TaskColumn {
   key: string;
@@ -13,7 +15,7 @@ interface TaskColumn {
 @Component({
   standalone: true,
   selector: 'app-maintenance-task',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './maintenance-task.html',
   styleUrls: ['./maintenance-task.css']
 })
@@ -28,6 +30,17 @@ export class MaintenanceTask {
     { key: 'estimatedDuration', label: 'Estimated Duration', visible: true },
     { key: 'completionNotes', label: 'Completion Notes', visible: false }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'taskChecklist', label: 'Task Checklist' },
+    { key: 'instructions', label: 'Instructions' },
+    { key: 'toolsRequired', label: 'Tools Required' },
+    { key: 'safetyProcedures', label: 'Safety Procedures' },
+    { key: 'estimatedDuration', label: 'Estimated Duration' },
+    { key: 'completionNotes', label: 'Completion Notes' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -56,7 +69,7 @@ export class MaintenanceTask {
     return {
       taskChecklist: [],
       instructions: '',
-      toolsRequired: '',
+      toolsRequired: [],
       safetyProcedures: '',
       estimatedDuration: null,
       completionNotes: ''
@@ -119,11 +132,14 @@ export class MaintenanceTask {
 
   onEdit(): void {
     if (this.selectedTasks.length !== 1) return;
-    const task = this.selectedTasks[0];
+    this.editRow(this.selectedTasks[0]);
+  }
+
+  editRow(task: MaintenanceTaskRecord): void {
     this.isEditMode = true;
     this.editingTask = task;
     const { selected, ...rest } = task;
-    this.form = { ...rest, taskChecklist: [...rest.taskChecklist] };
+    this.form = { ...rest, taskChecklist: [...rest.taskChecklist], toolsRequired: [...rest.toolsRequired] };
     this.showFormModal = true;
   }
 
@@ -148,8 +164,40 @@ export class MaintenanceTask {
     this.refresh();
   }
 
+  deleteRow(task: MaintenanceTaskRecord): void {
+    this.taskService.deleteTasks([task]);
+    this.refresh();
+  }
+
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.taskService.addTask({
+        taskChecklist: (row['taskChecklist'] ?? '')
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
+        instructions: row['instructions'] ?? '',
+        toolsRequired: (row['toolsRequired'] ?? '')
+          .split(',')
+          .map((s) => s.trim())
+          .filter(Boolean),
+        safetyProcedures: row['safetyProcedures'] ?? '',
+        estimatedDuration: this.toNumber(row['estimatedDuration']),
+        completionNotes: row['completionNotes'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
+  }
+
+  private toNumber(value: string | undefined): number | null {
+    if (value === undefined || value === '') return null;
+    const n = Number(value);
+    return Number.isNaN(n) ? null : n;
   }
 
   onDownload(): void {

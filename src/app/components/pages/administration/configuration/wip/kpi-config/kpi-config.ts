@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { KpiConfig, KpiConfigForm } from './kpi-config.model';
 import { KpiConfigService } from './kpi-config.service';
 
@@ -13,7 +16,7 @@ interface KpiConfigColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-kpi-config',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './kpi-config.html',
   styleUrls: ['./kpi-config.css']
 })
@@ -30,6 +33,19 @@ export class WipKpiConfig {
     { key: 'refreshFrequency', label: 'Refresh Frequency', visible: true },
     { key: 'widgetType', label: 'Widget Type', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'kpiId', label: 'KPI ID' },
+    { key: 'kpiName', label: 'KPI Name' },
+    { key: 'formulaDefinition', label: 'Formula Definition' },
+    { key: 'thresholdGreen', label: 'Threshold Green' },
+    { key: 'thresholdAmber', label: 'Threshold Amber' },
+    { key: 'thresholdRed', label: 'Threshold Red' },
+    { key: 'refreshFrequency', label: 'Refresh Frequency' },
+    { key: 'widgetType', label: 'Widget Type' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -123,7 +139,10 @@ export class WipKpiConfig {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: KpiConfig): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -152,7 +171,29 @@ export class WipKpiConfig {
     this.refresh();
   }
 
+  deleteRow(record: KpiConfig): void {
+    this.service.deleteRecords([record.kpiId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const mapped: KpiConfig[] = rows.map((row) => ({
+      kpiId: row['kpiId'] ?? '',
+      kpiName: row['kpiName'] ?? '',
+      formulaDefinition: row['formulaDefinition'] ?? '',
+      thresholdGreen: row['thresholdGreen'] ? Number(row['thresholdGreen']) : null,
+      thresholdAmber: row['thresholdAmber'] ? Number(row['thresholdAmber']) : null,
+      thresholdRed: row['thresholdRed'] ? Number(row['thresholdRed']) : null,
+      refreshFrequency: (row['refreshFrequency'] ?? '') as KpiConfig['refreshFrequency'],
+      widgetType: (row['widgetType'] ?? '') as KpiConfig['widgetType']
+    }));
+    this.records = [...this.records, ...mapped];
+    this.filteredRecords = [...this.filteredRecords, ...mapped];
+    this.showImportModal = false;
   }
 
   onDownload(): void {

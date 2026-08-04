@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementStatusItem } from './status.model';
 import { MasterManagementStatusService } from './status.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementStatusColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-status',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './status.html',
   styleUrls: ['./status.css']
 })
@@ -34,6 +37,10 @@ export class MasterManagementStatus {
 
   showColumnPicker = false;
 
+  readonly importColumns: ImportColumn[] = this.columns.map(({ key, label }) => ({ key, label }));
+
+  showImportModal = false;
+
   records: MasterManagementStatusRow[] = [];
   filteredRecords: MasterManagementStatusRow[] = [];
 
@@ -43,8 +50,37 @@ export class MasterManagementStatus {
 
   form: MasterManagementStatusItem = this.emptyForm();
 
-  constructor(private service: MasterManagementStatusService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementStatusService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.statusName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest, allowedTransitions: [...rest.allowedTransitions] };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get statusNameMaster() {
@@ -130,7 +166,10 @@ export class MasterManagementStatus {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementStatusRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -141,6 +180,9 @@ export class MasterManagementStatus {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -159,7 +201,31 @@ export class MasterManagementStatus {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementStatusRow): void {
+    this.service.deleteRecords([record.statusId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      const allowedTransitions = (row['allowedTransitions'] ?? '')
+        .split(',')
+        .map((t) => t.trim())
+        .filter((t) => t.length > 0);
+      this.service.addRecord({
+        statusId: row['statusId'] ?? '',
+        statusName: row['statusName'] ?? '',
+        colorCode: row['colorCode'] ?? '',
+        allowedTransitions,
+        isActive: /^(true|yes|1)$/i.test((row['isActive'] ?? '').trim())
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

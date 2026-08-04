@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementCustodianDepartmentItem } from './assigned-custodian-department.model';
 import { MasterManagementCustodianDepartmentService } from './assigned-custodian-department.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementCustodianDepartmentColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-assigned-custodian-department',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './assigned-custodian-department.html',
   styleUrls: ['./assigned-custodian-department.css']
 })
@@ -34,6 +37,18 @@ export class MasterManagementAssignedCustodianDepartment {
     { key: 'departmentCode', label: 'Department Code', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'recordType', label: 'Department or Custodian' },
+    { key: 'name', label: 'Name' },
+    { key: 'id', label: 'ID' },
+    { key: 'description', label: 'Description' },
+    { key: 'status', label: 'Status' },
+    { key: 'role', label: 'Role' },
+    { key: 'departmentCode', label: 'Department Code' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementCustodianDepartmentRow[] = [];
@@ -45,8 +60,37 @@ export class MasterManagementAssignedCustodianDepartment {
 
   form: MasterManagementCustodianDepartmentItem = this.emptyForm();
 
-  constructor(private service: MasterManagementCustodianDepartmentService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementCustodianDepartmentService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.name === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get recordTypeMaster() {
@@ -125,7 +169,10 @@ export class MasterManagementAssignedCustodianDepartment {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementCustodianDepartmentRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -136,6 +183,9 @@ export class MasterManagementAssignedCustodianDepartment {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -154,7 +204,29 @@ export class MasterManagementAssignedCustodianDepartment {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementCustodianDepartmentRow): void {
+    this.service.deleteRecords([record.id]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        recordType: (row['recordType'] ?? '') as MasterManagementCustodianDepartmentItem['recordType'],
+        id: row['id'] ?? '',
+        name: row['name'] ?? '',
+        description: row['description'] ?? '',
+        status: (row['status'] ?? '') as MasterManagementCustodianDepartmentItem['status'],
+        role: row['role'] ?? '',
+        departmentCode: row['departmentCode'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

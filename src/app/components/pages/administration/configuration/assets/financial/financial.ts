@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface FinancialEntry {
   purchaseCost: string;
@@ -15,11 +17,24 @@ export interface FinancialEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-financial',
-  imports: [CommonModule],
+  imports: [CommonModule, ImportFileModal, RowActions],
   templateUrl: './financial.html',
   styleUrls: ['./financial.css']
 })
 export class AssetFinancial {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'purchaseCost', label: 'Purchase Cost' },
+    { key: 'purchaseDate', label: 'Purchase Date' },
+    { key: 'vendorDetails', label: 'Vendor Details' },
+    { key: 'invoiceNumber', label: 'Invoice Number' },
+    { key: 'depreciationMethod', label: 'Depreciation Method' },
+    { key: 'currentBookValue', label: 'Current Book Value' },
+    { key: 'residualValue', label: 'Residual Value' },
+    { key: 'costCenterAllocation', label: 'Cost Center Allocation' }
+  ];
+
+  showImportModal = false;
+
   entries: FinancialEntry[] = [
     {
       purchaseCost: 'AED 42,500',
@@ -48,7 +63,24 @@ export class AssetFinancial {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        purchaseCost: row['purchaseCost'] ?? '',
+        purchaseDate: row['purchaseDate'] ?? '',
+        vendorDetails: row['vendorDetails'] ?? '',
+        invoiceNumber: row['invoiceNumber'] ?? '',
+        depreciationMethod: row['depreciationMethod'] ?? '',
+        currentBookValue: row['currentBookValue'] ?? '',
+        residualValue: row['residualValue'] ?? '',
+        costCenterAllocation: row['costCenterAllocation'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -61,5 +93,13 @@ export class AssetFinancial {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: FinancialEntry): void {
+    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+  }
+
+  deleteRow(entry: FinancialEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

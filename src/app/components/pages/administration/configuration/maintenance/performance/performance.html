@@ -1,7 +1,7 @@
 <section class="pf-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Performance Metrics</h1>
+      <h1 class="page-title">Performance Metrics</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -92,6 +92,7 @@
             <th *ngIf="isColumnVisible('mttr')">MTTR (hrs)</th>
             <th *ngIf="isColumnVisible('assetUptimePercent')">Asset Uptime %</th>
             <th *ngIf="isColumnVisible('maintenanceFrequency')">Maintenance Frequency</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -104,10 +105,13 @@
             <td *ngIf="isColumnVisible('mttr')">{{ r.mttr ?? '-' }}</td>
             <td *ngIf="isColumnVisible('assetUptimePercent')">{{ r.assetUptimePercent ?? '-' }}%</td>
             <td *ngIf="isColumnVisible('maintenanceFrequency')">{{ r.maintenanceFrequency ?? '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No performance metrics found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No performance metrics found.</td>
           </tr>
         </tbody>
       </table>
@@ -182,3 +186,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="performance"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

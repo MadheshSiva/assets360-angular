@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementCurrentLocationItem } from './current-location.model';
 import { MasterManagementCurrentLocationService } from './current-location.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementCurrentLocationColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-current-location',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './current-location.html',
   styleUrls: ['./current-location.css']
 })
@@ -32,6 +35,14 @@ export class MasterManagementCurrentLocation {
 
   showColumnPicker = false;
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'locationId', label: 'Location ID' },
+    { key: 'currentLocation', label: 'Current Location' },
+    { key: 'isActive', label: 'Active' }
+  ];
+
+  showImportModal = false;
+
   records: MasterManagementCurrentLocationRow[] = [];
   filteredRecords: MasterManagementCurrentLocationRow[] = [];
 
@@ -41,8 +52,37 @@ export class MasterManagementCurrentLocation {
 
   form: MasterManagementCurrentLocationItem = this.emptyForm();
 
-  constructor(private service: MasterManagementCurrentLocationService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementCurrentLocationService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => this.locationPath(r) === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get siteMaster(): string[] {
@@ -147,7 +187,10 @@ export class MasterManagementCurrentLocation {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementCurrentLocationRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -158,6 +201,9 @@ export class MasterManagementCurrentLocation {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -176,7 +222,33 @@ export class MasterManagementCurrentLocation {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementCurrentLocationRow): void {
+    this.service.deleteRecords([record.locationId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.records = [
+      ...this.records,
+      ...rows.map((row) => {
+        const path = (row['currentLocation'] ?? '').split('→').map((part) => part.trim());
+        const [site = '', building = '', zone = '', room = ''] = path;
+        return {
+          locationId: row['locationId'] ?? '',
+          site,
+          building,
+          zone,
+          room,
+          isActive: /^(true|yes|1)$/i.test(row['isActive'] ?? '')
+        };
+      })
+    ];
+    this.onSearch();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

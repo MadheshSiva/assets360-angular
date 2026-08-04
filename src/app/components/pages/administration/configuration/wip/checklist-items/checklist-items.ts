@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { ChecklistItem } from './checklist-items.model';
 import { ChecklistItemService } from './checklist-items.service';
 
@@ -17,7 +20,7 @@ interface ChecklistItemColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-checklist-items',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './checklist-items.html',
   styleUrls: ['./checklist-items.css']
 })
@@ -33,6 +36,18 @@ export class WipChecklistItems {
     { key: 'isCritical', label: 'Is Critical', visible: true },
     { key: 'sequenceOrder', label: 'Sequence Order', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'itemId', label: 'Item ID' },
+    { key: 'checklistId', label: 'Checklist ID' },
+    { key: 'itemDescription', label: 'Item Description' },
+    { key: 'responseType', label: 'Response Type' },
+    { key: 'thresholdValue', label: 'Threshold Value' },
+    { key: 'isCritical', label: 'Is Critical' },
+    { key: 'sequenceOrder', label: 'Sequence Order' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -125,7 +140,10 @@ export class WipChecklistItems {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: ChecklistItemRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -154,7 +172,28 @@ export class WipChecklistItems {
     this.refresh();
   }
 
+  deleteRow(record: ChecklistItemRow): void {
+    this.service.deleteRecords([record.itemId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const mapped: ChecklistItemRow[] = rows.map((row) => ({
+      itemId: row['itemId'] ?? '',
+      checklistId: row['checklistId'] ?? '',
+      itemDescription: row['itemDescription'] ?? '',
+      responseType: row['responseType'] ?? '',
+      thresholdValue: row['thresholdValue'] ? Number(row['thresholdValue']) : null,
+      isCritical: row['isCritical']?.toLowerCase() === 'true' || row['isCritical']?.toLowerCase() === 'yes',
+      sequenceOrder: row['sequenceOrder'] ? Number(row['sequenceOrder']) : null
+    }));
+    this.records = [...this.records, ...mapped];
+    this.filteredRecords = [...this.filteredRecords, ...mapped];
+    this.showImportModal = false;
   }
 
   onDownload(): void {

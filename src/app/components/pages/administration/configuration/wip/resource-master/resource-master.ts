@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { ResourceMaster } from './resource-master.model';
 import { ResourceMasterService } from './resource-master.service';
 
@@ -13,7 +16,7 @@ interface ResourceMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-resource-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './resource-master.html',
   styleUrls: ['./resource-master.css']
 })
@@ -34,6 +37,23 @@ export class WipResourceMaster {
     { key: 'certificationDetails', label: 'Certification Details', visible: true },
     { key: 'status', label: 'Status', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'resourceId', label: 'Resource ID' },
+    { key: 'resourceName', label: 'Resource Name' },
+    { key: 'resourceType', label: 'Resource Type' },
+    { key: 'skillSet', label: 'Skill Set' },
+    { key: 'departmentId', label: 'Department ID' },
+    { key: 'contactNumber', label: 'Contact Number' },
+    { key: 'email', label: 'Email' },
+    { key: 'availabilityStatus', label: 'Availability Status' },
+    { key: 'shiftId', label: 'Shift ID' },
+    { key: 'costPerHour', label: 'Cost Per Hour' },
+    { key: 'certificationDetails', label: 'Certification Details' },
+    { key: 'status', label: 'Status' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -157,7 +177,10 @@ export class WipResourceMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: ResourceMaster): void {
     this.isEditMode = true;
     this.editingRecord = record;
     this.form = { ...record, skillSet: [...record.skillSet] };
@@ -197,7 +220,36 @@ export class WipResourceMaster {
     this.refresh();
   }
 
+  deleteRow(record: ResourceMaster): void {
+    this.service.deleteRecords([record.resourceId]);
+    this.selectedIds.delete(record.resourceId);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      const status = (row['status'] ?? '').trim().toLowerCase();
+      this.service.addRecord({
+        resourceId: row['resourceId'] ?? '',
+        resourceName: row['resourceName'] ?? '',
+        resourceType: (row['resourceType'] ?? '') as ResourceMaster['resourceType'],
+        skillSet: row['skillSet'] ? row['skillSet'].split(',').map((s) => s.trim()).filter(Boolean) : [],
+        departmentId: row['departmentId'] ?? '',
+        contactNumber: row['contactNumber'] ?? '',
+        email: row['email'] ?? '',
+        availabilityStatus: (row['availabilityStatus'] ?? '') as ResourceMaster['availabilityStatus'],
+        shiftId: row['shiftId'] ?? '',
+        costPerHour: row['costPerHour'] ? Number(row['costPerHour']) : null,
+        certificationDetails: row['certificationDetails'] ?? '',
+        status: status === 'true' || status === 'active'
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

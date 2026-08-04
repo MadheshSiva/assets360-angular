@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementCertificationTypeMasterItem } from './certification-type-master.model';
 import { MasterManagementCertificationTypeMasterService } from './certification-type-master.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementCertificationTypeMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-certification-type-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './certification-type-master.html',
   styleUrls: ['./certification-type-master.css']
 })
@@ -36,6 +39,20 @@ export class MasterManagementCertificationTypeMaster {
     { key: 'status', label: 'Status', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'certificationTypeId', label: 'Certification ID' },
+    { key: 'certificationName', label: 'Certification Name' },
+    { key: 'certificationCode', label: 'Certification Code' },
+    { key: 'description', label: 'Description' },
+    { key: 'applicableAssetType', label: 'Applicable Asset Type' },
+    { key: 'issuingAuthority', label: 'Issuing Authority' },
+    { key: 'validityPeriodDays', label: 'Validity Period (Days)' },
+    { key: 'renewalRequired', label: 'Renewal Required' },
+    { key: 'status', label: 'Status' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementCertificationTypeMasterRow[] = [];
@@ -47,8 +64,37 @@ export class MasterManagementCertificationTypeMaster {
 
   form: MasterManagementCertificationTypeMasterItem = this.emptyForm();
 
-  constructor(private service: MasterManagementCertificationTypeMasterService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementCertificationTypeMasterService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.certificationName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get applicableAssetTypeMaster() {
@@ -133,7 +179,10 @@ export class MasterManagementCertificationTypeMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementCertificationTypeMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -144,6 +193,9 @@ export class MasterManagementCertificationTypeMaster {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -162,7 +214,32 @@ export class MasterManagementCertificationTypeMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementCertificationTypeMasterRow): void {
+    this.service.deleteRecords([record.certificationTypeId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      const validityPeriodDays = row['validityPeriodDays'] ? Number(row['validityPeriodDays']) : null;
+      this.service.addRecord({
+        certificationTypeId: row['certificationTypeId'] ?? '',
+        certificationName: row['certificationName'] ?? '',
+        certificationCode: row['certificationCode'] ?? '',
+        description: row['description'] ?? '',
+        applicableAssetType: row['applicableAssetType'] ?? '',
+        issuingAuthority: row['issuingAuthority'] ?? '',
+        validityPeriodDays: Number.isFinite(validityPeriodDays) ? validityPeriodDays : null,
+        renewalRequired: (row['renewalRequired'] ?? '') as MasterManagementCertificationTypeMasterItem['renewalRequired'],
+        status: (row['status'] ?? '') as MasterManagementCertificationTypeMasterItem['status']
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Master Management - Resolution Status</h1>
+      <h1 class="page-title">Resolution Status</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -85,6 +85,7 @@
             <th *ngIf="isColumnVisible('statusCategory')">Status Category</th>
             <th *ngIf="isColumnVisible('sequenceOrder')">Sequence Order</th>
             <th *ngIf="isColumnVisible('statusColor')">Status Color</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -107,10 +108,13 @@
               <span class="color-swatch" [style.background]="r.statusColor"></span>
               {{ r.statusColor || '-' }}
             </td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No records found.</td>
           </tr>
         </tbody>
       </table>
@@ -208,3 +212,11 @@
 <datalist id="statusNameSuggestions">
   <option *ngFor="let s of statusNameSuggestions" [value]="s"></option>
 </datalist>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="resolution-status"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

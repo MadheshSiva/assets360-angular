@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementPermitTypeMasterItem } from './permit-type-master.model';
 import { MasterManagementPermitTypeMasterService } from './permit-type-master.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementPermitTypeMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-permit-type-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './permit-type-master.html',
   styleUrls: ['./permit-type-master.css']
 })
@@ -31,6 +34,15 @@ export class MasterManagementPermitTypeMaster {
     { key: 'isApprovalRequired', label: 'Is Approval Required', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'permitTypeId', label: 'Permit Type ID' },
+    { key: 'permitName', label: 'Permit Name' },
+    { key: 'validityDays', label: 'Validity Days' },
+    { key: 'isApprovalRequired', label: 'Is Approval Required' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementPermitTypeMasterRow[] = [];
@@ -42,8 +54,37 @@ export class MasterManagementPermitTypeMaster {
 
   form: MasterManagementPermitTypeMasterItem = this.emptyForm();
 
-  constructor(private service: MasterManagementPermitTypeMasterService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementPermitTypeMasterService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.permitName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   private emptyForm(): MasterManagementPermitTypeMasterItem {
@@ -111,7 +152,10 @@ export class MasterManagementPermitTypeMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementPermitTypeMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -122,6 +166,9 @@ export class MasterManagementPermitTypeMaster {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -140,7 +187,29 @@ export class MasterManagementPermitTypeMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementPermitTypeMasterRow): void {
+    this.service.deleteRecords([record.permitTypeId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      const validityDaysRaw = (row['validityDays'] ?? '').trim();
+      const parsedValidityDays = validityDaysRaw ? Number(validityDaysRaw) : NaN;
+      const approvalRaw = (row['isApprovalRequired'] ?? '').trim().toLowerCase();
+      this.service.addRecord({
+        permitTypeId: row['permitTypeId'] ?? '',
+        permitName: row['permitName'] ?? '',
+        validityDays: Number.isFinite(parsedValidityDays) ? parsedValidityDays : null,
+        isApprovalRequired: approvalRaw === 'yes' || approvalRaw === 'true'
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

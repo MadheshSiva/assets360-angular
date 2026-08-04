@@ -1,0 +1,40 @@
+<div class="import-modal-overlay" (click)="onCancel()">
+  <div class="import-modal" (click)="$event.stopPropagation()">
+    <div class="import-modal-header">
+      <h2 class="import-modal-title">Import File</h2>
+      <button class="import-modal-close" title="Close" (click)="onCancel()">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+
+    <div class="import-modal-body">
+      <button type="button" class="dashed-btn" (click)="downloadSample()">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 5v13M6 12l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        Download Sample Excel
+      </button>
+
+      <label class="import-file-label">Import Excel File</label>
+
+      <label class="dashed-btn">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M12 19V6M6 12l6-6 6 6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        {{ selectedFile ? selectedFile.name : 'Choose File' }}
+        <input type="file" accept=".xlsx,.xls,.csv" hidden (change)="onFileSelected($event)" />
+      </label>
+
+      <p class="import-error" *ngIf="errorMessage">{{ errorMessage }}</p>
+    </div>
+
+    <div class="import-modal-footer">
+      <button type="button" class="btn btn-cancel" (click)="onCancel()">Cancel</button>
+      <button type="button" class="btn btn-submit" [disabled]="!selectedFile || isProcessing" (click)="onUpload()">
+        {{ isProcessing ? 'Uploading…' : 'Upload' }}
+      </button>
+    </div>
+  </div>
+</div>

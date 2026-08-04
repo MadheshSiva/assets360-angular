@@ -1,5 +1,6 @@
 export interface BreakdownIssueRecord {
   issueId: string;
+  assetId: string;
   reportedBy: string;
   issueType: string;
   severity: string;

@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface TrackingTelemetryEntry {
   deviceId: string;
@@ -13,11 +15,22 @@ export interface TrackingTelemetryEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-tracking-telemetry',
-  imports: [CommonModule],
+  imports: [CommonModule, ImportFileModal, RowActions],
   templateUrl: './tracking-telemetry.html',
   styleUrls: ['./tracking-telemetry.css']
 })
 export class AssetTrackingTelemetry {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'deviceId', label: 'Device ID / IMEI / MAC' },
+    { key: 'tagIds', label: 'Tag IDs (QR / RFID / BLE / GPS)' },
+    { key: 'movementLogs', label: 'Movement Logs (Timestamp + Location)' },
+    { key: 'lastSeenTimestamp', label: 'Last Seen Timestamp' },
+    { key: 'speedRoute', label: 'Speed / Route (Vehicles)' },
+    { key: 'sensorData', label: 'Sensor Data (Temp / Vibration / Battery)' }
+  ];
+
+  showImportModal = false;
+
   entries: TrackingTelemetryEntry[] = [
     {
       deviceId: 'IMEI-356938035643809',
@@ -42,7 +55,22 @@ export class AssetTrackingTelemetry {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        deviceId: row['deviceId'] ?? '',
+        tagIds: row['tagIds'] ?? '',
+        movementLogs: row['movementLogs'] ?? '',
+        lastSeenTimestamp: row['lastSeenTimestamp'] ?? '',
+        speedRoute: row['speedRoute'] ?? '',
+        sensorData: row['sensorData'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -55,5 +83,13 @@ export class AssetTrackingTelemetry {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(record: TrackingTelemetryEntry): void {
+    // TODO: open edit tracking & telemetry entry flow for the given record
+  }
+
+  deleteRow(record: TrackingTelemetryEntry): void {
+    this.entries = this.entries.filter((entry) => entry !== record);
   }
 }

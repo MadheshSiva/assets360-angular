@@ -1,7 +1,10 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MasterManagementApiSyncStatusMasterItem } from './api-sync-status-master.model';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterManagementApiSyncStatusMasterItem, ApiSyncStatusType, ApiSyncFinalFlag } from './api-sync-status-master.model';
 import { MasterManagementApiSyncStatusMasterService } from './api-sync-status-master.service';
 
 interface MasterManagementApiSyncStatusMasterRow extends MasterManagementApiSyncStatusMasterItem {
@@ -17,7 +20,7 @@ interface MasterManagementApiSyncStatusMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-api-sync-status-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './api-sync-status-master.html',
   styleUrls: ['./api-sync-status-master.css']
 })
@@ -33,6 +36,17 @@ export class MasterManagementApiSyncStatusMaster {
     { key: 'isFinalStatus', label: 'Is Final Status', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'syncStatusId', label: 'Status ID' },
+    { key: 'statusName', label: 'Status Name' },
+    { key: 'statusCode', label: 'Status Code' },
+    { key: 'description', label: 'Description' },
+    { key: 'statusType', label: 'Status Type' },
+    { key: 'isFinalStatus', label: 'Is Final Status' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementApiSyncStatusMasterRow[] = [];
@@ -44,8 +58,37 @@ export class MasterManagementApiSyncStatusMaster {
 
   form: MasterManagementApiSyncStatusMasterItem = this.emptyForm();
 
-  constructor(private service: MasterManagementApiSyncStatusMasterService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementApiSyncStatusMasterService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.statusName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get statusTypeMaster() {
@@ -123,7 +166,10 @@ export class MasterManagementApiSyncStatusMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementApiSyncStatusMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -134,6 +180,9 @@ export class MasterManagementApiSyncStatusMaster {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -152,7 +201,28 @@ export class MasterManagementApiSyncStatusMaster {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementApiSyncStatusMasterRow): void {
+    this.service.deleteRecords([record.syncStatusId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        syncStatusId: row['syncStatusId'] ?? '',
+        statusName: row['statusName'] ?? '',
+        statusCode: row['statusCode'] ?? '',
+        description: row['description'] ?? '',
+        statusType: (row['statusType'] ?? '') as ApiSyncStatusType | '',
+        isFinalStatus: (row['isFinalStatus'] ?? '') as ApiSyncFinalFlag | ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

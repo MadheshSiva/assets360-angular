@@ -34,14 +34,6 @@ export class AssetLocationHistory {
     }
   ];
 
-  onAdd(): void {
-    // TODO: open add location history entry flow
-  }
-
-  onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
-  }
-
   onDownload(): void {
     // TODO: export current location history list
   }

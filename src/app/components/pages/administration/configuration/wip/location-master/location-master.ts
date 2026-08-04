@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { LocationMaster } from './location-master.model';
 import { LocationMasterService } from './location-master.service';
 
@@ -19,7 +21,7 @@ type LocationMasterForm = LocationMaster;
 @Component({
   standalone: true,
   selector: 'app-wip-location-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './location-master.html',
   styleUrls: ['./location-master.css']
 })
@@ -35,6 +37,18 @@ export class WipLocationMaster {
     { key: 'geoCoordinates', label: 'Geo Coordinates', visible: true },
     { key: 'parentLocationId', label: 'Parent Location', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'locationId', label: 'Location ID' },
+    { key: 'site', label: 'Site' },
+    { key: 'building', label: 'Building' },
+    { key: 'floor', label: 'Floor' },
+    { key: 'zone', label: 'Zone' },
+    { key: 'geoCoordinates', label: 'Geo Coordinates' },
+    { key: 'parentLocationId', label: 'Parent Location' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -119,7 +133,10 @@ export class WipLocationMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: LocationMasterRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -148,7 +165,29 @@ export class WipLocationMaster {
     this.refresh();
   }
 
+  deleteRow(record: LocationMasterRow): void {
+    this.service.deleteRecords([record.locationId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        locationId: row['locationId'] ?? '',
+        site: row['site'] ?? '',
+        building: row['building'] ?? '',
+        floor: row['floor'] ?? '',
+        zone: row['zone'] ?? '',
+        geoCoordinates: row['geoCoordinates'] ?? '',
+        parentLocationId: row['parentLocationId'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

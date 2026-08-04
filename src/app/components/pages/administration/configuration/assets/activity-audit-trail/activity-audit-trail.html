@@ -2,7 +2,7 @@
 
   <!-- Header Row -->
   <div class="lh-header">
-    <h1 class="lh-title">Assets - Activity / Audit Trail</h1>
+    <h1 class="lh-title">Activity / Audit Trail</h1>
 
     <div class="icon-toolbar">
       <button class="icon-btn" title="Download" (click)="onDownload()">
@@ -37,6 +37,7 @@
           <th>Changes Made (Field-level)</th>
           <th>Timestamp Logs</th>
           <th>Access Logs</th>
+          <th class="actions-col">Actions</th>
         </tr>
       </thead>
       <tbody>
@@ -45,10 +46,13 @@
           <td class="system-cell">{{ entry.changesMade }}</td>
           <td class="system-cell">{{ entry.timestampLogs }}</td>
           <td class="system-cell">{{ entry.accessLogs }}</td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="4" class="empty-row">No activity / audit trail records found.</td>
+          <td colspan="5" class="empty-row">No activity / audit trail records found.</td>
         </tr>
       </tbody>
     </table>

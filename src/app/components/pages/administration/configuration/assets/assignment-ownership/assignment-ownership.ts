@@ -1,5 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 
 export interface AssignmentOwnershipEntry {
   assignedCustodian: string;
@@ -12,11 +14,21 @@ export interface AssignmentOwnershipEntry {
 @Component({
   standalone: true,
   selector: 'app-asset-assignment-ownership',
-  imports: [CommonModule],
+  imports: [CommonModule, ImportFileModal, RowActions],
   templateUrl: './assignment-ownership.html',
   styleUrls: ['./assignment-ownership.css']
 })
 export class AssetAssignmentOwnership {
+  readonly importColumns: ImportColumn[] = [
+    { key: 'assignedCustodian', label: 'Assigned Custodian / Department' },
+    { key: 'assignmentPeriod', label: 'Assignment Start & End Date' },
+    { key: 'transferHistory', label: 'Transfer History' },
+    { key: 'custodianDetails', label: 'Custodian Details' },
+    { key: 'checkInOutLogs', label: 'Check-in / Check-out Logs' }
+  ];
+
+  showImportModal = false;
+
   entries: AssignmentOwnershipEntry[] = [
     {
       assignedCustodian: 'John Doe / Facilities',
@@ -39,7 +51,21 @@ export class AssetAssignmentOwnership {
   }
 
   onUpload(): void {
-    // TODO: trigger file upload (e.g. bulk import via Excel/CSV)
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => ({
+        assignedCustodian: row['assignedCustodian'] ?? '',
+        assignmentPeriod: row['assignmentPeriod'] ?? '',
+        transferHistory: row['transferHistory'] ?? '',
+        custodianDetails: row['custodianDetails'] ?? '',
+        checkInOutLogs: row['checkInOutLogs'] ?? ''
+      }))
+    ];
+    this.showImportModal = false;
   }
 
   onDownload(): void {
@@ -52,5 +78,13 @@ export class AssetAssignmentOwnership {
 
   onDelete(): void {
     // TODO: delete selected entries
+  }
+
+  editRow(entry: AssignmentOwnershipEntry): void {
+    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+  }
+
+  deleteRow(entry: AssignmentOwnershipEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 }

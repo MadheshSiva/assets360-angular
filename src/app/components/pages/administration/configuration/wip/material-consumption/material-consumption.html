@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - Material Consumption Master</h1>
+      <h1 class="page-title">Material Consumption Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -87,6 +87,7 @@
             <th *ngIf="isColumnVisible('unit')">Unit</th>
             <th *ngIf="isColumnVisible('cost')">Cost</th>
             <th *ngIf="isColumnVisible('vendorId')">Vendor ID</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -104,10 +105,13 @@
             <td *ngIf="isColumnVisible('unit')">{{ r.unit || '-' }}</td>
             <td *ngIf="isColumnVisible('cost')">{{ r.cost ?? '-' }}</td>
             <td *ngIf="isColumnVisible('vendorId')">{{ vendorName(r.vendorId) }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No records found.</td>
           </tr>
         </tbody>
       </table>
@@ -188,11 +192,17 @@
 
         <div class="form-field">
           <label>UNIT</label>
-          <div class="select-wrap">
-            <select name="unit" [(ngModel)]="form.unit">
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let u of unitMaster" [value]="u">{{ u }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="unit" [(ngModel)]="form.unit">
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let u of unitMaster" [value]="u">{{ u }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/unit-master"
+              [currentValue]="form.unit"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -221,3 +231,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="material-consumption"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

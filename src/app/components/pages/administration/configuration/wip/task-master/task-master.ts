@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { TaskMaster } from './task-master.model';
 import { TaskMasterService } from './task-master.service';
 
@@ -13,7 +16,7 @@ interface TaskMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-task-master',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, MasterLinkIcons, RowActions],
   templateUrl: './task-master.html',
   styleUrls: ['./task-master.css']
 })
@@ -39,6 +42,9 @@ export class WipTaskMaster {
   ];
 
   showColumnPicker = false;
+
+  readonly importColumns: ImportColumn[] = this.columns.map(({ key, label }) => ({ key, label }));
+  showImportModal = false;
 
   records: TaskMaster[] = [];
   filteredRecords: TaskMaster[] = [];
@@ -175,7 +181,10 @@ export class WipTaskMaster {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: TaskMaster): void {
     this.isEditMode = true;
     this.editingRecord = record;
     this.form = { ...record };
@@ -203,7 +212,37 @@ export class WipTaskMaster {
     this.refresh();
   }
 
+  deleteRow(record: TaskMaster): void {
+    this.service.deleteRecords([record.taskId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        taskId: row['taskId'] ?? '',
+        jobId: row['jobId'] ?? '',
+        taskName: row['taskName'] ?? '',
+        description: row['description'] ?? '',
+        sequenceOrder: row['sequenceOrder'] ? Number(row['sequenceOrder']) : null,
+        assignedTo: row['assignedTo'] ?? '',
+        plannedStartTime: row['plannedStartTime'] ?? '',
+        plannedEndTime: row['plannedEndTime'] ?? '',
+        actualStartTime: row['actualStartTime'] ?? '',
+        actualEndTime: row['actualEndTime'] ?? '',
+        statusId: row['statusId'] ?? '',
+        dependencyTaskId: row['dependencyTaskId'] ?? '',
+        checklistId: row['checklistId'] ?? '',
+        completionPercentage: row['completionPercentage'] ? Number(row['completionPercentage']) : null,
+        remarks: row['remarks'] ?? ''
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

@@ -1,6 +1,9 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { MasterManagementResourceTypeItem } from './resource-type.model';
 import { MasterManagementResourceTypeService } from './resource-type.service';
 
@@ -17,7 +20,7 @@ interface MasterManagementResourceTypeColumn {
 @Component({
   standalone: true,
   selector: 'app-master-management-resource-type',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './resource-type.html',
   styleUrls: ['./resource-type.css']
 })
@@ -31,6 +34,15 @@ export class MasterManagementResourceType {
     { key: 'isActive', label: 'Is Active', visible: true }
   ];
 
+  readonly importColumns: ImportColumn[] = [
+    { key: 'resourceTypeId', label: 'Type ID' },
+    { key: 'resourceTypeName', label: 'Type Name' },
+    { key: 'category', label: 'Category' },
+    { key: 'isActive', label: 'Is Active' }
+  ];
+
+  showImportModal = false;
+
   showColumnPicker = false;
 
   records: MasterManagementResourceTypeRow[] = [];
@@ -42,8 +54,37 @@ export class MasterManagementResourceType {
 
   form: MasterManagementResourceTypeItem = this.emptyForm();
 
-  constructor(private service: MasterManagementResourceTypeService) {
+  private returnUrl: string | null = null;
+
+  constructor(
+    private service: MasterManagementResourceTypeService,
+    private route: ActivatedRoute,
+    private router: Router
+  ) {
     this.refresh();
+    this.handleDeepLink();
+  }
+
+  private handleDeepLink(): void {
+    const params = this.route.snapshot.queryParamMap;
+    const action = params.get('linkAction');
+    if (!action) return;
+
+    this.returnUrl = params.get('linkReturn');
+
+    if (action === 'create') {
+      this.onCreate();
+    } else if (action === 'edit') {
+      const value = params.get('linkValue') ?? '';
+      const match = this.records.find((r) => r.resourceTypeName === value);
+      if (match) {
+        this.isEditMode = true;
+        this.editingRecord = match;
+        const { selected, ...rest } = match;
+        this.form = { ...rest };
+        this.showFormModal = true;
+      }
+    }
   }
 
   get categoryMaster() {
@@ -115,7 +156,10 @@ export class MasterManagementResourceType {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: MasterManagementResourceTypeRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -126,6 +170,9 @@ export class MasterManagementResourceType {
   closeFormModal(): void {
     this.showFormModal = false;
     this.editingRecord = null;
+    if (this.returnUrl) {
+      this.router.navigateByUrl(this.returnUrl);
+    }
   }
 
   submitForm(): void {
@@ -144,7 +191,27 @@ export class MasterManagementResourceType {
     this.refresh();
   }
 
+  deleteRow(record: MasterManagementResourceTypeRow): void {
+    this.service.deleteRecords([record.resourceTypeId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    const toBool = (v?: string) => ['true', 'yes', '1'].includes((v ?? '').trim().toLowerCase());
+    rows.forEach((row) => {
+      this.service.addRecord({
+        resourceTypeId: row['resourceTypeId'] ?? '',
+        resourceTypeName: row['resourceTypeName'] ?? '',
+        category: (row['category'] as MasterManagementResourceTypeItem['category']) || '',
+        isActive: toBool(row['isActive'])
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

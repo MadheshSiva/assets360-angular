@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - SLA Master</h1>
+      <h1 class="page-title">SLA Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -86,6 +86,7 @@
             <th *ngIf="isColumnVisible('escalationLevel1')">Escalation Level 1</th>
             <th *ngIf="isColumnVisible('escalationLevel2')">Escalation Level 2</th>
             <th *ngIf="isColumnVisible('escalationLevel3')">Escalation Level 3</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -104,10 +105,13 @@
             <td *ngIf="isColumnVisible('escalationLevel1')">{{ userName(r.escalationLevel1) }}</td>
             <td *ngIf="isColumnVisible('escalationLevel2')">{{ userName(r.escalationLevel2) }}</td>
             <td *ngIf="isColumnVisible('escalationLevel3')">{{ userName(r.escalationLevel3) }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No SLAs found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No SLAs found.</td>
           </tr>
         </tbody>
       </table>
@@ -153,21 +157,33 @@
 
         <div class="form-field">
           <label>WORK TYPE <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="workType" [(ngModel)]="form.workType" required>
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let t of workTypeMaster" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="workType" [(ngModel)]="form.workType" required>
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let t of workTypeMaster" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/work-type"
+              [currentValue]="form.workType"
+            ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
           <label>PRIORITY <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="priority" [(ngModel)]="form.priority" required>
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let p of priorityMaster" [value]="p">{{ p }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="priority" [(ngModel)]="form.priority" required>
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let p of priorityMaster" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/priority"
+              [currentValue]="form.priority"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -221,3 +237,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="sla-master"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

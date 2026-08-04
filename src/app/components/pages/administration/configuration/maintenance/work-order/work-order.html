@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Maintenance - Work Order</h1>
+      <h1 class="page-title">Work Order</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -101,6 +101,7 @@
             <th *ngIf="isColumnVisible('assignedTechnician')">Assigned Technician</th>
             <th *ngIf="isColumnVisible('department')">Department</th>
             <th *ngIf="isColumnVisible('location')">Location</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -109,8 +110,8 @@
               <input type="checkbox" [checked]="wo.selected" (change)="toggleSelectWorkOrder(wo)" />
             </td>
             <td *ngIf="isColumnVisible('workOrderId')" class="mono">{{ wo.workOrderId }}</td>
-            <td *ngIf="isColumnVisible('assetId')">{{ assetName(wo.assetId) }}</td>
-            <td *ngIf="isColumnVisible('workType')">{{ wo.workType }}</td>
+            <td *ngIf="isColumnVisible('assetId')">{{ assetNames(wo.assetId) }}</td>
+            <td *ngIf="isColumnVisible('workType')">{{ wo.workType.join(', ') }}</td>
             <td *ngIf="isColumnVisible('title')">{{ wo.title }}</td>
             <td *ngIf="isColumnVisible('priority')">
               <span class="badge" [attr.data-priority]="wo.priority">{{ wo.priority }}</span>
@@ -123,13 +124,16 @@
             <td *ngIf="isColumnVisible('startTime')">{{ wo.startTime }}</td>
             <td *ngIf="isColumnVisible('endTime')">{{ wo.endTime }}</td>
             <td *ngIf="isColumnVisible('downtimeDuration')">{{ wo.downtimeDuration ?? '-' }}</td>
-            <td *ngIf="isColumnVisible('assignedTechnician')">{{ wo.assignedTechnician }}</td>
+            <td *ngIf="isColumnVisible('assignedTechnician')">{{ wo.assignedTechnician.join(', ') }}</td>
             <td *ngIf="isColumnVisible('department')">{{ wo.department }}</td>
             <td *ngIf="isColumnVisible('location')">{{ wo.location }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(wo)" (delete)="deleteRow(wo)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredWorkOrders.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No work orders found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No work orders found.</td>
           </tr>
         </tbody>
       </table>
@@ -178,20 +182,32 @@
         <div class="form-field">
           <label>ASSET ID <span class="required">*</span></label>
           <div class="select-wrap">
-            <select name="assetId" [(ngModel)]="form.assetId" required>
-              <option value="" disabled selected>-- Select Asset --</option>
+            <select (change)="addFormAssetId($event)">
+              <option value="" selected>-- Select Asset --</option>
               <option *ngFor="let a of assetMaster" [value]="a.id">{{ a.id }} - {{ a.name }}</option>
             </select>
+          </div>
+          <div class="chip-row" *ngIf="form.assetId.length">
+            <span class="chip" *ngFor="let id of form.assetId">
+              {{ assetName(id) }}
+              <button type="button" class="chip-remove" title="Remove" (click)="removeFormAssetId(id)">×</button>
+            </span>
           </div>
         </div>
 
         <div class="form-field">
           <label>WORK TYPE <span class="required">*</span></label>
           <div class="select-wrap">
-            <select name="workType" [(ngModel)]="form.workType" required>
-              <option value="" disabled selected>-- Select Work Type --</option>
+            <select (change)="addFormWorkType($event)">
+              <option value="" selected>-- Select Work Type --</option>
               <option *ngFor="let t of workTypeMaster" [value]="t">{{ t }}</option>
             </select>
+          </div>
+          <div class="chip-row" *ngIf="form.workType.length">
+            <span class="chip" *ngFor="let t of form.workType">
+              {{ t }}
+              <button type="button" class="chip-remove" title="Remove" (click)="removeFormWorkType(t)">×</button>
+            </span>
           </div>
         </div>
 
@@ -208,21 +224,33 @@
 
         <div class="form-field">
           <label>PRIORITY <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="priority" [(ngModel)]="form.priority" required>
-              <option value="" disabled selected>-- Select Priority --</option>
-              <option *ngFor="let p of priorityMaster" [value]="p">{{ p }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="priority" [(ngModel)]="form.priority" required>
+                <option value="" disabled selected>-- Select Priority --</option>
+                <option *ngFor="let p of priorityMaster" [value]="p">{{ p }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/priority"
+              [currentValue]="form.priority"
+            ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
           <label>STATUS <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="status" [(ngModel)]="form.status" required>
-              <option value="" disabled selected>-- Select Status --</option>
-              <option *ngFor="let s of statusMaster" [value]="s">{{ s }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="status" [(ngModel)]="form.status" required>
+                <option value="" disabled selected>-- Select Status --</option>
+                <option *ngFor="let s of statusMaster" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/status"
+              [currentValue]="form.status"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -254,40 +282,70 @@
         <div class="form-field">
           <label>ASSIGNED TECHNICIAN</label>
           <div class="select-wrap">
-            <select name="assignedTechnician" [(ngModel)]="form.assignedTechnician">
-              <option value="">-- Select Technician --</option>
+            <select (change)="addFormTechnician($event)">
+              <option value="" selected>-- Select Technician --</option>
               <option *ngFor="let t of technicianMaster" [value]="t">{{ t }}</option>
             </select>
+          </div>
+          <div class="chip-row" *ngIf="form.assignedTechnician.length">
+            <span class="chip" *ngFor="let t of form.assignedTechnician">
+              {{ t }}
+              <button type="button" class="chip-remove" title="Remove" (click)="removeFormTechnician(t)">×</button>
+            </span>
           </div>
         </div>
 
         <div class="form-field">
           <label>DEPARTMENT</label>
-          <div class="select-wrap">
-            <select name="department" [(ngModel)]="form.department">
-              <option value="">-- Select Department --</option>
-              <option *ngFor="let d of departmentMaster" [value]="d">{{ d }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="department" [(ngModel)]="form.department">
+                <option value="">-- Select Department --</option>
+                <option *ngFor="let d of departmentMaster" [value]="d">{{ d }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/assigned-custodian-department"
+              [currentValue]="form.department"
+            ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
           <label>LOCATION</label>
-          <div class="select-wrap">
-            <select name="location" [(ngModel)]="form.location">
-              <option value="">-- Select Location --</option>
-              <option *ngFor="let l of locationMaster" [value]="l">{{ l }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="location" [(ngModel)]="form.location">
+                <option value="">-- Select Location --</option>
+                <option *ngFor="let l of locationMaster" [value]="l">{{ l }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/current-location"
+              [currentValue]="form.location"
+            ></app-master-link-icons>
           </div>
         </div>
       </div>
 
       <div class="modal-footer">
         <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
-        <button type="submit" class="btn btn-submit" [disabled]="!workOrderForm.valid">
+        <button
+          type="submit"
+          class="btn btn-submit"
+          [disabled]="!workOrderForm.valid || form.assetId.length === 0 || form.workType.length === 0"
+        >
           {{ isEditMode ? 'Save Changes' : 'Create Work Order' }}
         </button>
       </div>
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="work-order"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

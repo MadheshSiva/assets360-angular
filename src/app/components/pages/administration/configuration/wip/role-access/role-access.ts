@@ -1,6 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { RowActions } from '@shared/row-actions/row-actions';
 import { RoleAccess, RoleAccessForm } from './role-access.model';
 import { RoleAccessService } from './role-access.service';
 
@@ -13,7 +15,7 @@ interface RoleAccessColumn {
 @Component({
   standalone: true,
   selector: 'app-wip-role-access',
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './role-access.html',
   styleUrls: ['./role-access.css']
 })
@@ -27,6 +29,16 @@ export class WipRoleAccess {
     { key: 'moduleAccess', label: 'Module Access', visible: true },
     { key: 'dataAccessLevel', label: 'Data Access Level', visible: true }
   ];
+
+  readonly importColumns: ImportColumn[] = [
+    { key: 'roleId', label: 'Role ID' },
+    { key: 'roleName', label: 'Role Name' },
+    { key: 'permissions', label: 'Permissions' },
+    { key: 'moduleAccess', label: 'Module Access' },
+    { key: 'dataAccessLevel', label: 'Data Access Level' }
+  ];
+
+  showImportModal = false;
 
   showColumnPicker = false;
 
@@ -121,7 +133,10 @@ export class WipRoleAccess {
 
   onEdit(): void {
     if (this.selectedRecords.length !== 1) return;
-    const record = this.selectedRecords[0];
+    this.editRow(this.selectedRecords[0]);
+  }
+
+  editRow(record: RoleAccess): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -170,7 +185,29 @@ export class WipRoleAccess {
     this.refresh();
   }
 
+  deleteRow(record: RoleAccess): void {
+    this.service.deleteRecords([record.roleId]);
+    this.refresh();
+  }
+
   onUpload(): void {
+    this.showImportModal = true;
+  }
+
+  onImportRows(rows: Record<string, string>[]): void {
+    rows.forEach((row) => {
+      this.service.addRecord({
+        roleId: row['roleId'] ?? '',
+        roleName: row['roleName'] ?? '',
+        permissions: row['permissions']
+          ? (row['permissions'].split(',').map((p) => p.trim()).filter(Boolean) as RoleAccess['permissions'])
+          : [],
+        moduleAccess: row['moduleAccess'] ? row['moduleAccess'].split(',').map((m) => m.trim()).filter(Boolean) : [],
+        dataAccessLevel: (row['dataAccessLevel'] ?? '') as RoleAccess['dataAccessLevel']
+      });
+    });
+    this.refresh();
+    this.showImportModal = false;
   }
 
   onDownload(): void {

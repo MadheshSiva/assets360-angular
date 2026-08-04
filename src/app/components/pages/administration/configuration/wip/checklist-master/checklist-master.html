@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - Checklist Master</h1>
+      <h1 class="page-title">Checklist Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -83,6 +83,7 @@
             <th *ngIf="isColumnVisible('applicableWorkType')">Applicable Work Type</th>
             <th *ngIf="isColumnVisible('versionNumber')">Version Number</th>
             <th *ngIf="isColumnVisible('isMandatory')">Is Mandatory</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -98,10 +99,13 @@
             <td *ngIf="isColumnVisible('isMandatory')">
               <span class="badge" [attr.data-mandatory]="r.isMandatory">{{ r.isMandatory ? 'Yes' : 'No' }}</span>
             </td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No checklists found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No checklists found.</td>
           </tr>
         </tbody>
       </table>
@@ -147,11 +151,17 @@
 
         <div class="form-field">
           <label>CHECKLIST TYPE <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="checklistType" [(ngModel)]="form.checklistType" required>
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let t of checklistTypeMaster" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="checklistType" [(ngModel)]="form.checklistType" required>
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let t of checklistTypeMaster" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/checklist-type-master"
+              [currentValue]="form.checklistType"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -192,3 +202,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="checklist-master"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

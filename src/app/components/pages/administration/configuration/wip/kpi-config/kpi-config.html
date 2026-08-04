@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - KPI Master (Dashboard Configuration)</h1>
+      <h1 class="page-title">KPI Master (Dashboard Configuration)</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -85,6 +85,7 @@
             <th *ngIf="isColumnVisible('thresholdRed')">Threshold Red</th>
             <th *ngIf="isColumnVisible('refreshFrequency')">Refresh Frequency</th>
             <th *ngIf="isColumnVisible('widgetType')">Widget Type</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -100,10 +101,13 @@
             <td *ngIf="isColumnVisible('thresholdRed')">{{ r.thresholdRed ?? '-' }}</td>
             <td *ngIf="isColumnVisible('refreshFrequency')">{{ r.refreshFrequency || '-' }}</td>
             <td *ngIf="isColumnVisible('widgetType')">{{ r.widgetType || '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No records found.</td>
           </tr>
         </tbody>
       </table>
@@ -179,11 +183,17 @@
 
         <div class="form-field">
           <label>WIDGET TYPE <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="widgetType" [(ngModel)]="form.widgetType" required>
-              <option value="" disabled selected>-- Select Widget Type --</option>
-              <option *ngFor="let w of widgetTypeMaster" [value]="w">{{ w }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="widgetType" [(ngModel)]="form.widgetType" required>
+                <option value="" disabled selected>-- Select Widget Type --</option>
+                <option *ngFor="let w of widgetTypeMaster" [value]="w">{{ w }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/chart-type-master"
+              [currentValue]="form.widgetType"
+            ></app-master-link-icons>
           </div>
         </div>
       </div>
@@ -197,3 +207,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="kpi-config"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

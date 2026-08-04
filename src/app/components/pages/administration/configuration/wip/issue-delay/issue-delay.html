@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">WIP - Issue / Delay Master</h1>
+      <h1 class="page-title">Issue / Delay Master</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -88,6 +88,7 @@
             <th *ngIf="isColumnVisible('statusId')">Status</th>
             <th *ngIf="isColumnVisible('resolutionRemarks')">Resolution Remarks</th>
             <th *ngIf="isColumnVisible('closedDate')">Closed Date</th>
+            <th class="actions-col">Actions</th>
           </tr>
         </thead>
         <tbody>
@@ -110,10 +111,13 @@
             </td>
             <td *ngIf="isColumnVisible('resolutionRemarks')">{{ r.resolutionRemarks || '-' }}</td>
             <td *ngIf="isColumnVisible('closedDate')">{{ r.closedDate || '-' }}</td>
+            <td class="actions-col">
+              <app-row-actions (edit)="editRow(r)" (delete)="deleteRow(r)"></app-row-actions>
+            </td>
           </tr>
 
           <tr *ngIf="filteredRecords.length === 0">
-            <td [attr.colspan]="columns.length + 1" class="empty-row">No records found.</td>
+            <td [attr.colspan]="columns.length + 2" class="empty-row">No records found.</td>
           </tr>
         </tbody>
       </table>
@@ -170,11 +174,17 @@
 
         <div class="form-field">
           <label>ISSUE TYPE <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="issueType" [(ngModel)]="form.issueType" required>
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let t of issueTypeMaster" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="issueType" [(ngModel)]="form.issueType" required>
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let t of issueTypeMaster" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/issue-type-master"
+              [currentValue]="form.issueType"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -200,21 +210,33 @@
 
         <div class="form-field">
           <label>SEVERITY <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="severity" [(ngModel)]="form.severity" required>
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let s of severityMaster" [value]="s">{{ s }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="severity" [(ngModel)]="form.severity" required>
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let s of severityMaster" [value]="s">{{ s }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/severity-master"
+              [currentValue]="form.severity"
+            ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
           <label>STATUS <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="statusId" [(ngModel)]="form.statusId" required>
-              <option value="" disabled selected>-- Select --</option>
-              <option *ngFor="let s of statusMaster" [value]="s.statusId">{{ s.statusName || s.statusId }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="statusId" [(ngModel)]="form.statusId" required>
+                <option value="" disabled selected>-- Select --</option>
+                <option *ngFor="let s of statusMaster" [value]="s.statusId">{{ s.statusName || s.statusId }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/status"
+              [currentValue]="form.statusId"
+            ></app-master-link-icons>
           </div>
         </div>
 
@@ -238,3 +260,11 @@
     </form>
   </div>
 </div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="issue-delay"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

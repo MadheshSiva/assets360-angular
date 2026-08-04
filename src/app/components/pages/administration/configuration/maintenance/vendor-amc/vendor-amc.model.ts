@@ -1,6 +1,7 @@
 export interface VendorAmcRecord {
   vendorName: string;
   contractId: string;
+  assetIds: string[];
   startDate: string;
   endDate: string;
   slaTerms: string;
