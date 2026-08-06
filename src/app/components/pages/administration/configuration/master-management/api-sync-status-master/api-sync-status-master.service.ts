@@ -13,6 +13,8 @@ export class MasterManagementApiSyncStatusMasterService {
   private readonly records: MasterManagementApiSyncStatusMasterItem[] = [
     {
       syncStatusId: 'SYN-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'Synced',
       statusCode: 'SYNCED',
       description: 'Record successfully synced with the external system',
@@ -21,6 +23,8 @@ export class MasterManagementApiSyncStatusMasterService {
     },
     {
       syncStatusId: 'SYN-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       statusName: 'Pending',
       statusCode: 'PENDING',
       description: 'Record is queued and awaiting the next sync cycle',
@@ -29,6 +33,8 @@ export class MasterManagementApiSyncStatusMasterService {
     },
     {
       syncStatusId: 'SYN-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       statusName: 'Failed',
       statusCode: 'FAILED',
       description: 'Sync attempt failed and requires manual review',
@@ -37,6 +43,8 @@ export class MasterManagementApiSyncStatusMasterService {
     },
     {
       syncStatusId: 'SYN-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'Conflict',
       statusCode: 'CONFLICT',
       description: 'Sync detected conflicting data between systems',

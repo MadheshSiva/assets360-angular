@@ -24,6 +24,8 @@ export class MaintenanceComplianceInspection {
 
   columns: InspectionColumn[] = [
     { key: 'inspectionId', label: 'Inspection ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'inspectionType', label: 'Inspection Type', visible: true },
     { key: 'checklist', label: 'Checklist', visible: true },
     { key: 'inspectorName', label: 'Inspector Name', visible: true },
@@ -34,6 +36,8 @@ export class MaintenanceComplianceInspection {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'inspectionId', label: 'Inspection ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'inspectionType', label: 'Inspection Type' },
     { key: 'checklist', label: 'Checklist' },
     { key: 'inspectorName', label: 'Inspector Name' },
@@ -78,6 +82,8 @@ export class MaintenanceComplianceInspection {
   private emptyForm(): ComplianceInspectionForm {
     return {
       inspectionId: '',
+      assetId: '',
+      assetName: '',
       inspectionType: '',
       checklist: '',
       inspectorName: '',
@@ -188,6 +194,8 @@ export class MaintenanceComplianceInspection {
     rows.forEach((row) => {
       this.inspectionService.addRecord({
         inspectionId: row['inspectionId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         inspectionType: row['inspectionType'] ?? '',
         checklist: row['checklist'] ?? '',
         inspectorName: row['inspectorName'] ?? '',

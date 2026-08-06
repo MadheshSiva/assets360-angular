@@ -29,6 +29,8 @@ export class MasterManagementResourceType {
 
   columns: MasterManagementResourceTypeColumn[] = [
     { key: 'resourceTypeId', label: 'Type ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'resourceTypeName', label: 'Type Name', visible: true },
     { key: 'category', label: 'Category', visible: true },
     { key: 'isActive', label: 'Is Active', visible: true }
@@ -36,6 +38,8 @@ export class MasterManagementResourceType {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'resourceTypeId', label: 'Type ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'resourceTypeName', label: 'Type Name' },
     { key: 'category', label: 'Category' },
     { key: 'isActive', label: 'Is Active' }
@@ -94,6 +98,8 @@ export class MasterManagementResourceType {
   private emptyForm(): MasterManagementResourceTypeItem {
     return {
       resourceTypeId: '',
+      assetId: '',
+      assetName: '',
       resourceTypeName: '',
       category: '',
       isActive: true
@@ -205,6 +211,8 @@ export class MasterManagementResourceType {
     rows.forEach((row) => {
       this.service.addRecord({
         resourceTypeId: row['resourceTypeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         resourceTypeName: row['resourceTypeName'] ?? '',
         category: (row['category'] as MasterManagementResourceTypeItem['category']) || '',
         isActive: toBool(row['isActive'])

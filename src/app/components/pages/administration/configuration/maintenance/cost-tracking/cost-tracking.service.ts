@@ -11,6 +11,8 @@ import { CostTrackingRecord } from './cost-tracking.model';
 export class CostTrackingService {
   private readonly recordsSubject = new BehaviorSubject<CostTrackingRecord[]>([
     {
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       laborCost: 1200,
       sparePartsCost: 450,
       totalMaintenanceCost: 1650,
@@ -18,6 +20,8 @@ export class CostTrackingService {
       costPerAsset: 275
     },
     {
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       laborCost: 800,
       sparePartsCost: 300,
       totalMaintenanceCost: 1100,

@@ -1,5 +1,7 @@
 export interface SparePartRecord {
   partId: string;
+  assetId: string;
+  assetName: string;
   partName: string;
   category: string;
   quantityInStock: number | null;

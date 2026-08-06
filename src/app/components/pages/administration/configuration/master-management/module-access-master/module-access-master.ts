@@ -28,6 +28,8 @@ export class MasterManagementModuleAccessMaster {
 
   columns: MasterManagementModuleAccessMasterColumn[] = [
     { key: 'moduleId', label: 'Module ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'moduleName', label: 'Module Name', visible: true },
     { key: 'routePath', label: 'Route Path', visible: true },
     { key: 'icon', label: 'Icon', visible: true }
@@ -35,6 +37,8 @@ export class MasterManagementModuleAccessMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'moduleId', label: 'Module ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'moduleName', label: 'Module Name' },
     { key: 'routePath', label: 'Route Path' },
     { key: 'icon', label: 'Icon' }
@@ -60,6 +64,8 @@ export class MasterManagementModuleAccessMaster {
   private emptyForm(): MasterManagementModuleAccessMasterItem {
     return {
       moduleId: '',
+      assetId: '',
+      assetName: '',
       moduleName: '',
       routePath: '',
       icon: ''
@@ -167,6 +173,8 @@ export class MasterManagementModuleAccessMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         moduleId: row['moduleId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         moduleName: row['moduleName'] ?? '',
         routePath: row['routePath'] ?? '',
         icon: row['icon'] ?? ''

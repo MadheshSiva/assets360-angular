@@ -23,6 +23,8 @@ export class MaintenanceCostTracking {
   searchTerm = '';
 
   columns: CostColumn[] = [
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'laborCost', label: 'Labor Cost', visible: true },
     { key: 'sparePartsCost', label: 'Spare Parts Cost', visible: true },
     { key: 'totalMaintenanceCost', label: 'Total Maintenance Cost', visible: true },
@@ -31,6 +33,8 @@ export class MaintenanceCostTracking {
   ];
 
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'laborCost', label: 'Labor Cost' },
     { key: 'sparePartsCost', label: 'Spare Parts Cost' },
     { key: 'totalMaintenanceCost', label: 'Total Maintenance Cost' },
@@ -61,6 +65,8 @@ export class MaintenanceCostTracking {
 
   private emptyForm(): CostTrackingForm {
     return {
+      assetId: '',
+      assetName: '',
       laborCost: null,
       sparePartsCost: null,
       budgetAllocation: null,
@@ -169,6 +175,8 @@ export class MaintenanceCostTracking {
   onImportRows(rows: Record<string, string>[]): void {
     rows.forEach((row) => {
       this.costService.addRecord({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         laborCost: row['laborCost'] ? Number(row['laborCost']) : null,
         sparePartsCost: row['sparePartsCost'] ? Number(row['sparePartsCost']) : null,
         totalMaintenanceCost: row['totalMaintenanceCost'] ? Number(row['totalMaintenanceCost']) : null,

@@ -24,6 +24,8 @@ export class MaintenancePredictive {
   searchTerm = '';
 
   columns: PredictiveColumn[] = [
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'sensorType', label: 'Sensor Type', visible: true },
     { key: 'thresholdValue', label: 'Threshold Value', visible: true },
     { key: 'alertCondition', label: 'Alert Condition', visible: true },
@@ -33,6 +35,8 @@ export class MaintenancePredictive {
   ];
 
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'sensorType', label: 'Sensor Type' },
     { key: 'thresholdValue', label: 'Threshold Value' },
     { key: 'alertCondition', label: 'Alert Condition' },
@@ -76,6 +80,8 @@ export class MaintenancePredictive {
 
   private emptyForm(): PredictiveMaintenanceForm {
     return {
+      assetId: '',
+      assetName: '',
       sensorType: '',
       thresholdValue: null,
       alertCondition: '',
@@ -185,6 +191,8 @@ export class MaintenancePredictive {
   onImportRows(rows: Record<string, string>[]): void {
     rows.forEach((row) => {
       this.predictiveService.addRecord({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         sensorType: row['sensorType'] ?? '',
         thresholdValue: this.toNumber(row['thresholdValue']),
         alertCondition: row['alertCondition'] ?? '',

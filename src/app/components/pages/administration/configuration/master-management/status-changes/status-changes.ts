@@ -28,6 +28,8 @@ export class MasterManagementStatusChanges {
 
   columns: MasterManagementStatusChangeColumn[] = [
     { key: 'statusChangeId', label: 'Status Change ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'statusName', label: 'Status Name', visible: true },
     { key: 'statusCode', label: 'Status Code', visible: true },
     { key: 'sequenceOrder', label: 'Sequence Order', visible: true },
@@ -39,6 +41,8 @@ export class MasterManagementStatusChanges {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'statusChangeId', label: 'Status Change ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'statusName', label: 'Status Name' },
     { key: 'statusCode', label: 'Status Code' },
     { key: 'sequenceOrder', label: 'Sequence Order' },
@@ -72,6 +76,8 @@ export class MasterManagementStatusChanges {
   private emptyForm(): MasterManagementStatusChangeItem {
     return {
       statusChangeId: '',
+      assetId: '',
+      assetName: '',
       statusName: '',
       statusCode: '',
       sequenceOrder: null,
@@ -186,6 +192,8 @@ export class MasterManagementStatusChanges {
       const sequenceRaw = Number(row['sequenceOrder']);
       this.service.addRecord({
         statusChangeId: row['statusChangeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         statusName: row['statusName'] ?? '',
         statusCode: row['statusCode'] ?? '',
         sequenceOrder: Number.isFinite(sequenceRaw) && row['sequenceOrder'] ? sequenceRaw : null,

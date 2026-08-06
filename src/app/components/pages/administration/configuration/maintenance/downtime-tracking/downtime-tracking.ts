@@ -25,6 +25,7 @@ export class MaintenanceDowntimeTracking {
 
   columns: DowntimeColumn[] = [
     { key: 'assetId', label: 'Asset', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'downtimeStart', label: 'Downtime Start', visible: true },
     { key: 'downtimeEnd', label: 'Downtime End', visible: true },
     { key: 'totalDowntime', label: 'Total Downtime', visible: true },
@@ -34,6 +35,7 @@ export class MaintenanceDowntimeTracking {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'assetId', label: 'Asset' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'downtimeStart', label: 'Downtime Start' },
     { key: 'downtimeEnd', label: 'Downtime End' },
     { key: 'totalDowntime', label: 'Total Downtime' },
@@ -81,6 +83,7 @@ export class MaintenanceDowntimeTracking {
   private emptyForm(): DowntimeTrackingForm {
     return {
       assetId: '',
+      assetName: '',
       downtimeStart: '',
       downtimeEnd: '',
       reasonForDowntime: '',
@@ -190,6 +193,7 @@ export class MaintenanceDowntimeTracking {
     rows.forEach((row) => {
       this.downtimeService.addRecord({
         assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         downtimeStart: row['downtimeStart'] ?? '',
         downtimeEnd: row['downtimeEnd'] ?? '',
         totalDowntime: row['totalDowntime'] ?? '',

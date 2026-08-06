@@ -8,6 +8,8 @@ export class MasterManagementAssetTypeService {
   private readonly records: MasterManagementAssetTypeItem[] = [
     {
       assetTypeId: 'AST-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       assetTypeName: 'HVAC Unit',
       assetTypeCode: 'HVAC-UNIT',
       description: 'Heating, ventilation and air conditioning units installed on premises',
@@ -15,6 +17,8 @@ export class MasterManagementAssetTypeService {
     },
     {
       assetTypeId: 'AST-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       assetTypeName: 'Forklift',
       assetTypeCode: 'FORKLIFT',
       description: 'Powered industrial trucks used to lift and move materials',
@@ -22,6 +26,8 @@ export class MasterManagementAssetTypeService {
     },
     {
       assetTypeId: 'AST-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       assetTypeName: 'Laptop',
       assetTypeCode: 'LAPTOP',
       description: 'Portable computers issued to staff for daily operations',
@@ -29,6 +35,8 @@ export class MasterManagementAssetTypeService {
     },
     {
       assetTypeId: 'AST-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       assetTypeName: 'Delivery Van',
       assetTypeCode: 'DELIVERY-VAN',
       description: 'Light commercial vehicles used for goods delivery',

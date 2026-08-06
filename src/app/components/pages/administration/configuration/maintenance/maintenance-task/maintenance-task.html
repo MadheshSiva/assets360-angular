@@ -87,6 +87,8 @@
             <th class="selection-col">
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('taskChecklist')">Task Checklist</th>
             <th *ngIf="isColumnVisible('instructions')">Instructions</th>
             <th *ngIf="isColumnVisible('toolsRequired')">Tools Required</th>
@@ -101,6 +103,8 @@
             <td class="selection-col">
               <input type="checkbox" [checked]="task.selected" (change)="toggleSelectTask(task)" />
             </td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ task.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ task.assetName }}</td>
             <td *ngIf="isColumnVisible('taskChecklist')">{{ task.taskChecklist.join(', ') || '-' }}</td>
             <td *ngIf="isColumnVisible('instructions')">{{ task.instructions }}</td>
             <td *ngIf="isColumnVisible('toolsRequired')">{{ task.toolsRequired.join(', ') || '-' }}</td>
@@ -148,6 +152,16 @@
 
     <form class="modal-form" (ngSubmit)="submitForm()" #taskForm="ngForm">
       <div class="form-grid">
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+
         <div class="form-field form-field-wide">
           <label>TASK CHECKLIST <span class="required">*</span></label>
           <select name="taskChecklist" class="multi-select" [(ngModel)]="form.taskChecklist" multiple required>

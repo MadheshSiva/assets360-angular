@@ -1,5 +1,7 @@
 export interface PreventiveMaintenanceRecord {
   pmScheduleId: string;
+  assetId: string;
+  assetName: string;
   frequency: string;
   triggerType: string;
   lastMaintenanceDate: string;

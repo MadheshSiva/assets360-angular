@@ -29,6 +29,8 @@ export class MasterManagementShiftMaster {
 
   columns: MasterManagementShiftMasterColumn[] = [
     { key: 'shiftId', label: 'Shift ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'shiftName', label: 'Shift Name', visible: true },
     { key: 'startTime', label: 'Start Time', visible: true },
     { key: 'endTime', label: 'End Time', visible: true }
@@ -36,6 +38,8 @@ export class MasterManagementShiftMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'shiftId', label: 'Shift ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'shiftName', label: 'Shift Name' },
     { key: 'startTime', label: 'Start Time' },
     { key: 'endTime', label: 'End Time' }
@@ -90,6 +94,8 @@ export class MasterManagementShiftMaster {
   private emptyForm(): MasterManagementShiftMasterItem {
     return {
       shiftId: '',
+      assetId: '',
+      assetName: '',
       shiftName: '',
       startTime: '',
       endTime: ''
@@ -200,6 +206,8 @@ export class MasterManagementShiftMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         shiftId: row['shiftId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         shiftName: row['shiftName'] ?? '',
         startTime: row['startTime'] ?? '',
         endTime: row['endTime'] ?? ''

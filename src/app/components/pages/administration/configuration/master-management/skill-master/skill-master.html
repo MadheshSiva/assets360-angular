@@ -78,6 +78,8 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('skillId')">Skill ID</th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('skillName')">Skill Name</th>
             <th *ngIf="isColumnVisible('skillLevel')">Skill Level</th>
             <th *ngIf="isColumnVisible('certificationRequired')">Certification Required</th>
@@ -90,6 +92,8 @@
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
             <td *ngIf="isColumnVisible('skillId')" class="mono">{{ r.skillId }}</td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('skillName')">{{ r.skillName }}</td>
             <td *ngIf="isColumnVisible('skillLevel')">{{ r.skillLevel || '-' }}</td>
             <td *ngIf="isColumnVisible('certificationRequired')">
@@ -138,6 +142,16 @@
         <div class="form-field">
           <label>SKILL ID</label>
           <input type="text" name="skillId" placeholder="Auto-generated if left blank" [(ngModel)]="form.skillId" [readonly]="isEditMode" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

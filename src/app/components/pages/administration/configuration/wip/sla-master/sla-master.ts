@@ -27,6 +27,8 @@ export class WipSlaMaster {
 
   columns: SlaMasterColumn[] = [
     { key: 'slaId', label: 'SLA ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'slaName', label: 'SLA Name', visible: true },
     { key: 'workType', label: 'Work Type', visible: true },
     { key: 'priority', label: 'Priority', visible: true },
@@ -70,6 +72,8 @@ export class WipSlaMaster {
   private emptyForm(): SlaMaster {
     return {
       slaId: '',
+      assetId: '',
+      assetName: '',
       slaName: '',
       workType: '',
       priority: '',
@@ -182,6 +186,8 @@ export class WipSlaMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         slaId: row['slaId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         slaName: row['slaName'] ?? '',
         workType: row['workType'] ?? '',
         priority: row['priority'] ?? '',

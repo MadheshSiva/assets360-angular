@@ -29,6 +29,8 @@ export class MasterManagementPriority {
 
   columns: MasterManagementPriorityColumn[] = [
     { key: 'priorityId', label: 'Priority ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'priorityName', label: 'Priority Name', visible: true },
     { key: 'colorCode', label: 'Color Code', visible: true },
     { key: 'slaMapping', label: 'SLA Mapping', visible: true },
@@ -37,6 +39,8 @@ export class MasterManagementPriority {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'priorityId', label: 'Priority ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'priorityName', label: 'Priority Name' },
     { key: 'colorCode', label: 'Color Code' },
     { key: 'slaMapping', label: 'SLA Mapping' },
@@ -100,6 +104,8 @@ export class MasterManagementPriority {
   private emptyForm(): MasterManagementPriorityItem {
     return {
       priorityId: '',
+      assetId: '',
+      assetName: '',
       priorityName: '',
       colorCode: '',
       slaMapping: '',
@@ -212,6 +218,8 @@ export class MasterManagementPriority {
       const activeRaw = (row['isActive'] ?? '').trim().toLowerCase();
       this.service.addRecord({
         priorityId: row['priorityId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         priorityName: (row['priorityName'] ?? '') as PriorityName | '',
         colorCode: row['colorCode'] ?? '',
         slaMapping: row['slaMapping'] ?? '',

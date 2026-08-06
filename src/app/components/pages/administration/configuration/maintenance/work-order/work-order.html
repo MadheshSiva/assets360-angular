@@ -89,6 +89,7 @@
             </th>
             <th *ngIf="isColumnVisible('workOrderId')">Work Order ID</th>
             <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('workType')">Work Type</th>
             <th *ngIf="isColumnVisible('title')">Title / Description</th>
             <th *ngIf="isColumnVisible('priority')">Priority</th>
@@ -110,7 +111,8 @@
               <input type="checkbox" [checked]="wo.selected" (change)="toggleSelectWorkOrder(wo)" />
             </td>
             <td *ngIf="isColumnVisible('workOrderId')" class="mono">{{ wo.workOrderId }}</td>
-            <td *ngIf="isColumnVisible('assetId')">{{ assetNames(wo.assetId) }}</td>
+            <td *ngIf="isColumnVisible('assetId')">{{ wo.assetId.join(', ') }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ assetNames(wo.assetId) }}</td>
             <td *ngIf="isColumnVisible('workType')">{{ wo.workType.join(', ') }}</td>
             <td *ngIf="isColumnVisible('title')">{{ wo.title }}</td>
             <td *ngIf="isColumnVisible('priority')">

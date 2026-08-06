@@ -1,5 +1,7 @@
 export interface StatusMaster {
   statusId: string;
+  assetId: string;
+  assetName: string;
   statusName: string;
   statusCode: string;
   sequenceOrder: number | null;

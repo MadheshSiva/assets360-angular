@@ -1,5 +1,7 @@
 export interface MasterManagementMasterItem {
   maintenanceId: string;
+  assetId: string;
+  assetName: string;
   maintenanceCode: string;
   maintenanceName: string;
   maintenanceCategory: string;

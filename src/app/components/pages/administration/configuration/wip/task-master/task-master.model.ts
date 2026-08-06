@@ -1,5 +1,7 @@
 export interface TaskMaster {
   taskId: string;
+  assetId: string;
+  assetName: string;
   jobId: string;
   taskName: string;
   description: string;

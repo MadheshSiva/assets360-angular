@@ -3,6 +3,8 @@ export type AssetTypeFieldRequired = 'Yes' | 'No';
 
 export interface MasterManagementAssetTypeFieldsItem {
   fieldId: string;
+  assetId: string;
+  assetName: string;
   assetType: string;
   fieldName: string;
   fieldType: AssetTypeFieldDataType | '';

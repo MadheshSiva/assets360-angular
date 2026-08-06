@@ -14,6 +14,8 @@ export class MasterManagementCustodianDepartmentService {
     {
       recordType: 'Department',
       id: 'DEP-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       name: 'Maintenance',
       description: 'Department responsible for equipment upkeep and repairs',
       status: 'Active',
@@ -23,6 +25,8 @@ export class MasterManagementCustodianDepartmentService {
     {
       recordType: 'Department',
       id: 'DEP-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       name: 'Facilities',
       description: 'Department responsible for building and premises management',
       status: 'Active',
@@ -32,6 +36,8 @@ export class MasterManagementCustodianDepartmentService {
     {
       recordType: 'Custodian',
       id: 'CUS-1001',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       name: 'Rajesh Kumar',
       description: 'Custodian accountable for maintenance assets',
       status: 'Active',
@@ -41,6 +47,8 @@ export class MasterManagementCustodianDepartmentService {
     {
       recordType: 'Custodian',
       id: 'CUS-1002',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       name: 'Priya Sharma',
       description: 'Custodian accountable for facilities assets',
       status: 'Inactive',

@@ -89,6 +89,8 @@
             </th>
             <th *ngIf="isColumnVisible('vendorName')">Vendor Name</th>
             <th *ngIf="isColumnVisible('contractId')">Contract ID</th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('assetIds')">Assets Covered</th>
             <th *ngIf="isColumnVisible('startDate')">Start Date</th>
             <th *ngIf="isColumnVisible('endDate')">End Date</th>
@@ -105,6 +107,8 @@
             </td>
             <td *ngIf="isColumnVisible('vendorName')">{{ r.vendorName }}</td>
             <td *ngIf="isColumnVisible('contractId')" class="mono">{{ r.contractId }}</td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('assetIds')">{{ assetNames(r.assetIds) || '-' }}</td>
             <td *ngIf="isColumnVisible('startDate')">{{ r.startDate }}</td>
             <td *ngIf="isColumnVisible('endDate')">{{ r.endDate }}</td>
@@ -170,6 +174,16 @@
               <option *ngFor="let a of amcMaster" [value]="a">{{ a }}</option>
             </select>
           </div>
+        </div>
+
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field form-field-wide">

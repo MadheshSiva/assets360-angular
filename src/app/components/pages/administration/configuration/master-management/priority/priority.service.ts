@@ -9,6 +9,8 @@ export class MasterManagementPriorityService {
   private readonly records: MasterManagementPriorityItem[] = [
     {
       priorityId: 'PRI-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       priorityName: 'Low',
       colorCode: '#1e7e34',
       slaMapping: 'SLA-1 (72 Hours)',
@@ -16,6 +18,8 @@ export class MasterManagementPriorityService {
     },
     {
       priorityId: 'PRI-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       priorityName: 'Medium',
       colorCode: '#b8860b',
       slaMapping: 'SLA-2 (24 Hours)',
@@ -23,6 +27,8 @@ export class MasterManagementPriorityService {
     },
     {
       priorityId: 'PRI-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       priorityName: 'High',
       colorCode: '#c0491f',
       slaMapping: 'SLA-3 (4 Hours)',
@@ -30,6 +36,8 @@ export class MasterManagementPriorityService {
     },
     {
       priorityId: 'PRI-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       priorityName: 'Critical',
       colorCode: '#c0221f',
       slaMapping: 'SLA-4 (1 Hour)',

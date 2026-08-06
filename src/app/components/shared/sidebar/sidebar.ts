@@ -93,7 +93,18 @@ export class Sidebar {
                 { label: 'Compliance & Inspection', path: '/administration/configuration/maintenance/compliance-inspection', icon: '' }
               ]
             },
-            { label: 'Workflows', path: '/administration/configuration/workflows', icon: '' },
+            {
+              label: 'Workflows',
+              path: '/administration/configuration/workflows',
+              icon: '',
+              children: [
+                { label: 'Workflow List', path: '/administration/configuration/workflows/list', icon: '' },
+                { label: 'Workflow Builder', path: '/administration/configuration/workflows/builder', icon: '' },
+                { label: 'Workflow Instances', path: '/administration/configuration/workflows/instances', icon: '' },
+                { label: 'My Tasks / Approvals', path: '/administration/configuration/workflows/tasks', icon: '' },
+                { label: 'Insights', path: '/administration/configuration/workflows/insights', icon: '' }
+              ]
+            },
             {
               label: 'WIP',
               path: '/administration/configuration/wip',

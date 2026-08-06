@@ -29,6 +29,8 @@ export class MasterManagementAlertType {
 
   columns: MasterManagementAlertTypeColumn[] = [
     { key: 'alertTypeId', label: 'Alert Type ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'alertName', label: 'Alert Name', visible: true },
     { key: 'alertCode', label: 'Alert Code', visible: true },
     { key: 'description', label: 'Description', visible: true },
@@ -41,6 +43,8 @@ export class MasterManagementAlertType {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'alertTypeId', label: 'Alert Type ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'alertName', label: 'Alert Name' },
     { key: 'alertCode', label: 'Alert Code' },
     { key: 'description', label: 'Description' },
@@ -116,6 +120,8 @@ export class MasterManagementAlertType {
   private emptyForm(): MasterManagementAlertTypeItem {
     return {
       alertTypeId: '',
+      assetId: '',
+      assetName: '',
       alertName: '',
       alertCode: '',
       description: '',
@@ -231,6 +237,8 @@ export class MasterManagementAlertType {
     rows.forEach((row) => {
       this.service.addRecord({
         alertTypeId: row['alertTypeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         alertName: row['alertName'] ?? '',
         alertCode: row['alertCode'] ?? '',
         description: row['description'] ?? '',

@@ -34,6 +34,8 @@ export class IssueDelayService {
   private issues: IssueDelay[] = [
     {
       issueId: 'ISD-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       jobId: 'b3f1c2a0-1e2d-4f3a-9b8c-1a2b3c4d5e6f',
       taskId: 'TSK-1001',
       issueType: 'Technical',
@@ -47,6 +49,8 @@ export class IssueDelayService {
     },
     {
       issueId: 'ISD-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       jobId: 'a7d4e5f6-2b3c-4d5e-8f9a-0b1c2d3e4f5a',
       taskId: '',
       issueType: 'External',

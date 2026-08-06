@@ -15,6 +15,8 @@ export class MasterManagementPhysicalVerificationResultService {
   private readonly records: MasterManagementPhysicalVerificationResultItem[] = [
     {
       resultId: 'PVR-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       resultName: 'Matched',
       resultCode: 'MATCHED',
       description: 'Asset located and details match the register',
@@ -24,6 +26,8 @@ export class MasterManagementPhysicalVerificationResultService {
     },
     {
       resultId: 'PVR-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       resultName: 'Not Matched',
       resultCode: 'NOT_MATCHED',
       description: 'Asset located but details differ from the register',
@@ -33,6 +37,8 @@ export class MasterManagementPhysicalVerificationResultService {
     },
     {
       resultId: 'PVR-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       resultName: 'Missing',
       resultCode: 'MISSING',
       description: 'Asset could not be located at its recorded location',
@@ -42,6 +48,8 @@ export class MasterManagementPhysicalVerificationResultService {
     },
     {
       resultId: 'PVR-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       resultName: 'Damaged',
       resultCode: 'DAMAGED',
       description: 'Asset located but found to be damaged',

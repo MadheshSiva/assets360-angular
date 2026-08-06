@@ -29,6 +29,8 @@ export class MasterManagementCertificationTypeMaster {
 
   columns: MasterManagementCertificationTypeMasterColumn[] = [
     { key: 'certificationTypeId', label: 'Certification ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'certificationName', label: 'Certification Name', visible: true },
     { key: 'certificationCode', label: 'Certification Code', visible: true },
     { key: 'description', label: 'Description', visible: true },
@@ -41,6 +43,8 @@ export class MasterManagementCertificationTypeMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'certificationTypeId', label: 'Certification ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'certificationName', label: 'Certification Name' },
     { key: 'certificationCode', label: 'Certification Code' },
     { key: 'description', label: 'Description' },
@@ -112,6 +116,8 @@ export class MasterManagementCertificationTypeMaster {
   private emptyForm(): MasterManagementCertificationTypeMasterItem {
     return {
       certificationTypeId: '',
+      assetId: '',
+      assetName: '',
       certificationName: '',
       certificationCode: '',
       description: '',
@@ -228,6 +234,8 @@ export class MasterManagementCertificationTypeMaster {
       const validityPeriodDays = row['validityPeriodDays'] ? Number(row['validityPeriodDays']) : null;
       this.service.addRecord({
         certificationTypeId: row['certificationTypeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         certificationName: row['certificationName'] ?? '',
         certificationCode: row['certificationCode'] ?? '',
         description: row['description'] ?? '',

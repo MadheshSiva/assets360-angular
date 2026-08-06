@@ -14,6 +14,8 @@ export class MasterManagementAssetTypeFieldsService {
   private readonly records: MasterManagementAssetTypeFieldsItem[] = [
     {
       fieldId: 'ATF-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       assetType: 'IT Equipment',
       fieldName: 'Warranty Expiry',
       fieldType: 'Date',
@@ -21,6 +23,8 @@ export class MasterManagementAssetTypeFieldsService {
     },
     {
       fieldId: 'ATF-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       assetType: 'Vehicle',
       fieldName: 'Engine Number',
       fieldType: 'Text',
@@ -28,6 +32,8 @@ export class MasterManagementAssetTypeFieldsService {
     },
     {
       fieldId: 'ATF-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       assetType: 'Machinery',
       fieldName: 'Requires Calibration',
       fieldType: 'Checkbox',

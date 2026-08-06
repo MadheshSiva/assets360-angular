@@ -3,6 +3,8 @@ export type IssueDelaySeverity = 'Low' | 'Medium' | 'High' | 'Critical';
 
 export interface IssueDelay {
   issueId: string;
+  assetId: string;
+  assetName: string;
   jobId: string;
   taskId: string;
   issueType: IssueDelayType | '';

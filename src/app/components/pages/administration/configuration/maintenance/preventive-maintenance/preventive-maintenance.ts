@@ -25,6 +25,8 @@ export class MaintenancePreventive {
 
   columns: PmColumn[] = [
     { key: 'pmScheduleId', label: 'PM Schedule ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'frequency', label: 'Frequency', visible: true },
     { key: 'triggerType', label: 'Trigger Type', visible: true },
     { key: 'lastMaintenanceDate', label: 'Last Maintenance Date', visible: true },
@@ -34,6 +36,8 @@ export class MaintenancePreventive {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'pmScheduleId', label: 'PM Schedule ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'frequency', label: 'Frequency' },
     { key: 'triggerType', label: 'Trigger Type' },
     { key: 'lastMaintenanceDate', label: 'Last Maintenance Date' },
@@ -77,6 +81,8 @@ export class MaintenancePreventive {
   private emptyForm(): PreventiveMaintenanceForm {
     return {
       pmScheduleId: '',
+      assetId: '',
+      assetName: '',
       frequency: '',
       triggerType: '',
       lastMaintenanceDate: '',
@@ -187,6 +193,8 @@ export class MaintenancePreventive {
       const autoCreateWorkOrder = row['autoCreateWorkOrder'] ?? '';
       this.pmService.addRecord({
         pmScheduleId: row['pmScheduleId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         frequency: row['frequency'] ?? '',
         triggerType: row['triggerType'] ?? '',
         lastMaintenanceDate: row['lastMaintenanceDate'] ?? '',

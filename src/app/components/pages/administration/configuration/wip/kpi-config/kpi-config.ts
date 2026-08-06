@@ -25,6 +25,8 @@ export class WipKpiConfig {
 
   columns: KpiConfigColumn[] = [
     { key: 'kpiId', label: 'KPI ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'kpiName', label: 'KPI Name', visible: true },
     { key: 'formulaDefinition', label: 'Formula Definition', visible: true },
     { key: 'thresholdGreen', label: 'Threshold Green', visible: true },
@@ -36,6 +38,8 @@ export class WipKpiConfig {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'kpiId', label: 'KPI ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'kpiName', label: 'KPI Name' },
     { key: 'formulaDefinition', label: 'Formula Definition' },
     { key: 'thresholdGreen', label: 'Threshold Green' },
@@ -73,6 +77,8 @@ export class WipKpiConfig {
   private emptyForm(): KpiConfigForm {
     return {
       kpiId: '',
+      assetId: '',
+      assetName: '',
       kpiName: '',
       formulaDefinition: '',
       thresholdGreen: null,
@@ -183,6 +189,8 @@ export class WipKpiConfig {
   onImportRows(rows: Record<string, string>[]): void {
     const mapped: KpiConfig[] = rows.map((row) => ({
       kpiId: row['kpiId'] ?? '',
+      assetId: row['assetId'] ?? '',
+      assetName: row['assetName'] ?? '',
       kpiName: row['kpiName'] ?? '',
       formulaDefinition: row['formulaDefinition'] ?? '',
       thresholdGreen: row['thresholdGreen'] ? Number(row['thresholdGreen']) : null,

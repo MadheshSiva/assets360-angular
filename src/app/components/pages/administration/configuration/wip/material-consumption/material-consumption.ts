@@ -25,6 +25,8 @@ export class WipMaterialConsumption {
 
   columns: MaterialConsumptionColumn[] = [
     { key: 'materialId', label: 'Material ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'jobId', label: 'Job ID', visible: true },
     { key: 'taskId', label: 'Task ID', visible: true },
     { key: 'itemName', label: 'Item Name', visible: true },
@@ -38,6 +40,8 @@ export class WipMaterialConsumption {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'materialId', label: 'Material ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'jobId', label: 'Job ID' },
     { key: 'taskId', label: 'Task ID' },
     { key: 'itemName', label: 'Item Name' },
@@ -87,6 +91,8 @@ export class WipMaterialConsumption {
   private emptyForm(): MaterialConsumption {
     return {
       materialId: '',
+      assetId: '',
+      assetName: '',
       jobId: '',
       taskId: '',
       itemName: '',
@@ -217,6 +223,8 @@ export class WipMaterialConsumption {
     rows.forEach((row) => {
       this.service.addRecord({
         materialId: row['materialId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         jobId: row['jobId'] ?? '',
         taskId: row['taskId'] ?? '',
         itemName: row['itemName'] ?? '',

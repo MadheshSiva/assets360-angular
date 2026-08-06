@@ -22,6 +22,8 @@ export class VendorAmcService {
     {
       vendorName: 'ABC Traders',
       contractId: 'AMC-2026-001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       assetIds: ['AST-1001', 'AST-1003'],
       startDate: '2026-01-01',
       endDate: '2026-12-31',
@@ -32,6 +34,8 @@ export class VendorAmcService {
     {
       vendorName: 'Gulf Spares Co.',
       contractId: 'AMC-2026-002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       assetIds: ['AST-1002'],
       startDate: '2026-03-01',
       endDate: '2027-02-28',

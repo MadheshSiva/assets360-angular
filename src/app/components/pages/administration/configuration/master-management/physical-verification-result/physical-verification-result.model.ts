@@ -4,6 +4,8 @@ export type PhysicalVerificationResultStatus = 'Active' | 'Inactive';
 
 export interface MasterManagementPhysicalVerificationResultItem {
   resultId: string;
+  assetId: string;
+  assetName: string;
   resultName: string;
   resultCode: string;
   description: string;

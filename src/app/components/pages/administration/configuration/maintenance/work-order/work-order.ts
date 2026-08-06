@@ -26,6 +26,7 @@ export class MaintenanceWorkOrder {
   columns: WorkOrderColumn[] = [
     { key: 'workOrderId', label: 'Work Order ID', visible: true },
     { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'workType', label: 'Work Type', visible: true },
     { key: 'title', label: 'Title / Description', visible: true },
     { key: 'priority', label: 'Priority', visible: true },
@@ -43,6 +44,7 @@ export class MaintenanceWorkOrder {
   readonly importColumns: ImportColumn[] = [
     { key: 'workOrderId', label: 'Work Order ID' },
     { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'workType', label: 'Work Type' },
     { key: 'title', label: 'Title / Description' },
     { key: 'priority', label: 'Priority' },

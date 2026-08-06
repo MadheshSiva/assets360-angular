@@ -1,5 +1,7 @@
 export interface ComplianceInspectionRecord {
   inspectionId: string;
+  assetId: string;
+  assetName: string;
   inspectionType: string;
   checklist: string;
   inspectorName: string;

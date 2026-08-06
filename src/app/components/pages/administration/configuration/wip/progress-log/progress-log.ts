@@ -25,6 +25,8 @@ export class WipProgressLog {
 
   columns: ProgressLogColumn[] = [
     { key: 'logId', label: 'Log ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'jobId', label: 'Job ID', visible: true },
     { key: 'taskId', label: 'Task ID', visible: true },
     { key: 'timestamp', label: 'Timestamp', visible: true },
@@ -38,6 +40,8 @@ export class WipProgressLog {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'logId', label: 'Log ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'jobId', label: 'Job ID' },
     { key: 'taskId', label: 'Task ID' },
     { key: 'timestamp', label: 'Timestamp' },
@@ -85,6 +89,8 @@ export class WipProgressLog {
   private emptyForm(): ProgressLogForm {
     return {
       logId: '',
+      assetId: '',
+      assetName: '',
       jobId: '',
       taskId: '',
       timestamp: '',
@@ -208,6 +214,8 @@ export class WipProgressLog {
     rows.forEach((row) => {
       this.service.addRecord({
         logId: row['logId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         jobId: row['jobId'] ?? '',
         taskId: row['taskId'] ?? '',
         timestamp: row['timestamp'] ?? '',

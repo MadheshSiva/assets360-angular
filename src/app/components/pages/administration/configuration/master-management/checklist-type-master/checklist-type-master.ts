@@ -29,6 +29,8 @@ export class MasterManagementChecklistTypeMaster {
 
   columns: MasterManagementChecklistTypeMasterColumn[] = [
     { key: 'typeId', label: 'Type ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'typeName', label: 'Type Name', visible: true },
     { key: 'applicableModule', label: 'Applicable Module', visible: true },
     { key: 'isActive', label: 'Is Active', visible: true }
@@ -36,6 +38,8 @@ export class MasterManagementChecklistTypeMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'typeId', label: 'Type ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'typeName', label: 'Type Name' },
     { key: 'applicableModule', label: 'Applicable Module' },
     { key: 'isActive', label: 'Is Active' }
@@ -94,6 +98,8 @@ export class MasterManagementChecklistTypeMaster {
   private emptyForm(): MasterManagementChecklistTypeMasterItem {
     return {
       typeId: '',
+      assetId: '',
+      assetName: '',
       typeName: '',
       applicableModule: '',
       isActive: true
@@ -204,6 +210,8 @@ export class MasterManagementChecklistTypeMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         typeId: row['typeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         typeName: row['typeName'] ?? '',
         applicableModule: (row['applicableModule'] ?? '') as MasterManagementChecklistTypeMasterItem['applicableModule'],
         isActive: ['true', 'yes', 'active'].includes((row['isActive'] ?? '').trim().toLowerCase())

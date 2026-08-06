@@ -3,6 +3,8 @@ export type CertificationTypeMasterStatus = 'Active' | 'Inactive';
 
 export interface MasterManagementCertificationTypeMasterItem {
   certificationTypeId: string;
+  assetId: string;
+  assetName: string;
   certificationName: string;
   certificationCode: string;
   description: string;

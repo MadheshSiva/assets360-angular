@@ -1,5 +1,7 @@
 export interface MaterialConsumption {
   materialId: string;
+  assetId: string;
+  assetName: string;
   jobId: string;
   taskId: string;
   itemName: string;

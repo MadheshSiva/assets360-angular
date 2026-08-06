@@ -3,6 +3,8 @@ export type RoleAccessDataLevel = 'Site' | 'Dept' | 'Global';
 
 export interface RoleAccess {
   roleId: string;
+  assetId: string;
+  assetName: string;
   roleName: string;
   permissions: RoleAccessPermission[];
   moduleAccess: string[];

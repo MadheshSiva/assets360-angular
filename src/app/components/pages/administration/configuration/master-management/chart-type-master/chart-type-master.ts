@@ -29,6 +29,8 @@ export class MasterManagementChartTypeMaster {
 
   columns: MasterManagementChartTypeMasterColumn[] = [
     { key: 'widgetId', label: 'Widget ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'widgetName', label: 'Widget Name', visible: true },
     { key: 'configJson', label: 'Config JSON', visible: true },
     { key: 'isActive', label: 'Is Active', visible: true }
@@ -36,6 +38,8 @@ export class MasterManagementChartTypeMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'widgetId', label: 'Widget ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'widgetName', label: 'Widget Name' },
     { key: 'configJson', label: 'Config JSON' },
     { key: 'isActive', label: 'Is Active' }
@@ -94,6 +98,8 @@ export class MasterManagementChartTypeMaster {
   private emptyForm(): MasterManagementChartTypeMasterItem {
     return {
       widgetId: '',
+      assetId: '',
+      assetName: '',
       widgetName: '',
       configJson: '',
       isActive: true
@@ -204,6 +210,8 @@ export class MasterManagementChartTypeMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         widgetId: row['widgetId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         widgetName: (row['widgetName'] ?? '') as MasterManagementChartTypeMasterItem['widgetName'],
         configJson: row['configJson'] ?? '',
         isActive: ['true', 'yes', 'active'].includes((row['isActive'] ?? '').trim().toLowerCase())

@@ -29,6 +29,8 @@ export class MasterManagementUnitMaster {
 
   columns: MasterManagementUnitMasterColumn[] = [
     { key: 'unitId', label: 'Unit ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'unitName', label: 'Unit Name', visible: true },
     { key: 'symbol', label: 'Symbol', visible: true },
     { key: 'isActive', label: 'Is Active', visible: true }
@@ -85,6 +87,8 @@ export class MasterManagementUnitMaster {
   private emptyForm(): MasterManagementUnitMasterItem {
     return {
       unitId: '',
+      assetId: '',
+      assetName: '',
       unitName: '',
       symbol: '',
       isActive: true
@@ -195,6 +199,8 @@ export class MasterManagementUnitMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         unitId: row['unitId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         unitName: row['unitName'] ?? '',
         symbol: row['symbol'] ?? '',
         isActive: /^(true|yes|1)$/i.test((row['isActive'] ?? '').trim())

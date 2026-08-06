@@ -78,6 +78,8 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('alertId')">Alert ID</th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('alertType')">Alert Type</th>
             <th *ngIf="isColumnVisible('triggerCondition')">Trigger Condition</th>
             <th *ngIf="isColumnVisible('notificationChannel')">Notification Channel</th>
@@ -92,6 +94,8 @@
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
             <td *ngIf="isColumnVisible('alertId')" class="mono">{{ r.alertId }}</td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('alertType')">
               <span class="badge" [attr.data-type]="r.alertType">{{ r.alertType }}</span>
             </td>
@@ -142,6 +146,16 @@
         <div class="form-field">
           <label>ALERT ID</label>
           <input type="text" name="alertId" placeholder="Auto-generated if left blank" [(ngModel)]="form.alertId" [readonly]="isEditMode" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

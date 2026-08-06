@@ -16,6 +16,8 @@ export class MasterManagementCategorySubcategoryService {
   private readonly records: MasterManagementCategorySubcategoryItem[] = [
     {
       categoryId: 'CAT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       categoryName: 'Electrical',
       categoryCode: 'ELEC',
       description: 'Top-level electrical equipment category',
@@ -25,6 +27,8 @@ export class MasterManagementCategorySubcategoryService {
     },
     {
       categoryId: 'CAT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       categoryName: 'Wiring & Cabling',
       categoryCode: 'ELEC-WIR',
       description: 'Electrical wiring, cabling and associated connection accessories',
@@ -34,6 +38,8 @@ export class MasterManagementCategorySubcategoryService {
     },
     {
       categoryId: 'CAT-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       categoryName: 'Mechanical',
       categoryCode: 'MECH',
       description: 'Top-level mechanical equipment category',
@@ -43,6 +49,8 @@ export class MasterManagementCategorySubcategoryService {
     },
     {
       categoryId: 'CAT-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       categoryName: 'Pumps & Motors',
       categoryCode: 'MECH-PMP',
       description: 'Rotating equipment including pumps, motors and drives',

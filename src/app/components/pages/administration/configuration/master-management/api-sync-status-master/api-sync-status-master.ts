@@ -29,6 +29,8 @@ export class MasterManagementApiSyncStatusMaster {
 
   columns: MasterManagementApiSyncStatusMasterColumn[] = [
     { key: 'syncStatusId', label: 'Status ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'statusName', label: 'Status Name', visible: true },
     { key: 'statusCode', label: 'Status Code', visible: true },
     { key: 'description', label: 'Description', visible: true },
@@ -38,6 +40,8 @@ export class MasterManagementApiSyncStatusMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'syncStatusId', label: 'Status ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'statusName', label: 'Status Name' },
     { key: 'statusCode', label: 'Status Code' },
     { key: 'description', label: 'Description' },
@@ -102,6 +106,8 @@ export class MasterManagementApiSyncStatusMaster {
   private emptyForm(): MasterManagementApiSyncStatusMasterItem {
     return {
       syncStatusId: '',
+      assetId: '',
+      assetName: '',
       statusName: '',
       statusCode: '',
       description: '',
@@ -214,6 +220,8 @@ export class MasterManagementApiSyncStatusMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         syncStatusId: row['syncStatusId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         statusName: row['statusName'] ?? '',
         statusCode: row['statusCode'] ?? '',
         description: row['description'] ?? '',

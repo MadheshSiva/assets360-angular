@@ -29,6 +29,8 @@ export class MasterManagementWorkType {
 
   columns: MasterManagementWorkTypeColumn[] = [
     { key: 'workTypeId', label: 'Work Type ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'workTypeName', label: 'Work Type Name', visible: true },
     { key: 'description', label: 'Description', visible: true },
     { key: 'isActive', label: 'Is Active', visible: true }
@@ -85,6 +87,8 @@ export class MasterManagementWorkType {
   private emptyForm(): MasterManagementWorkTypeItem {
     return {
       workTypeId: '',
+      assetId: '',
+      assetName: '',
       workTypeName: '',
       description: '',
       isActive: true
@@ -195,6 +199,8 @@ export class MasterManagementWorkType {
     rows.forEach((row) => {
       this.service.addRecord({
         workTypeId: row['workTypeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         workTypeName: row['workTypeName'] ?? '',
         description: row['description'] ?? '',
         isActive: /^(true|yes|1)$/i.test((row['isActive'] ?? '').trim())

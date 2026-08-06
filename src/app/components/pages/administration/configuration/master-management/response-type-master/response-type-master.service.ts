@@ -9,24 +9,32 @@ export class MasterManagementResponseTypeMasterService {
   private readonly records: MasterManagementResponseTypeMasterItem[] = [
     {
       typeId: 'RSP-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       typeName: 'Yes/No',
       validationType: 'Required',
       isActive: true
     },
     {
       typeId: 'RSP-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       typeName: 'Numeric',
       validationType: 'Range',
       isActive: true
     },
     {
       typeId: 'RSP-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       typeName: 'Text',
       validationType: 'Regex',
       isActive: true
     },
     {
       typeId: 'RSP-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       typeName: 'Image Upload',
       validationType: 'Required',
       isActive: true

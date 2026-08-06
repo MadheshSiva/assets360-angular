@@ -29,6 +29,8 @@ export class MasterManagementPermitTypeMaster {
 
   columns: MasterManagementPermitTypeMasterColumn[] = [
     { key: 'permitTypeId', label: 'Permit Type ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'permitName', label: 'Permit Name', visible: true },
     { key: 'validityDays', label: 'Validity Days', visible: true },
     { key: 'isApprovalRequired', label: 'Is Approval Required', visible: true }
@@ -36,6 +38,8 @@ export class MasterManagementPermitTypeMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'permitTypeId', label: 'Permit Type ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'permitName', label: 'Permit Name' },
     { key: 'validityDays', label: 'Validity Days' },
     { key: 'isApprovalRequired', label: 'Is Approval Required' }
@@ -90,6 +94,8 @@ export class MasterManagementPermitTypeMaster {
   private emptyForm(): MasterManagementPermitTypeMasterItem {
     return {
       permitTypeId: '',
+      assetId: '',
+      assetName: '',
       permitName: '',
       validityDays: null,
       isApprovalRequired: true
@@ -203,6 +209,8 @@ export class MasterManagementPermitTypeMaster {
       const approvalRaw = (row['isApprovalRequired'] ?? '').trim().toLowerCase();
       this.service.addRecord({
         permitTypeId: row['permitTypeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         permitName: row['permitName'] ?? '',
         validityDays: Number.isFinite(parsedValidityDays) ? parsedValidityDays : null,
         isApprovalRequired: approvalRaw === 'yes' || approvalRaw === 'true'

@@ -88,6 +88,8 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('partId')">Part ID</th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('partName')">Part Name</th>
             <th *ngIf="isColumnVisible('category')">Category</th>
             <th *ngIf="isColumnVisible('quantityInStock')">Quantity in Stock</th>
@@ -104,6 +106,8 @@
               <input type="checkbox" [checked]="part.selected" (change)="toggleSelectPart(part)" />
             </td>
             <td *ngIf="isColumnVisible('partId')" class="mono">{{ part.partId }}</td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ part.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ part.assetName }}</td>
             <td *ngIf="isColumnVisible('partName')">{{ part.partName }}</td>
             <td *ngIf="isColumnVisible('category')">{{ part.category }}</td>
             <td *ngIf="isColumnVisible('quantityInStock')">
@@ -163,6 +167,16 @@
               <option *ngFor="let p of sparePartsMaster" [value]="p.id">{{ p.id }} - {{ p.name }}</option>
             </select>
           </div>
+        </div>
+
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

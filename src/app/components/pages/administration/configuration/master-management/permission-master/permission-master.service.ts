@@ -9,26 +9,36 @@ export class MasterManagementPermissionMasterService {
   private readonly records: MasterManagementPermissionMasterItem[] = [
     {
       permissionId: 'PRM-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       permissionName: 'Create',
       module: 'Assets'
     },
     {
       permissionId: 'PRM-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       permissionName: 'Edit',
       module: 'Maintenance'
     },
     {
       permissionId: 'PRM-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       permissionName: 'Delete',
       module: 'WIP'
     },
     {
       permissionId: 'PRM-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       permissionName: 'View',
       module: 'Reports'
     },
     {
       permissionId: 'PRM-1005',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       permissionName: 'Approve',
       module: 'Administration'
     }

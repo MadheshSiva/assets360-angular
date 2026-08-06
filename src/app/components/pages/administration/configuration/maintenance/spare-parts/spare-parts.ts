@@ -24,6 +24,8 @@ export class MaintenanceSpareParts {
 
   columns: SparePartColumn[] = [
     { key: 'partId', label: 'Part ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'partName', label: 'Part Name', visible: true },
     { key: 'category', label: 'Category', visible: true },
     { key: 'quantityInStock', label: 'Quantity in Stock', visible: true },
@@ -35,6 +37,8 @@ export class MaintenanceSpareParts {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'partId', label: 'Part ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'partName', label: 'Part Name' },
     { key: 'category', label: 'Category' },
     { key: 'quantityInStock', label: 'Quantity in Stock' },
@@ -76,6 +80,8 @@ export class MaintenanceSpareParts {
   private emptyForm(): SparePartForm {
     return {
       partId: '',
+      assetId: '',
+      assetName: '',
       partName: '',
       category: '',
       quantityInStock: null,
@@ -195,6 +201,8 @@ export class MaintenanceSpareParts {
     rows.forEach((row) => {
       this.partsService.addPart({
         partId: row['partId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         partName: row['partName'] ?? '',
         category: row['category'] ?? '',
         quantityInStock: this.toNumber(row['quantityInStock']),

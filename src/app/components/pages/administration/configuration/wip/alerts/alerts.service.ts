@@ -17,6 +17,8 @@ export class AlertService {
   private readonly recordsSubject = new BehaviorSubject<Alert[]>([
     {
       alertId: 'ALT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       alertType: 'SLA Breach',
       triggerCondition: 'Response time exceeds SLA threshold for Critical priority jobs',
       notificationChannel: ['Email', 'App'],
@@ -25,6 +27,8 @@ export class AlertService {
     },
     {
       alertId: 'ALT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       alertType: 'Delay',
       triggerCondition: 'Task planned end time passed without completion',
       notificationChannel: ['App'],

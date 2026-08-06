@@ -29,6 +29,8 @@ export class MasterManagementMaster {
 
   columns: MasterManagementMasterColumn[] = [
     { key: 'maintenanceId', label: 'Maintenance ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'maintenanceCode', label: 'Maintenance Code', visible: true },
     { key: 'maintenanceName', label: 'Maintenance Name', visible: true },
     { key: 'maintenanceCategory', label: 'Category', visible: true },
@@ -41,6 +43,8 @@ export class MasterManagementMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'maintenanceId', label: 'Maintenance ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'maintenanceCode', label: 'Maintenance Code' },
     { key: 'maintenanceName', label: 'Maintenance Name' },
     { key: 'maintenanceCategory', label: 'Category' },
@@ -104,6 +108,8 @@ export class MasterManagementMaster {
   private emptyForm(): MasterManagementMasterItem {
     return {
       maintenanceId: '',
+      assetId: '',
+      assetName: '',
       maintenanceCode: '',
       maintenanceName: '',
       maintenanceCategory: '',
@@ -219,6 +225,8 @@ export class MasterManagementMaster {
       ...this.records,
       ...rows.map((row) => ({
         maintenanceId: row['maintenanceId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         maintenanceCode: row['maintenanceCode'] ?? '',
         maintenanceName: row['maintenanceName'] ?? '',
         maintenanceCategory: row['maintenanceCategory'] ?? '',

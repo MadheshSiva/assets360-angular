@@ -29,12 +29,16 @@ export class MasterManagementSeverityMaster {
 
   columns: MasterManagementSeverityMasterColumn[] = [
     { key: 'severityId', label: 'Severity ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'severityName', label: 'Severity Name', visible: true },
     { key: 'colorCode', label: 'Color Code', visible: true }
   ];
 
   readonly importColumns: ImportColumn[] = [
     { key: 'severityId', label: 'Severity ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'severityName', label: 'Severity Name' },
     { key: 'colorCode', label: 'Color Code' }
   ];
@@ -92,6 +96,8 @@ export class MasterManagementSeverityMaster {
   private emptyForm(): MasterManagementSeverityMasterItem {
     return {
       severityId: '',
+      assetId: '',
+      assetName: '',
       severityName: '',
       colorCode: ''
     };
@@ -201,6 +207,8 @@ export class MasterManagementSeverityMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         severityId: row['severityId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         severityName: (row['severityName'] as MasterManagementSeverityMasterItem['severityName']) || '',
         colorCode: row['colorCode'] ?? ''
       });

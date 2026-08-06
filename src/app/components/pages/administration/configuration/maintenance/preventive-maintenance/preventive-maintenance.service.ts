@@ -17,6 +17,8 @@ export class PreventiveMaintenanceService {
   private readonly recordsSubject = new BehaviorSubject<PreventiveMaintenanceRecord[]>([
     {
       pmScheduleId: 'PM-SCH-001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       frequency: 'Monthly',
       triggerType: 'Time-based',
       lastMaintenanceDate: '2026-05-01',
@@ -25,6 +27,8 @@ export class PreventiveMaintenanceService {
     },
     {
       pmScheduleId: 'PM-SCH-002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       frequency: 'Weekly',
       triggerType: 'Usage-based',
       lastMaintenanceDate: '2026-06-20',

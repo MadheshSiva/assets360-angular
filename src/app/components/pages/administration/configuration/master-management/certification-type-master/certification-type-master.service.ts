@@ -14,6 +14,8 @@ export class MasterManagementCertificationTypeMasterService {
   private readonly records: MasterManagementCertificationTypeMasterItem[] = [
     {
       certificationTypeId: 'CRT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       certificationName: 'ISO 9001 Quality Management',
       certificationCode: 'ISO-9001',
       description: 'Quality management system certification for organizational processes',
@@ -25,6 +27,8 @@ export class MasterManagementCertificationTypeMasterService {
     },
     {
       certificationTypeId: 'CRT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       certificationName: 'ISO 27001 Information Security',
       certificationCode: 'ISO-27001',
       description: 'Information security management system certification',
@@ -36,6 +40,8 @@ export class MasterManagementCertificationTypeMasterService {
     },
     {
       certificationTypeId: 'CRT-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       certificationName: 'Calibration Certificate',
       certificationCode: 'CAL-CERT',
       description: 'Confirms measuring equipment is calibrated to required accuracy',
@@ -47,6 +53,8 @@ export class MasterManagementCertificationTypeMasterService {
     },
     {
       certificationTypeId: 'CRT-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       certificationName: 'Vehicle Roadworthiness Certificate',
       certificationCode: 'VEH-ROADWORTHY',
       description: 'Confirms a vehicle meets safety and roadworthiness standards',

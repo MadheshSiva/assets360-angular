@@ -29,6 +29,7 @@ export class BreakdownIssueReportingService {
     {
       issueId: 'ISS-3001',
       assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       reportedBy: 'Ali Hassan',
       issueType: 'Electrical Fault',
       severity: 'Critical',
@@ -40,6 +41,7 @@ export class BreakdownIssueReportingService {
     {
       issueId: 'ISS-3002',
       assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       reportedBy: 'Priya Nair',
       issueType: 'Mechanical Failure',
       severity: 'Medium',
@@ -80,6 +82,7 @@ export class BreakdownIssueReportingService {
       [
         i.issueId,
         i.assetId,
+        i.assetName,
         i.reportedBy,
         i.issueType,
         i.severity,

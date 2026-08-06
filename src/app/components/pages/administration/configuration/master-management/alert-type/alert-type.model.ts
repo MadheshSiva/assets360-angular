@@ -5,6 +5,8 @@ export type AlertStatus = 'Active' | 'Inactive';
 
 export interface MasterManagementAlertTypeItem {
   alertTypeId: string;
+  assetId: string;
+  assetName: string;
   alertName: string;
   alertCode: string;
   description: string;

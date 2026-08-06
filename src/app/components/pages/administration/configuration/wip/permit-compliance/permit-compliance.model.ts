@@ -3,6 +3,8 @@ export type PermitStatus = 'Active' | 'Expired' | 'Revoked' | 'Pending Approval'
 
 export interface PermitCompliance {
   permitId: string;
+  assetId: string;
+  assetName: string;
   jobId: string;
   permitType: PermitType | '';
   issuedBy: string;

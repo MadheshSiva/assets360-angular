@@ -29,6 +29,8 @@ export class ResourceMasterService {
   private resources: ResourceMaster[] = [
     {
       resourceId: 'RES-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       resourceName: 'John Mathew',
       resourceType: 'Technician',
       skillSet: ['Electrical', 'Fire Safety'],
@@ -43,6 +45,8 @@ export class ResourceMasterService {
     },
     {
       resourceId: 'RES-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       resourceName: 'Ali Hassan',
       resourceType: 'Contractor',
       skillSet: ['HVAC', 'Mechanical'],

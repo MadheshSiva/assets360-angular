@@ -24,6 +24,8 @@ export class WipAlerts {
 
   columns: AlertColumn[] = [
     { key: 'alertId', label: 'Alert ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'alertType', label: 'Alert Type', visible: true },
     { key: 'triggerCondition', label: 'Trigger Condition', visible: true },
     { key: 'notificationChannel', label: 'Notification Channel', visible: true },
@@ -65,6 +67,8 @@ export class WipAlerts {
   private emptyForm(): AlertForm {
     return {
       alertId: '',
+      assetId: '',
+      assetName: '',
       alertType: '',
       triggerCondition: '',
       notificationChannel: [],
@@ -190,6 +194,8 @@ export class WipAlerts {
       const escalationLevel = escalationLevelRaw === '' ? null : Number(escalationLevelRaw);
       this.service.addRecord({
         alertId: row['alertId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         alertType: (row['alertType'] ?? '') as AlertType | '',
         triggerCondition: row['triggerCondition'] ?? '',
         notificationChannel,

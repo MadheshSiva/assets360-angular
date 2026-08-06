@@ -80,6 +80,11 @@ import { MasterManagementUpdateSourceMaster } from './components/pages/administr
 import { MasterManagementChartTypeMaster } from './components/pages/administration/configuration/master-management/chart-type-master/chart-type-master';
 import { MasterManagementPermissionMaster } from './components/pages/administration/configuration/master-management/permission-master/permission-master';
 import { MasterManagementModuleAccessMaster } from './components/pages/administration/configuration/master-management/module-access-master/module-access-master';
+import { WorkflowList } from './components/pages/administration/configuration/workflows/workflow-list/workflow-list';
+import { WorkflowBuilder } from './components/pages/administration/configuration/workflows/workflow-builder/workflow-builder';
+import { WorkflowInstances } from './components/pages/administration/configuration/workflows/workflow-instances/workflow-instances';
+import { MyTasks } from './components/pages/administration/configuration/workflows/my-tasks/my-tasks';
+import { WorkflowInsights } from './components/pages/administration/configuration/workflows/workflow-insights/workflow-insights';
 import { ProcessAutomation } from './components/pages/process-automation/process-automation/process-automation';
 import { ProcessAutomationAdd } from './components/pages/process-automation/process-automation-add/process-automation-add';
 import { WipJobMaster } from './components/pages/administration/configuration/wip/job-master/job-master';
@@ -158,6 +163,13 @@ export const routes: Routes = [
               { path: 'maintenance/downtime-tracking', component: MaintenanceDowntimeTracking },
               { path: 'maintenance/performance', component: MaintenancePerformance },
               { path: 'maintenance/compliance-inspection', component: MaintenanceComplianceInspection },
+              { path: 'workflows', redirectTo: 'workflows/list', pathMatch: 'full' },
+              { path: 'workflows/list', component: WorkflowList },
+              { path: 'workflows/builder', component: WorkflowBuilder },
+              { path: 'workflows/builder/:id', component: WorkflowBuilder },
+              { path: 'workflows/instances', component: WorkflowInstances },
+              { path: 'workflows/tasks', component: MyTasks },
+              { path: 'workflows/insights', component: WorkflowInsights },
               { path: 'wip', redirectTo: 'wip/job-master', pathMatch: 'full' },
               { path: 'wip/job-master', component: WipJobMaster },
               { path: 'wip/status-master', component: WipStatusMaster },

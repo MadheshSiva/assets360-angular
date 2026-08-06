@@ -24,6 +24,7 @@ export class MaintenancePerformance {
 
   columns: PerformanceColumn[] = [
     { key: 'assetId', label: 'Asset', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'mtbf', label: 'MTBF (Mean Time Between Failures)', visible: true },
     { key: 'mttr', label: 'MTTR (Mean Time To Repair)', visible: true },
     { key: 'assetUptimePercent', label: 'Asset Uptime %', visible: true },
@@ -32,6 +33,7 @@ export class MaintenancePerformance {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'assetId', label: 'Asset' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'mtbf', label: 'MTBF (Mean Time Between Failures)' },
     { key: 'mttr', label: 'MTTR (Mean Time To Repair)' },
     { key: 'assetUptimePercent', label: 'Asset Uptime %' },
@@ -66,6 +68,7 @@ export class MaintenancePerformance {
   private emptyForm(): PerformanceMetricForm {
     return {
       assetId: '',
+      assetName: '',
       mtbf: null,
       mttr: null,
       assetUptimePercent: null,
@@ -174,6 +177,7 @@ export class MaintenancePerformance {
     rows.forEach((row) => {
       this.performanceService.addRecord({
         assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         mtbf: this.toNumber(row['mtbf']),
         mttr: this.toNumber(row['mttr']),
         assetUptimePercent: this.toNumber(row['assetUptimePercent']),

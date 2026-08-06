@@ -8,21 +8,29 @@ export class MasterManagementSeverityMasterService {
   private readonly records: MasterManagementSeverityMasterItem[] = [
     {
       severityId: 'SEV-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       severityName: 'Low',
       colorCode: '#1e7e34'
     },
     {
       severityId: 'SEV-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       severityName: 'Medium',
       colorCode: '#b8860b'
     },
     {
       severityId: 'SEV-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       severityName: 'High',
       colorCode: '#c0491f'
     },
     {
       severityId: 'SEV-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       severityName: 'Critical',
       colorCode: '#c0221f'
     }

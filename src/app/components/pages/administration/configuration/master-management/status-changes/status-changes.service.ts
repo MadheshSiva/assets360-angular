@@ -8,6 +8,8 @@ export class MasterManagementStatusChangeService {
   private readonly records: MasterManagementStatusChangeItem[] = [
     {
       statusChangeId: 'STC-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'In stock',
       statusCode: 'IN_STOCK',
       sequenceOrder: 1,
@@ -19,6 +21,8 @@ export class MasterManagementStatusChangeService {
     },
     {
       statusChangeId: 'STC-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       statusName: 'Active',
       statusCode: 'ACTIVE',
       sequenceOrder: 2,
@@ -30,6 +34,8 @@ export class MasterManagementStatusChangeService {
     },
     {
       statusChangeId: 'STC-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       statusName: 'Maintenance',
       statusCode: 'MAINTENANCE',
       sequenceOrder: 3,
@@ -41,6 +47,8 @@ export class MasterManagementStatusChangeService {
     },
     {
       statusChangeId: 'STC-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'Retired',
       statusCode: 'RETIRED',
       sequenceOrder: 4,

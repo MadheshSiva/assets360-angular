@@ -18,6 +18,7 @@ export class PerformanceService {
   private readonly recordsSubject = new BehaviorSubject<PerformanceMetricRecord[]>([
     {
       assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       mtbf: 720,
       mttr: 4,
       assetUptimePercent: 98.5,
@@ -25,6 +26,7 @@ export class PerformanceService {
     },
     {
       assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       mtbf: 480,
       mttr: 6,
       assetUptimePercent: 96.2,

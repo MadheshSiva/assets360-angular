@@ -29,6 +29,8 @@ export class MasterManagementAssetTypeFields {
 
   columns: MasterManagementAssetTypeFieldsColumn[] = [
     { key: 'fieldId', label: 'Field ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'assetType', label: 'Asset Type', visible: true },
     { key: 'fieldName', label: 'Field Name', visible: true },
     { key: 'fieldType', label: 'Field Type', visible: true },
@@ -37,6 +39,8 @@ export class MasterManagementAssetTypeFields {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'fieldId', label: 'Field ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'assetType', label: 'Asset Type' },
     { key: 'fieldName', label: 'Field Name' },
     { key: 'fieldType', label: 'Field Type' },
@@ -104,6 +108,8 @@ export class MasterManagementAssetTypeFields {
   private emptyForm(): MasterManagementAssetTypeFieldsItem {
     return {
       fieldId: '',
+      assetId: '',
+      assetName: '',
       assetType: '',
       fieldName: '',
       fieldType: '',
@@ -215,6 +221,8 @@ export class MasterManagementAssetTypeFields {
     rows.forEach((row) => {
       this.service.addRecord({
         fieldId: row['fieldId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         assetType: row['assetType'] ?? '',
         fieldName: row['fieldName'] ?? '',
         fieldType: (row['fieldType'] ?? '') as AssetTypeFieldDataType | '',

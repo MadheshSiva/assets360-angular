@@ -26,6 +26,8 @@ export class RoleAccessService {
   private readonly recordsSubject = new BehaviorSubject<RoleAccess[]>([
     {
       roleId: 'ROL-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       roleName: 'Site Administrator',
       permissions: ['Create', 'Edit', 'Delete', 'View', 'Approve'],
       moduleAccess: ['Dashboard', 'Administration', 'Configuration', 'WIP'],
@@ -33,6 +35,8 @@ export class RoleAccessService {
     },
     {
       roleId: 'ROL-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       roleName: 'WIP Viewer',
       permissions: ['View'],
       moduleAccess: ['WIP', 'Dashboard'],

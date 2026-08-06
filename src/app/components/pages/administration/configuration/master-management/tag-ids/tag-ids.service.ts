@@ -8,6 +8,8 @@ export class MasterManagementTagIdService {
   private readonly records: MasterManagementTagIdItem[] = [
     {
       tagId: 'TAG-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       tagCode: 'RF-00231',
       tagType: 'RFID',
       assignedAssetCode: 'AST-2041',
@@ -16,6 +18,8 @@ export class MasterManagementTagIdService {
     },
     {
       tagId: 'TAG-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       tagCode: 'QR-10045',
       tagType: 'QR',
       assignedAssetCode: 'AST-2078',
@@ -24,6 +28,8 @@ export class MasterManagementTagIdService {
     },
     {
       tagId: 'TAG-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       tagCode: 'BLE-30021',
       tagType: 'BLE',
       assignedAssetCode: 'AST-2114',
@@ -32,6 +38,8 @@ export class MasterManagementTagIdService {
     },
     {
       tagId: 'TAG-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       tagCode: 'GPS-40587',
       tagType: 'GPS',
       assignedAssetCode: 'AST-2159',

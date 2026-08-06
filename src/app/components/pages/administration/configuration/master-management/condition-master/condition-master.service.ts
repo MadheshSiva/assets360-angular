@@ -8,18 +8,24 @@ export class MasterManagementConditionMasterService {
   private readonly records: MasterManagementConditionMasterItem[] = [
     {
       conditionId: 'CND-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       conditionName: 'Good',
       thresholdValue: 80,
       colorCode: '#1e7e34'
     },
     {
       conditionId: 'CND-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       conditionName: 'Warning',
       thresholdValue: 60,
       colorCode: '#b8860b'
     },
     {
       conditionId: 'CND-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       conditionName: 'Critical',
       thresholdValue: 30,
       colorCode: '#c0221f'

@@ -89,6 +89,7 @@
             </th>
             <th *ngIf="isColumnVisible('issueId')">Issue ID</th>
             <th *ngIf="isColumnVisible('assetId')">Asset</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('reportedBy')">Reported By</th>
             <th *ngIf="isColumnVisible('issueType')">Issue Type</th>
             <th *ngIf="isColumnVisible('severity')">Severity</th>
@@ -106,6 +107,7 @@
             </td>
             <td *ngIf="isColumnVisible('issueId')" class="mono">{{ issue.issueId }}</td>
             <td *ngIf="isColumnVisible('assetId')">{{ assetName(issue.assetId) }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ issue.assetName }}</td>
             <td *ngIf="isColumnVisible('reportedBy')">{{ issue.reportedBy }}</td>
             <td *ngIf="isColumnVisible('issueType')">{{ issue.issueType }}</td>
             <td *ngIf="isColumnVisible('severity')">
@@ -175,6 +177,11 @@
               <option *ngFor="let a of assetMaster" [value]="a.id">{{ a.name }} ({{ a.id }})</option>
             </select>
           </div>
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

@@ -29,6 +29,8 @@ export class MasterManagementStatus {
 
   columns: MasterManagementStatusColumn[] = [
     { key: 'statusId', label: 'Status ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'statusName', label: 'Status Name', visible: true },
     { key: 'colorCode', label: 'Color Code', visible: true },
     { key: 'allowedTransitions', label: 'Allowed Transitions', visible: true },
@@ -90,6 +92,8 @@ export class MasterManagementStatus {
   private emptyForm(): MasterManagementStatusItem {
     return {
       statusId: '',
+      assetId: '',
+      assetName: '',
       statusName: '',
       colorCode: '',
       allowedTransitions: [],
@@ -218,6 +222,8 @@ export class MasterManagementStatus {
         .filter((t) => t.length > 0);
       this.service.addRecord({
         statusId: row['statusId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         statusName: row['statusName'] ?? '',
         colorCode: row['colorCode'] ?? '',
         allowedTransitions,

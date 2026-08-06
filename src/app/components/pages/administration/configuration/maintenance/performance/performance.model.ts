@@ -1,5 +1,6 @@
 export interface PerformanceMetricRecord {
   assetId: string;
+  assetName: string;
   mtbf: number | null;
   mttr: number | null;
   assetUptimePercent: number | null;

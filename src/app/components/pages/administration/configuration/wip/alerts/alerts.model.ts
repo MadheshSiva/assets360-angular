@@ -3,6 +3,8 @@ export type AlertNotificationChannel = 'Email' | 'SMS' | 'App';
 
 export interface Alert {
   alertId: string;
+  assetId: string;
+  assetName: string;
   alertType: AlertType | '';
   triggerCondition: string;
   notificationChannel: AlertNotificationChannel[];

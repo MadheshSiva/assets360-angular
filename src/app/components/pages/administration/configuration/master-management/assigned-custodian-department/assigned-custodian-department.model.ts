@@ -4,6 +4,8 @@ export type CustodianDepartmentStatus = 'Active' | 'Inactive';
 export interface MasterManagementCustodianDepartmentItem {
   recordType: CustodianDepartmentType | '';
   id: string;
+  assetId: string;
+  assetName: string;
   name: string;
   description: string;
   status: CustodianDepartmentStatus | '';

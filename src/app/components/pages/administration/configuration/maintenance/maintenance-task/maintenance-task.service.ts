@@ -21,6 +21,8 @@ export class MaintenanceTaskService {
 
   private readonly tasksSubject = new BehaviorSubject<MaintenanceTaskRecord[]>([
     {
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       taskChecklist: ['Visual Inspection', 'Lubrication Check'],
       instructions: 'Inspect belts and lubricate bearings as per OEM guidelines.',
       toolsRequired: ['Grease Gun'],
@@ -29,6 +31,8 @@ export class MaintenanceTaskService {
       completionNotes: ''
     },
     {
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       taskChecklist: ['Filter Replacement'],
       instructions: 'Replace the primary intake filter and check air flow.',
       toolsRequired: ['Vacuum Cleaner'],
@@ -60,7 +64,7 @@ export class MaintenanceTaskService {
     const value = term.trim().toLowerCase();
     if (!value) return this.tasksSubject.value;
     return this.tasksSubject.value.filter((t) =>
-      [t.taskChecklist.join(', '), t.instructions, t.toolsRequired.join(', '), t.safetyProcedures, t.completionNotes].some(
+      [t.assetId, t.assetName, t.taskChecklist.join(', '), t.instructions, t.toolsRequired.join(', '), t.safetyProcedures, t.completionNotes].some(
         (v) => v.toLowerCase().includes(value)
       )
     );

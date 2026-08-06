@@ -87,6 +87,8 @@
             <th class="selection-col">
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('laborCost')">Labor Cost</th>
             <th *ngIf="isColumnVisible('sparePartsCost')">Spare Parts Cost</th>
             <th *ngIf="isColumnVisible('totalMaintenanceCost')">Total Maintenance Cost</th>
@@ -100,6 +102,8 @@
             <td class="selection-col">
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('laborCost')">{{ r.laborCost ?? '-' }}</td>
             <td *ngIf="isColumnVisible('sparePartsCost')">{{ r.sparePartsCost ?? '-' }}</td>
             <td *ngIf="isColumnVisible('totalMaintenanceCost')" class="mono">{{ r.totalMaintenanceCost ?? '-' }}</td>
@@ -146,6 +150,16 @@
 
     <form class="modal-form" (ngSubmit)="submitForm()" #costForm="ngForm">
       <div class="form-grid">
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+
         <div class="form-field">
           <label>LABOR COST</label>
           <input type="number" name="laborCost" min="0" step="0.01" [(ngModel)]="form.laborCost" />

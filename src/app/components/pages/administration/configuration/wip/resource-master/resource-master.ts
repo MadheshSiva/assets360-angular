@@ -25,6 +25,8 @@ export class WipResourceMaster {
 
   columns: ResourceMasterColumn[] = [
     { key: 'resourceId', label: 'Resource ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'resourceName', label: 'Resource Name', visible: true },
     { key: 'resourceType', label: 'Resource Type', visible: true },
     { key: 'skillSet', label: 'Skill Set', visible: true },
@@ -40,6 +42,8 @@ export class WipResourceMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'resourceId', label: 'Resource ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'resourceName', label: 'Resource Name' },
     { key: 'resourceType', label: 'Resource Type' },
     { key: 'skillSet', label: 'Skill Set' },
@@ -95,6 +99,8 @@ export class WipResourceMaster {
   private emptyForm(): ResourceMaster {
     return {
       resourceId: '',
+      assetId: '',
+      assetName: '',
       resourceName: '',
       resourceType: '',
       skillSet: [],
@@ -235,6 +241,8 @@ export class WipResourceMaster {
       const status = (row['status'] ?? '').trim().toLowerCase();
       this.service.addRecord({
         resourceId: row['resourceId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         resourceName: row['resourceName'] ?? '',
         resourceType: (row['resourceType'] ?? '') as ResourceMaster['resourceType'],
         skillSet: row['skillSet'] ? row['skillSet'].split(',').map((s) => s.trim()).filter(Boolean) : [],

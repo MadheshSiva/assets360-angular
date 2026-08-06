@@ -78,6 +78,8 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('kpiId')">KPI ID</th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('kpiName')">KPI Name</th>
             <th *ngIf="isColumnVisible('formulaDefinition')">Formula Definition</th>
             <th *ngIf="isColumnVisible('thresholdGreen')">Threshold Green</th>
@@ -94,6 +96,8 @@
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
             <td *ngIf="isColumnVisible('kpiId')" class="mono">{{ r.kpiId }}</td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('kpiName')">{{ r.kpiName }}</td>
             <td *ngIf="isColumnVisible('formulaDefinition')">{{ r.formulaDefinition || '-' }}</td>
             <td *ngIf="isColumnVisible('thresholdGreen')">{{ r.thresholdGreen ?? '-' }}</td>
@@ -144,6 +148,16 @@
         <div class="form-field">
           <label>KPI ID</label>
           <input type="text" name="kpiId" placeholder="Auto-generated if left blank" [(ngModel)]="form.kpiId" [readonly]="isEditMode" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

@@ -25,6 +25,8 @@ export class WipChecklistMaster {
 
   columns: ChecklistMasterColumn[] = [
     { key: 'checklistId', label: 'Checklist ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'checklistName', label: 'Checklist Name', visible: true },
     { key: 'checklistType', label: 'Checklist Type', visible: true },
     { key: 'applicableWorkType', label: 'Applicable Work Type', visible: true },
@@ -34,6 +36,8 @@ export class WipChecklistMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'checklistId', label: 'Checklist ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'checklistName', label: 'Checklist Name' },
     { key: 'checklistType', label: 'Checklist Type' },
     { key: 'applicableWorkType', label: 'Applicable Work Type' },
@@ -71,6 +75,8 @@ export class WipChecklistMaster {
   private emptyForm(): ChecklistMaster {
     return {
       checklistId: '',
+      assetId: '',
+      assetName: '',
       checklistName: '',
       checklistType: '',
       applicableWorkType: [],
@@ -212,6 +218,8 @@ export class WipChecklistMaster {
   onImportRows(rows: Record<string, string>[]): void {
     const mapped: ChecklistMaster[] = rows.map((row) => ({
       checklistId: row['checklistId'] ?? '',
+      assetId: row['assetId'] ?? '',
+      assetName: row['assetName'] ?? '',
       checklistName: row['checklistName'] ?? '',
       checklistType: row['checklistType'] ?? '',
       applicableWorkType: (row['applicableWorkType'] ?? '')

@@ -1,5 +1,7 @@
 export interface TechnicianRecord {
   technicianId: string;
+  assetId: string;
+  assetName: string;
   name: string;
   skillSet: string;
   certification: string;

@@ -8,24 +8,32 @@ export class MasterManagementChecklistTypeMasterService {
   private readonly records: MasterManagementChecklistTypeMasterItem[] = [
     {
       typeId: 'CKT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       typeName: 'Daily Asset Inspection',
       applicableModule: 'Asset',
       isActive: true
     },
     {
       typeId: 'CKT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       typeName: 'Preventive Maintenance Checklist',
       applicableModule: 'Maintenance',
       isActive: true
     },
     {
       typeId: 'CKT-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       typeName: 'Safety Walkdown',
       applicableModule: 'Safety',
       isActive: true
     },
     {
       typeId: 'CKT-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       typeName: 'WIP Progress Review',
       applicableModule: 'WIP',
       isActive: false

@@ -29,6 +29,8 @@ export class MasterManagementUpdateSourceMaster {
 
   columns: MasterManagementUpdateSourceMasterColumn[] = [
     { key: 'sourceId', label: 'Source ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'sourceName', label: 'Source Name', visible: true },
     { key: 'description', label: 'Description', visible: true }
   ];
@@ -88,6 +90,8 @@ export class MasterManagementUpdateSourceMaster {
   private emptyForm(): MasterManagementUpdateSourceMasterItem {
     return {
       sourceId: '',
+      assetId: '',
+      assetName: '',
       sourceName: '',
       description: ''
     };
@@ -197,6 +201,8 @@ export class MasterManagementUpdateSourceMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         sourceId: row['sourceId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         sourceName: (row['sourceName'] ?? '') as UpdateSourceType | '',
         description: row['description'] ?? ''
       });

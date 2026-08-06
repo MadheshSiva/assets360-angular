@@ -3,6 +3,8 @@ export type ResourceMasterAvailability = 'Available' | 'Busy' | 'On Leave' | 'Un
 
 export interface ResourceMaster {
   resourceId: string;
+  assetId: string;
+  assetName: string;
   resourceName: string;
   resourceType: ResourceMasterType | '';
   skillSet: string[];

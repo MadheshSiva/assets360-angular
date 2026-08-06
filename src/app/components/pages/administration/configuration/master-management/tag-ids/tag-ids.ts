@@ -29,6 +29,8 @@ export class MasterManagementTagIds {
 
   columns: MasterManagementTagIdColumn[] = [
     { key: 'tagId', label: 'Tag ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'tagCode', label: 'Tag Code', visible: true },
     { key: 'tagType', label: 'Tag Type', visible: true },
     { key: 'assignedAssetCode', label: 'Assigned Asset Code', visible: true },
@@ -91,6 +93,8 @@ export class MasterManagementTagIds {
   private emptyForm(): MasterManagementTagIdItem {
     return {
       tagId: '',
+      assetId: '',
+      assetName: '',
       tagCode: '',
       tagType: '',
       assignedAssetCode: '',
@@ -203,6 +207,8 @@ export class MasterManagementTagIds {
     rows.forEach((row) => {
       this.service.addRecord({
         tagId: row['tagId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         tagCode: row['tagCode'] ?? '',
         tagType: row['tagType'] ?? '',
         assignedAssetCode: row['assignedAssetCode'] ?? '',

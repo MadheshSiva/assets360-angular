@@ -21,6 +21,8 @@ export class MasterManagementAuditorDetailsService {
   private readonly records: MasterManagementAuditorDetailsItem[] = [
     {
       auditorId: 'AUD-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       auditorName: 'Fatima Al Suwaidi',
       employeeCode: 'EMP-2031',
       department: 'Compliance',
@@ -31,6 +33,8 @@ export class MasterManagementAuditorDetailsService {
     },
     {
       auditorId: 'AUD-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       auditorName: 'Rahul Menon',
       employeeCode: 'EMP-2044',
       department: 'IT',
@@ -41,6 +45,8 @@ export class MasterManagementAuditorDetailsService {
     },
     {
       auditorId: 'AUD-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       auditorName: 'Sara Al Marzooqi',
       employeeCode: 'EMP-2059',
       department: 'Finance',

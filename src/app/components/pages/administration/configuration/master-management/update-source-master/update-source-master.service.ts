@@ -11,16 +11,22 @@ export class MasterManagementUpdateSourceMasterService {
   private readonly records: MasterManagementUpdateSourceMasterItem[] = [
     {
       sourceId: 'SRC-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       sourceName: 'Manual',
       description: 'Manually entered or updated by an operator'
     },
     {
       sourceId: 'SRC-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       sourceName: 'IoT',
       description: 'Streamed automatically from IoT sensors and devices'
     },
     {
       sourceId: 'SRC-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       sourceName: 'API',
       description: 'Synced via an external API integration'
     }

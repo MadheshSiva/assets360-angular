@@ -17,6 +17,8 @@ export class MasterManagementAlertTypeService {
   private readonly records: MasterManagementAlertTypeItem[] = [
     {
       alertTypeId: 'ALT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       alertName: 'Geofence Breach',
       alertCode: 'GEO-BRCH',
       description: 'Raised when an asset exits its assigned geofence boundary',
@@ -28,6 +30,8 @@ export class MasterManagementAlertTypeService {
     },
     {
       alertTypeId: 'ALT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       alertName: 'Low Battery',
       alertCode: 'LOW-BATT',
       description: 'Raised when a tracked device battery level drops too low',
@@ -39,6 +43,8 @@ export class MasterManagementAlertTypeService {
     },
     {
       alertTypeId: 'ALT-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       alertName: 'Equipment Breakdown',
       alertCode: 'EQP-BRK',
       description: 'Raised when an asset fails unexpectedly and requires immediate attention',
@@ -50,6 +56,8 @@ export class MasterManagementAlertTypeService {
     },
     {
       alertTypeId: 'ALT-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       alertName: 'Inspection Due',
       alertCode: 'INS-DUE',
       description: 'Raised when a routine inspection is coming up for an asset',

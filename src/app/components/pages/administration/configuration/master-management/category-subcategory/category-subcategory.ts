@@ -29,6 +29,8 @@ export class MasterManagementCategorySubcategory {
 
   columns: MasterManagementCategorySubcategoryColumn[] = [
     { key: 'categoryId', label: 'Category ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'categoryName', label: 'Category Name', visible: true },
     { key: 'categoryCode', label: 'Category Code', visible: true },
     { key: 'description', label: 'Description', visible: true },
@@ -39,6 +41,8 @@ export class MasterManagementCategorySubcategory {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'categoryId', label: 'Category ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'categoryName', label: 'Category Name' },
     { key: 'categoryCode', label: 'Category Code' },
     { key: 'description', label: 'Description' },
@@ -108,6 +112,8 @@ export class MasterManagementCategorySubcategory {
   private emptyForm(): MasterManagementCategorySubcategoryItem {
     return {
       categoryId: '',
+      assetId: '',
+      assetName: '',
       categoryName: '',
       categoryCode: '',
       description: '',
@@ -227,6 +233,8 @@ export class MasterManagementCategorySubcategory {
     rows.forEach((row) => {
       this.service.addRecord({
         categoryId: row['categoryId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         categoryName: row['categoryName'] ?? '',
         categoryCode: row['categoryCode'] ?? '',
         description: row['description'] ?? '',

@@ -21,6 +21,8 @@ export class PredictiveMaintenanceService {
 
   private readonly recordsSubject = new BehaviorSubject<PredictiveMaintenanceRecord[]>([
     {
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       sensorType: 'Vibration',
       thresholdValue: 4.5,
       alertCondition: 'Above Threshold',
@@ -29,6 +31,8 @@ export class PredictiveMaintenanceService {
       riskLevel: 'High'
     },
     {
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       sensorType: 'Temperature',
       thresholdValue: 85,
       alertCondition: 'Above Threshold',

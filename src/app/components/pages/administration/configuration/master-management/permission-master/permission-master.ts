@@ -28,12 +28,16 @@ export class MasterManagementPermissionMaster {
 
   columns: MasterManagementPermissionMasterColumn[] = [
     { key: 'permissionId', label: 'Permission ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'permissionName', label: 'Permission Name', visible: true },
     { key: 'module', label: 'Module', visible: true }
   ];
 
   readonly importColumns: ImportColumn[] = [
     { key: 'permissionId', label: 'Permission ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'permissionName', label: 'Permission Name' },
     { key: 'module', label: 'Module' }
   ];
@@ -66,6 +70,8 @@ export class MasterManagementPermissionMaster {
   private emptyForm(): MasterManagementPermissionMasterItem {
     return {
       permissionId: '',
+      assetId: '',
+      assetName: '',
       permissionName: '',
       module: ''
     };
@@ -172,6 +178,8 @@ export class MasterManagementPermissionMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         permissionId: row['permissionId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         permissionName: (row['permissionName'] ?? '') as PermissionAction | '',
         module: row['module'] ?? ''
       });

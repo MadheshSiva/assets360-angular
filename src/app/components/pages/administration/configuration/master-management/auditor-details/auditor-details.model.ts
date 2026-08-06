@@ -4,6 +4,8 @@ export type AuditorStatus = 'Active' | 'Inactive';
 
 export interface MasterManagementAuditorDetailsItem {
   auditorId: string;
+  assetId: string;
+  assetName: string;
   auditorName: string;
   employeeCode: string;
   department: AuditorDepartment | '';

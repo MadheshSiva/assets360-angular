@@ -6,18 +6,24 @@ export class MasterManagementShiftMasterService {
   private readonly records: MasterManagementShiftMasterItem[] = [
     {
       shiftId: 'SHF-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       shiftName: 'Morning Shift',
       startTime: '06:00',
       endTime: '14:00'
     },
     {
       shiftId: 'SHF-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       shiftName: 'Afternoon Shift',
       startTime: '14:00',
       endTime: '22:00'
     },
     {
       shiftId: 'SHF-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       shiftName: 'Night Shift',
       startTime: '22:00',
       endTime: '06:00'

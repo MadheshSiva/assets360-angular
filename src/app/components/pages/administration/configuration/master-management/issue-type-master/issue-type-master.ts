@@ -29,6 +29,8 @@ export class MasterManagementIssueTypeMaster {
 
   columns: MasterManagementIssueTypeMasterColumn[] = [
     { key: 'issueTypeId', label: 'Issue Type ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'issueTypeName', label: 'Issue Type Name', visible: true },
     { key: 'category', label: 'Category', visible: true },
     { key: 'isActive', label: 'Is Active', visible: true }
@@ -38,6 +40,8 @@ export class MasterManagementIssueTypeMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'issueTypeId', label: 'Issue Type ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'issueTypeName', label: 'Issue Type Name' },
     { key: 'category', label: 'Category' },
     { key: 'isActive', label: 'Is Active' }
@@ -94,6 +98,8 @@ export class MasterManagementIssueTypeMaster {
   private emptyForm(): MasterManagementIssueTypeMasterItem {
     return {
       issueTypeId: '',
+      assetId: '',
+      assetName: '',
       issueTypeName: '',
       category: '',
       isActive: true
@@ -205,6 +211,8 @@ export class MasterManagementIssueTypeMaster {
       ...this.records,
       ...rows.map((row) => ({
         issueTypeId: row['issueTypeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         issueTypeName: row['issueTypeName'] ?? '',
         category: (row['category'] ?? '') as IssueCategory | '',
         isActive: /^(true|yes|1)$/i.test(row['isActive'] ?? '')

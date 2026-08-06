@@ -8,24 +8,32 @@ export class MasterManagementIssueTypeMasterService {
   private readonly records: MasterManagementIssueTypeMasterItem[] = [
     {
       issueTypeId: 'ISS-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       issueTypeName: 'Equipment Malfunction',
       category: 'Technical',
       isActive: true
     },
     {
       issueTypeId: 'ISS-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       issueTypeName: 'Manpower Shortage',
       category: 'Resource',
       isActive: true
     },
     {
       issueTypeId: 'ISS-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       issueTypeName: 'Material Unavailability',
       category: 'Material',
       isActive: true
     },
     {
       issueTypeId: 'ISS-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       issueTypeName: 'Weather Delay',
       category: 'External',
       isActive: true

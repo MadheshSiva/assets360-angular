@@ -24,6 +24,8 @@ export class KpiConfigService {
   private readonly recordsSubject = new BehaviorSubject<KpiConfig[]>([
     {
       kpiId: 'KPI-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       kpiName: 'SLA Compliance Rate',
       formulaDefinition: '(Jobs completed within SLA / Total jobs) * 100',
       thresholdGreen: 95,
@@ -34,6 +36,8 @@ export class KpiConfigService {
     },
     {
       kpiId: 'KPI-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       kpiName: 'Open Work Orders',
       formulaDefinition: 'COUNT(WorkOrders WHERE status != "Closed")',
       thresholdGreen: 10,

@@ -3,6 +3,8 @@ export type ApiSyncFinalFlag = 'Yes' | 'No';
 
 export interface MasterManagementApiSyncStatusMasterItem {
   syncStatusId: string;
+  assetId: string;
+  assetName: string;
   statusName: string;
   statusCode: string;
   description: string;

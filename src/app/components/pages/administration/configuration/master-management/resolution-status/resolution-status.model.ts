@@ -3,6 +3,8 @@ export type ResolutionStatusCategory = 'Open' | 'In Progress' | 'Closed';
 
 export interface MasterManagementResolutionStatusItem {
   resolutionStatusId: string;
+  assetId: string;
+  assetName: string;
   statusName: string;
   statusCode: string;
   description: string;

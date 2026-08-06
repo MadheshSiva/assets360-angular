@@ -8,6 +8,8 @@ export class MasterManagementStatusService {
   private readonly records: MasterManagementStatusItem[] = [
     {
       statusId: 'STA-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'Open',
       colorCode: '#1d4ed8',
       allowedTransitions: ['In Progress', 'Cancelled'],
@@ -15,6 +17,8 @@ export class MasterManagementStatusService {
     },
     {
       statusId: 'STA-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       statusName: 'In Progress',
       colorCode: '#b8860b',
       allowedTransitions: ['On Hold', 'Resolved', 'Cancelled'],
@@ -22,6 +26,8 @@ export class MasterManagementStatusService {
     },
     {
       statusId: 'STA-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       statusName: 'On Hold',
       colorCode: '#7030a0',
       allowedTransitions: ['In Progress', 'Cancelled'],
@@ -29,6 +35,8 @@ export class MasterManagementStatusService {
     },
     {
       statusId: 'STA-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'Resolved',
       colorCode: '#1e7e34',
       allowedTransitions: ['Closed', 'In Progress'],
@@ -36,6 +44,8 @@ export class MasterManagementStatusService {
     },
     {
       statusId: 'STA-1005',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       statusName: 'Closed',
       colorCode: '#64748b',
       allowedTransitions: [],
@@ -43,6 +53,8 @@ export class MasterManagementStatusService {
     },
     {
       statusId: 'STA-1006',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       statusName: 'Cancelled',
       colorCode: '#c0221f',
       allowedTransitions: [],

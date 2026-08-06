@@ -15,6 +15,8 @@ export class ChecklistItemService {
   private items: ChecklistItem[] = [
     {
       itemId: 'ITM-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       checklistId: 'CHK-001',
       itemDescription: 'Verify circuit breaker is locked out / tagged out',
       responseType: 'Yes/No',
@@ -24,6 +26,8 @@ export class ChecklistItemService {
     },
     {
       itemId: 'ITM-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       checklistId: 'CHK-001',
       itemDescription: 'Measure residual voltage at terminals',
       responseType: 'Numeric',

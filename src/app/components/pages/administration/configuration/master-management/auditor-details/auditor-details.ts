@@ -29,6 +29,8 @@ export class MasterManagementAuditorDetails {
 
   columns: MasterManagementAuditorDetailsColumn[] = [
     { key: 'auditorId', label: 'Auditor ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'auditorName', label: 'Auditor Name', visible: true },
     { key: 'employeeCode', label: 'Employee Code', visible: true },
     { key: 'department', label: 'Department', visible: true },
@@ -40,6 +42,8 @@ export class MasterManagementAuditorDetails {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'auditorId', label: 'Auditor ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'auditorName', label: 'Auditor Name' },
     { key: 'employeeCode', label: 'Employee Code' },
     { key: 'department', label: 'Department' },
@@ -110,6 +114,8 @@ export class MasterManagementAuditorDetails {
   private emptyForm(): MasterManagementAuditorDetailsItem {
     return {
       auditorId: '',
+      assetId: '',
+      assetName: '',
       auditorName: '',
       employeeCode: '',
       department: '',
@@ -224,6 +230,8 @@ export class MasterManagementAuditorDetails {
     rows.forEach((row) => {
       this.service.addRecord({
         auditorId: row['auditorId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         auditorName: row['auditorName'] ?? '',
         employeeCode: row['employeeCode'] ?? '',
         department: (row['department'] ?? '') as MasterManagementAuditorDetailsItem['department'],

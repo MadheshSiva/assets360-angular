@@ -6,24 +6,32 @@ export class MasterManagementUnitMasterService {
   private readonly records: MasterManagementUnitMasterItem[] = [
     {
       unitId: 'UNT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       unitName: 'Kilogram',
       symbol: 'kg',
       isActive: true
     },
     {
       unitId: 'UNT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       unitName: 'Meter',
       symbol: 'm',
       isActive: true
     },
     {
       unitId: 'UNT-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       unitName: 'Liter',
       symbol: 'L',
       isActive: true
     },
     {
       unitId: 'UNT-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       unitName: 'Piece',
       symbol: 'pcs',
       isActive: true

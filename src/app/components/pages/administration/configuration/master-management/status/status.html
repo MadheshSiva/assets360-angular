@@ -78,6 +78,8 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('statusId')">Status ID</th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('statusName')">Status Name</th>
             <th *ngIf="isColumnVisible('colorCode')">Color Code</th>
             <th *ngIf="isColumnVisible('allowedTransitions')">Allowed Transitions</th>
@@ -91,6 +93,8 @@
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
             <td *ngIf="isColumnVisible('statusId')" class="mono">{{ r.statusId }}</td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('statusName')">
               <span class="badge" [attr.data-status]="r.statusName">{{ r.statusName }}</span>
             </td>
@@ -145,6 +149,16 @@
         <div class="form-field">
           <label>STATUS ID</label>
           <input type="text" name="statusId" placeholder="Auto-generated if left blank" [(ngModel)]="form.statusId" [readonly]="isEditMode" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

@@ -26,6 +26,7 @@ export class MaintenanceBreakdownIssueReporting {
   columns: IssueColumn[] = [
     { key: 'issueId', label: 'Issue ID', visible: true },
     { key: 'assetId', label: 'Asset', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'reportedBy', label: 'Reported By', visible: true },
     { key: 'issueType', label: 'Issue Type', visible: true },
     { key: 'severity', label: 'Severity', visible: true },
@@ -38,6 +39,7 @@ export class MaintenanceBreakdownIssueReporting {
   readonly importColumns: ImportColumn[] = [
     { key: 'issueId', label: 'Issue ID' },
     { key: 'assetId', label: 'Asset' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'reportedBy', label: 'Reported By' },
     { key: 'issueType', label: 'Issue Type' },
     { key: 'severity', label: 'Severity' },
@@ -88,6 +90,7 @@ export class MaintenanceBreakdownIssueReporting {
     return {
       issueId: '',
       assetId: '',
+      assetName: '',
       reportedBy: '',
       issueType: '',
       severity: '',
@@ -205,6 +208,7 @@ export class MaintenanceBreakdownIssueReporting {
       this.issueService.addIssue({
         issueId: row['issueId'] ?? '',
         assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         reportedBy: row['reportedBy'] ?? '',
         issueType: row['issueType'] ?? '',
         severity: row['severity'] ?? '',

@@ -25,6 +25,8 @@ export class WipTaskMaster {
 
   columns: TaskMasterColumn[] = [
     { key: 'taskId', label: 'Task ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'jobId', label: 'Job ID', visible: true },
     { key: 'taskName', label: 'Task Name', visible: true },
     { key: 'description', label: 'Description', visible: true },
@@ -89,6 +91,8 @@ export class WipTaskMaster {
   private emptyForm(): TaskMaster {
     return {
       taskId: '',
+      assetId: '',
+      assetName: '',
       jobId: '',
       taskName: '',
       description: '',
@@ -225,6 +229,8 @@ export class WipTaskMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         taskId: row['taskId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         jobId: row['jobId'] ?? '',
         taskName: row['taskName'] ?? '',
         description: row['description'] ?? '',

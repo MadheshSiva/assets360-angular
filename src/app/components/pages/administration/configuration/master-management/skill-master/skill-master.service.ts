@@ -8,24 +8,32 @@ export class MasterManagementSkillMasterService {
   private readonly records: MasterManagementSkillMasterItem[] = [
     {
       skillId: 'SKL-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       skillName: 'Electrical Safety',
       skillLevel: 'Advanced',
       certificationRequired: true
     },
     {
       skillId: 'SKL-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       skillName: 'Forklift Operation',
       skillLevel: 'Intermediate',
       certificationRequired: true
     },
     {
       skillId: 'SKL-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       skillName: 'First Aid & CPR',
       skillLevel: 'Beginner',
       certificationRequired: false
     },
     {
       skillId: 'SKL-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       skillName: 'Confined Space Entry',
       skillLevel: 'Expert',
       certificationRequired: true

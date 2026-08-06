@@ -29,6 +29,8 @@ export class MasterManagementResponseTypeMaster {
 
   columns: MasterManagementResponseTypeMasterColumn[] = [
     { key: 'typeId', label: 'Type ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'typeName', label: 'Type Name', visible: true },
     { key: 'validationType', label: 'Validation Type', visible: true },
     { key: 'isActive', label: 'Is Active', visible: true }
@@ -36,6 +38,8 @@ export class MasterManagementResponseTypeMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'typeId', label: 'Type ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'typeName', label: 'Type Name' },
     { key: 'validationType', label: 'Validation Type' },
     { key: 'isActive', label: 'Is Active' }
@@ -98,6 +102,8 @@ export class MasterManagementResponseTypeMaster {
   private emptyForm(): MasterManagementResponseTypeMasterItem {
     return {
       typeId: '',
+      assetId: '',
+      assetName: '',
       typeName: '',
       validationType: '',
       isActive: true
@@ -209,6 +215,8 @@ export class MasterManagementResponseTypeMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         typeId: row['typeId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         typeName: (row['typeName'] as MasterManagementResponseTypeMasterItem['typeName']) || '',
         validationType: (row['validationType'] as MasterManagementResponseTypeMasterItem['validationType']) || '',
         isActive: toBool(row['isActive'])

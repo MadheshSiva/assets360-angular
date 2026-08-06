@@ -88,6 +88,8 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('inspectionId')">Inspection ID</th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('inspectionType')">Inspection Type</th>
             <th *ngIf="isColumnVisible('checklist')">Checklist</th>
             <th *ngIf="isColumnVisible('inspectorName')">Inspector Name</th>
@@ -103,6 +105,8 @@
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
             <td *ngIf="isColumnVisible('inspectionId')" class="mono">{{ r.inspectionId }}</td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('inspectionType')">{{ r.inspectionType }}</td>
             <td *ngIf="isColumnVisible('checklist')">{{ r.checklist }}</td>
             <td *ngIf="isColumnVisible('inspectorName')">{{ r.inspectorName }}</td>
@@ -161,6 +165,16 @@
             [(ngModel)]="form.inspectionId"
             [readonly]="isEditMode"
           />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

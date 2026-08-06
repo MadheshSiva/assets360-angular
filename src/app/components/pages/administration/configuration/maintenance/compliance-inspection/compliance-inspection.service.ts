@@ -30,6 +30,8 @@ export class ComplianceInspectionService {
   private readonly recordsSubject = new BehaviorSubject<ComplianceInspectionRecord[]>([
     {
       inspectionId: 'INS-4001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       inspectionType: 'Fire Safety Audit',
       checklist: 'Fire Safety Checklist',
       inspectorName: 'Ali Hassan',
@@ -39,6 +41,8 @@ export class ComplianceInspectionService {
     },
     {
       inspectionId: 'INS-4002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       inspectionType: 'Electrical Safety Audit',
       checklist: 'Electrical Safety Checklist',
       inspectorName: 'Priya Nair',

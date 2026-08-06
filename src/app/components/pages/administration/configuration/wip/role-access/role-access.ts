@@ -24,6 +24,8 @@ export class WipRoleAccess {
 
   columns: RoleAccessColumn[] = [
     { key: 'roleId', label: 'Role ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'roleName', label: 'Role Name', visible: true },
     { key: 'permissions', label: 'Permissions', visible: true },
     { key: 'moduleAccess', label: 'Module Access', visible: true },
@@ -32,6 +34,8 @@ export class WipRoleAccess {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'roleId', label: 'Role ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'roleName', label: 'Role Name' },
     { key: 'permissions', label: 'Permissions' },
     { key: 'moduleAccess', label: 'Module Access' },
@@ -70,6 +74,8 @@ export class WipRoleAccess {
   private emptyForm(): RoleAccessForm {
     return {
       roleId: '',
+      assetId: '',
+      assetName: '',
       roleName: '',
       permissions: [],
       moduleAccess: [],
@@ -198,6 +204,8 @@ export class WipRoleAccess {
     rows.forEach((row) => {
       this.service.addRecord({
         roleId: row['roleId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         roleName: row['roleName'] ?? '',
         permissions: row['permissions']
           ? (row['permissions'].split(',').map((p) => p.trim()).filter(Boolean) as RoleAccess['permissions'])

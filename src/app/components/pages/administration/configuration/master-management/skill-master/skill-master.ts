@@ -29,6 +29,8 @@ export class MasterManagementSkillMaster {
 
   columns: MasterManagementSkillMasterColumn[] = [
     { key: 'skillId', label: 'Skill ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'skillName', label: 'Skill Name', visible: true },
     { key: 'skillLevel', label: 'Skill Level', visible: true },
     { key: 'certificationRequired', label: 'Certification Required', visible: true }
@@ -36,6 +38,8 @@ export class MasterManagementSkillMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'skillId', label: 'Skill ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'skillName', label: 'Skill Name' },
     { key: 'skillLevel', label: 'Skill Level' },
     { key: 'certificationRequired', label: 'Certification Required' }
@@ -94,6 +98,8 @@ export class MasterManagementSkillMaster {
   private emptyForm(): MasterManagementSkillMasterItem {
     return {
       skillId: '',
+      assetId: '',
+      assetName: '',
       skillName: '',
       skillLevel: '',
       certificationRequired: false
@@ -205,6 +211,8 @@ export class MasterManagementSkillMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         skillId: row['skillId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         skillName: row['skillName'] ?? '',
         skillLevel: (row['skillLevel'] as MasterManagementSkillMasterItem['skillLevel']) || '',
         certificationRequired: toBool(row['certificationRequired'])

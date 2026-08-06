@@ -1,4 +1,6 @@
 export interface MaintenanceTaskRecord {
+  assetId: string;
+  assetName: string;
   taskChecklist: string[];
   instructions: string;
   toolsRequired: string[];

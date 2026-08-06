@@ -8,18 +8,24 @@ export class MasterManagementChartTypeMasterService {
   private readonly records: MasterManagementChartTypeMasterItem[] = [
     {
       widgetId: 'WGT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       widgetName: 'Chart',
       configJson: '{"type":"line","stacked":false}',
       isActive: true
     },
     {
       widgetId: 'WGT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       widgetName: 'Gauge',
       configJson: '{"min":0,"max":100,"thresholds":[50,80]}',
       isActive: true
     },
     {
       widgetId: 'WGT-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       widgetName: 'Table',
       configJson: '{"pageSize":25,"sortable":true}',
       isActive: true

@@ -87,6 +87,8 @@
             <th class="selection-col">
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
+            <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('sensorType')">Sensor Type</th>
             <th *ngIf="isColumnVisible('thresholdValue')">Threshold Value</th>
             <th *ngIf="isColumnVisible('alertCondition')">Alert Condition</th>
@@ -101,6 +103,8 @@
             <td class="selection-col">
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
+            <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('sensorType')">{{ r.sensorType }}</td>
             <td *ngIf="isColumnVisible('thresholdValue')">{{ r.thresholdValue ?? '-' }}</td>
             <td *ngIf="isColumnVisible('alertCondition')">{{ r.alertCondition }}</td>
@@ -150,6 +154,16 @@
 
     <form class="modal-form" (ngSubmit)="submitForm()" #predictiveForm="ngForm">
       <div class="form-grid">
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+
         <div class="form-field">
           <label>SENSOR TYPE <span class="required">*</span></label>
           <div class="select-wrap">

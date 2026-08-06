@@ -3,6 +3,8 @@ export type KpiConfigWidgetType = 'Line Chart' | 'Bar Chart' | 'Pie Chart' | 'Ga
 
 export interface KpiConfig {
   kpiId: string;
+  assetId: string;
+  assetName: string;
   kpiName: string;
   formulaDefinition: string;
   thresholdGreen: number | null;

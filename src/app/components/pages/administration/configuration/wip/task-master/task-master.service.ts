@@ -29,6 +29,8 @@ export class TaskMasterService {
   private readonly tasks: TaskMaster[] = [
     {
       taskId: 'TSK-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       jobId: 'b3f1c2a0-1e2d-4f3a-9b8c-1a2b3c4d5e6f',
       taskName: 'Remove old filters',
       description: 'Remove and dispose of old HVAC filters across ground floor units',
@@ -46,6 +48,8 @@ export class TaskMasterService {
     },
     {
       taskId: 'TSK-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       jobId: 'b3f1c2a0-1e2d-4f3a-9b8c-1a2b3c4d5e6f',
       taskName: 'Install new filters',
       description: 'Install replacement filters and verify airflow',

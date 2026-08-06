@@ -15,6 +15,8 @@ export class StatusMasterService {
   private readonly statuses: StatusMaster[] = [
     {
       statusId: 'STS-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'Planned',
       statusCode: 'PLANNED',
       sequenceOrder: 1,
@@ -26,6 +28,8 @@ export class StatusMasterService {
     },
     {
       statusId: 'STS-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       statusName: 'Approved',
       statusCode: 'APPROVED',
       sequenceOrder: 2,
@@ -37,6 +41,8 @@ export class StatusMasterService {
     },
     {
       statusId: 'STS-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       statusName: 'In Progress',
       statusCode: 'IN_PROGRESS',
       sequenceOrder: 3,
@@ -48,6 +54,8 @@ export class StatusMasterService {
     },
     {
       statusId: 'STS-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'On Hold',
       statusCode: 'ON_HOLD',
       sequenceOrder: 4,
@@ -59,6 +67,8 @@ export class StatusMasterService {
     },
     {
       statusId: 'STS-1005',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       statusName: 'Completed',
       statusCode: 'COMPLETED',
       sequenceOrder: 5,
@@ -70,6 +80,8 @@ export class StatusMasterService {
     },
     {
       statusId: 'STS-1006',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       statusName: 'Cancelled',
       statusCode: 'CANCELLED',
       sequenceOrder: 6,

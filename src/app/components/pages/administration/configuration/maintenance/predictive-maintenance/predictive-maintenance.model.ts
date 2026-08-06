@@ -1,4 +1,6 @@
 export interface PredictiveMaintenanceRecord {
+  assetId: string;
+  assetName: string;
   sensorType: string;
   thresholdValue: number | null;
   alertCondition: string;

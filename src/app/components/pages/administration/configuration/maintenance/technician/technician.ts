@@ -25,6 +25,8 @@ export class MaintenanceTechnician {
 
   columns: TechnicianColumn[] = [
     { key: 'technicianId', label: 'Technician ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'name', label: 'Name', visible: true },
     { key: 'skillSet', label: 'Skill Set', visible: true },
     { key: 'certification', label: 'Certification', visible: true },
@@ -34,6 +36,8 @@ export class MaintenanceTechnician {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'technicianId', label: 'Technician ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'name', label: 'Name' },
     { key: 'skillSet', label: 'Skill Set' },
     { key: 'certification', label: 'Certification' },
@@ -77,6 +81,8 @@ export class MaintenanceTechnician {
   private emptyForm(): TechnicianForm {
     return {
       technicianId: '',
+      assetId: '',
+      assetName: '',
       name: '',
       skillSet: '',
       certification: '',
@@ -189,6 +195,8 @@ export class MaintenanceTechnician {
     rows.forEach((row) => {
       this.technicianService.addTechnician({
         technicianId: row['technicianId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         name: row['name'] ?? '',
         skillSet: row['skillSet'] ?? '',
         certification: row['certification'] ?? '',

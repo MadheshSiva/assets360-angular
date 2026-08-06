@@ -28,6 +28,8 @@ export class TechnicianService {
   private readonly techniciansSubject = new BehaviorSubject<TechnicianRecord[]>([
     {
       technicianId: 'TECH-001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       name: 'John Mathew',
       skillSet: 'HVAC',
       certification: 'HVAC Technician License',
@@ -36,6 +38,8 @@ export class TechnicianService {
     },
     {
       technicianId: 'TECH-002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       name: 'Ali Hassan',
       skillSet: 'Electrical',
       certification: 'Electrical Safety Certified',

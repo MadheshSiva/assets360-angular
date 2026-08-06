@@ -6,18 +6,24 @@ export class MasterManagementWorkTypeService {
   private readonly records: MasterManagementWorkTypeItem[] = [
     {
       workTypeId: 'WKT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       workTypeName: 'Preventive Maintenance',
       description: 'Scheduled maintenance performed to prevent asset failure',
       isActive: true
     },
     {
       workTypeId: 'WKT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       workTypeName: 'Corrective Repair',
       description: 'Repair work carried out after a fault is identified',
       isActive: true
     },
     {
       workTypeId: 'WKT-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       workTypeName: 'Breakdown Response',
       description: 'Emergency response work following an unexpected breakdown',
       isActive: true

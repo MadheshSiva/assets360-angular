@@ -34,6 +34,8 @@ export class MasterManagementPhysicalVerificationResult {
 
   columns: MasterManagementPhysicalVerificationResultColumn[] = [
     { key: 'resultId', label: 'Result ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'resultName', label: 'Result Name', visible: true },
     { key: 'resultCode', label: 'Result Code', visible: true },
     { key: 'description', label: 'Description', visible: true },
@@ -44,6 +46,8 @@ export class MasterManagementPhysicalVerificationResult {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'resultId', label: 'Result ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'resultName', label: 'Result Name' },
     { key: 'resultCode', label: 'Result Code' },
     { key: 'description', label: 'Description' },
@@ -113,6 +117,8 @@ export class MasterManagementPhysicalVerificationResult {
   private emptyForm(): MasterManagementPhysicalVerificationResultItem {
     return {
       resultId: '',
+      assetId: '',
+      assetName: '',
       resultName: '',
       resultCode: '',
       description: '',
@@ -226,6 +232,8 @@ export class MasterManagementPhysicalVerificationResult {
     rows.forEach((row) => {
       this.service.addRecord({
         resultId: row['resultId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         resultName: row['resultName'] ?? '',
         resultCode: row['resultCode'] ?? '',
         description: row['description'] ?? '',

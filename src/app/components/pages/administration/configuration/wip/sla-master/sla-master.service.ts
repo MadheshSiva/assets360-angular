@@ -16,6 +16,8 @@ export class SlaMasterService {
   private readonly slas: SlaMaster[] = [
     {
       slaId: 'SLA-001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       slaName: '4 Hour Response',
       workType: 'Corrective',
       priority: 'Critical',
@@ -27,6 +29,8 @@ export class SlaMasterService {
     },
     {
       slaId: 'SLA-002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       slaName: '24 Hour Resolution',
       workType: 'Preventive',
       priority: 'Medium',

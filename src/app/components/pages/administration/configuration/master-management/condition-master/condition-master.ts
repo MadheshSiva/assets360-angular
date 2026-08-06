@@ -29,6 +29,8 @@ export class MasterManagementConditionMaster {
 
   columns: MasterManagementConditionMasterColumn[] = [
     { key: 'conditionId', label: 'Condition ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'conditionName', label: 'Condition Name', visible: true },
     { key: 'thresholdValue', label: 'Threshold Value', visible: true },
     { key: 'colorCode', label: 'Color Code', visible: true }
@@ -38,6 +40,8 @@ export class MasterManagementConditionMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'conditionId', label: 'Condition ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'conditionName', label: 'Condition Name' },
     { key: 'thresholdValue', label: 'Threshold Value' },
     { key: 'colorCode', label: 'Color Code' }
@@ -94,6 +98,8 @@ export class MasterManagementConditionMaster {
   private emptyForm(): MasterManagementConditionMasterItem {
     return {
       conditionId: '',
+      assetId: '',
+      assetName: '',
       conditionName: '',
       thresholdValue: null,
       colorCode: ''
@@ -205,6 +211,8 @@ export class MasterManagementConditionMaster {
       ...this.records,
       ...rows.map((row) => ({
         conditionId: row['conditionId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         conditionName: (row['conditionName'] ?? '') as ConditionName | '',
         thresholdValue: row['thresholdValue'] ? Number(row['thresholdValue']) : null,
         colorCode: row['colorCode'] ?? ''

@@ -25,6 +25,8 @@ export class MaintenanceVendorAmc {
   columns: VendorAmcColumn[] = [
     { key: 'vendorName', label: 'Vendor Name', visible: true },
     { key: 'contractId', label: 'Contract ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'assetIds', label: 'Assets Covered', visible: true },
     { key: 'startDate', label: 'Start Date', visible: true },
     { key: 'endDate', label: 'End Date', visible: true },
@@ -36,6 +38,8 @@ export class MaintenanceVendorAmc {
   readonly importColumns: ImportColumn[] = [
     { key: 'vendorName', label: 'Vendor Name' },
     { key: 'contractId', label: 'Contract ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'assetIds', label: 'Assets Covered' },
     { key: 'startDate', label: 'Start Date' },
     { key: 'endDate', label: 'End Date' },
@@ -105,6 +109,8 @@ export class MaintenanceVendorAmc {
     return {
       vendorName: '',
       contractId: '',
+      assetId: '',
+      assetName: '',
       assetIds: [],
       startDate: '',
       endDate: '',
@@ -217,6 +223,8 @@ export class MaintenanceVendorAmc {
       this.vendorAmcService.addRecord({
         vendorName: row['vendorName'] ?? '',
         contractId: row['contractId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         assetIds: (row['assetIds'] ?? '')
           .split(',')
           .map((id) => id.trim())

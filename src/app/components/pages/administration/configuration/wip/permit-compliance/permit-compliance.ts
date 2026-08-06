@@ -25,6 +25,8 @@ export class WipPermitCompliance {
 
   columns: PermitComplianceColumn[] = [
     { key: 'permitId', label: 'Permit ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'jobId', label: 'Job ID', visible: true },
     { key: 'permitType', label: 'Permit Type', visible: true },
     { key: 'issuedBy', label: 'Issued By', visible: true },
@@ -37,6 +39,8 @@ export class WipPermitCompliance {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'permitId', label: 'Permit ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'jobId', label: 'Job ID' },
     { key: 'permitType', label: 'Permit Type' },
     { key: 'issuedBy', label: 'Issued By' },
@@ -83,6 +87,8 @@ export class WipPermitCompliance {
   private emptyForm(): PermitComplianceForm {
     return {
       permitId: '',
+      assetId: '',
+      assetName: '',
       jobId: '',
       permitType: '',
       issuedBy: '',
@@ -200,6 +206,8 @@ export class WipPermitCompliance {
     rows.forEach((row) => {
       this.service.addRecord({
         permitId: row['permitId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         jobId: row['jobId'] ?? '',
         permitType: (row['permitType'] ?? '') as PermitCompliance['permitType'],
         issuedBy: row['issuedBy'] ?? '',

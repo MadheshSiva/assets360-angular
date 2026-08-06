@@ -9,6 +9,8 @@ export class MasterManagementMasterService {
   private readonly records: MasterManagementMasterItem[] = [
     {
       maintenanceId: 'MST-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       maintenanceCode: 'PM-STD',
       maintenanceName: 'Standard Preventive Maintenance',
       maintenanceCategory: 'Preventive',
@@ -19,6 +21,8 @@ export class MasterManagementMasterService {
     },
     {
       maintenanceId: 'MST-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       maintenanceCode: 'PDM-STD',
       maintenanceName: 'Condition-based Predictive Check',
       maintenanceCategory: 'Predictive',
@@ -29,6 +33,8 @@ export class MasterManagementMasterService {
     },
     {
       maintenanceId: 'MST-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       maintenanceCode: 'CM-STD',
       maintenanceName: 'Corrective Repair',
       maintenanceCategory: 'Corrective',
@@ -39,6 +45,8 @@ export class MasterManagementMasterService {
     },
     {
       maintenanceId: 'MST-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       maintenanceCode: 'BD-STD',
       maintenanceName: 'Breakdown Response',
       maintenanceCategory: 'Breakdown',

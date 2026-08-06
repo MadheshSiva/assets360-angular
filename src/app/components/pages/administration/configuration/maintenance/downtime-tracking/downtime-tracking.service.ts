@@ -27,6 +27,7 @@ export class DowntimeTrackingService {
   private readonly recordsSubject = new BehaviorSubject<DowntimeTrackingRecord[]>([
     {
       assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       downtimeStart: '2026-06-15T14:00',
       downtimeEnd: '2026-06-15T15:30',
       totalDowntime: this.formatDuration('2026-06-15T14:00', '2026-06-15T15:30'),
@@ -35,6 +36,7 @@ export class DowntimeTrackingService {
     },
     {
       assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       downtimeStart: '2026-06-20T09:00',
       downtimeEnd: '2026-06-20T09:45',
       totalDowntime: this.formatDuration('2026-06-20T09:00', '2026-06-20T09:45'),

@@ -23,6 +23,8 @@ export class MaintenanceTask {
   searchTerm = '';
 
   columns: TaskColumn[] = [
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'taskChecklist', label: 'Task Checklist', visible: true },
     { key: 'instructions', label: 'Instructions', visible: true },
     { key: 'toolsRequired', label: 'Tools Required', visible: true },
@@ -32,6 +34,8 @@ export class MaintenanceTask {
   ];
 
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'taskChecklist', label: 'Task Checklist' },
     { key: 'instructions', label: 'Instructions' },
     { key: 'toolsRequired', label: 'Tools Required' },
@@ -67,6 +71,8 @@ export class MaintenanceTask {
 
   private emptyForm(): MaintenanceTaskForm {
     return {
+      assetId: '',
+      assetName: '',
       taskChecklist: [],
       instructions: '',
       toolsRequired: [],
@@ -176,6 +182,8 @@ export class MaintenanceTask {
   onImportRows(rows: Record<string, string>[]): void {
     rows.forEach((row) => {
       this.taskService.addTask({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         taskChecklist: (row['taskChecklist'] ?? '')
           .split(',')
           .map((s) => s.trim())

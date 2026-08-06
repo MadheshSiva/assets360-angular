@@ -6,24 +6,32 @@ export class MasterManagementModuleAccessMasterService {
   private readonly records: MasterManagementModuleAccessMasterItem[] = [
     {
       moduleId: 'MOD-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       moduleName: 'Dashboard',
       routePath: '/dashboard',
       icon: 'dashboardpurple.png'
     },
     {
       moduleId: 'MOD-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       moduleName: 'Assets',
       routePath: '/administration/configuration/assets',
       icon: 'assets-purple.png'
     },
     {
       moduleId: 'MOD-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       moduleName: 'Maintenance',
       routePath: '/administration/configuration/maintenance',
       icon: 'maintenance-purple.png'
     },
     {
       moduleId: 'MOD-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       moduleName: 'Reports',
       routePath: '/report',
       icon: 'reports-purple.png'

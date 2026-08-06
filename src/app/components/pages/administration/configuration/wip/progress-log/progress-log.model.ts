@@ -2,6 +2,8 @@ export type ProgressLogUpdateSource = 'Manual' | 'IoT' | 'API';
 
 export interface ProgressLog {
   logId: string;
+  assetId: string;
+  assetName: string;
   jobId: string;
   taskId: string;
   timestamp: string;

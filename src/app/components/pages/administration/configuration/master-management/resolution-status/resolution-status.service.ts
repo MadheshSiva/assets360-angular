@@ -14,6 +14,8 @@ export class MasterManagementResolutionStatusService {
   private readonly records: MasterManagementResolutionStatusItem[] = [
     {
       resolutionStatusId: 'RES-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'Open',
       statusCode: 'OPEN',
       description: 'Issue has been logged and is awaiting action',
@@ -24,6 +26,8 @@ export class MasterManagementResolutionStatusService {
     },
     {
       resolutionStatusId: 'RES-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       statusName: 'Investigating',
       statusCode: 'INVESTIGATING',
       description: 'Issue is being actively investigated',
@@ -34,6 +38,8 @@ export class MasterManagementResolutionStatusService {
     },
     {
       resolutionStatusId: 'RES-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       statusName: 'Resolved',
       statusCode: 'RESOLVED',
       description: 'Issue has been fixed and verified',
@@ -44,6 +50,8 @@ export class MasterManagementResolutionStatusService {
     },
     {
       resolutionStatusId: 'RES-1004',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       statusName: 'Rejected',
       statusCode: 'REJECTED',
       description: 'Issue was reviewed and rejected as invalid or out of scope',
@@ -54,6 +62,8 @@ export class MasterManagementResolutionStatusService {
     },
     {
       resolutionStatusId: 'RES-1005',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       statusName: 'Closed',
       statusCode: 'CLOSED',
       description: 'Issue is fully closed with no further action required',

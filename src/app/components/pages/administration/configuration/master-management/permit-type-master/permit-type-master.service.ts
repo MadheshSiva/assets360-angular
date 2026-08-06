@@ -6,18 +6,24 @@ export class MasterManagementPermitTypeMasterService {
   private readonly records: MasterManagementPermitTypeMasterItem[] = [
     {
       permitTypeId: 'PRT-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       permitName: 'Electrical Permit',
       validityDays: 30,
       isApprovalRequired: true
     },
     {
       permitTypeId: 'PRT-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       permitName: 'Confined Space Permit',
       validityDays: 7,
       isApprovalRequired: true
     },
     {
       permitTypeId: 'PRT-1003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       permitName: 'Hot Work Permit',
       validityDays: 1,
       isApprovalRequired: true

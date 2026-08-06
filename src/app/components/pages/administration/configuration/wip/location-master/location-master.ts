@@ -30,6 +30,8 @@ export class WipLocationMaster {
 
   columns: LocationMasterColumn[] = [
     { key: 'locationId', label: 'Location ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'site', label: 'Site', visible: true },
     { key: 'building', label: 'Building', visible: true },
     { key: 'floor', label: 'Floor', visible: true },
@@ -40,6 +42,8 @@ export class WipLocationMaster {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'locationId', label: 'Location ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'site', label: 'Site' },
     { key: 'building', label: 'Building' },
     { key: 'floor', label: 'Floor' },
@@ -68,6 +72,8 @@ export class WipLocationMaster {
   private emptyForm(): LocationMasterForm {
     return {
       locationId: '',
+      assetId: '',
+      assetName: '',
       site: '',
       building: '',
       floor: '',
@@ -178,6 +184,8 @@ export class WipLocationMaster {
     rows.forEach((row) => {
       this.service.addRecord({
         locationId: row['locationId'] ?? '',
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         site: row['site'] ?? '',
         building: row['building'] ?? '',
         floor: row['floor'] ?? '',

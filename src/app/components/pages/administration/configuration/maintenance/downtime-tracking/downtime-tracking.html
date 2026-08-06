@@ -88,6 +88,7 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('assetId')">Asset</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('downtimeStart')">Downtime Start</th>
             <th *ngIf="isColumnVisible('downtimeEnd')">Downtime End</th>
             <th *ngIf="isColumnVisible('totalDowntime')">Total Downtime</th>
@@ -102,6 +103,7 @@
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
             <td *ngIf="isColumnVisible('assetId')">{{ assetName(r.assetId) }} ({{ r.assetId }})</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('downtimeStart')">{{ r.downtimeStart }}</td>
             <td *ngIf="isColumnVisible('downtimeEnd')">{{ r.downtimeEnd }}</td>
             <td *ngIf="isColumnVisible('totalDowntime')" class="mono">{{ r.totalDowntime }}</td>
@@ -158,6 +160,11 @@
               <option *ngFor="let a of assetMaster" [value]="a.id">{{ a.name }} ({{ a.id }})</option>
             </select>
           </div>
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

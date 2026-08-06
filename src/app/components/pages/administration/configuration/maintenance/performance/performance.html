@@ -88,6 +88,7 @@
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
             <th *ngIf="isColumnVisible('assetId')">Asset</th>
+            <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
             <th *ngIf="isColumnVisible('mtbf')">MTBF (hrs)</th>
             <th *ngIf="isColumnVisible('mttr')">MTTR (hrs)</th>
             <th *ngIf="isColumnVisible('assetUptimePercent')">Asset Uptime %</th>
@@ -101,6 +102,7 @@
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
             <td *ngIf="isColumnVisible('assetId')">{{ assetName(r.assetId) }}</td>
+            <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
             <td *ngIf="isColumnVisible('mtbf')">{{ r.mtbf ?? '-' }}</td>
             <td *ngIf="isColumnVisible('mttr')">{{ r.mttr ?? '-' }}</td>
             <td *ngIf="isColumnVisible('assetUptimePercent')">{{ r.assetUptimePercent ?? '-' }}%</td>
@@ -154,6 +156,11 @@
               <option *ngFor="let a of assetMaster" [value]="a.id">{{ a.id }} - {{ a.name }}</option>
             </select>
           </div>
+        </div>
+
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
         </div>
 
         <div class="form-field">

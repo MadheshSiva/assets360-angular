@@ -22,6 +22,8 @@ export class SparePartsService {
   private readonly partsSubject = new BehaviorSubject<SparePartRecord[]>([
     {
       partId: 'SP-1001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       partName: 'Air Filter',
       category: 'Filters',
       quantityInStock: 24,
@@ -32,6 +34,8 @@ export class SparePartsService {
     },
     {
       partId: 'SP-1002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       partName: 'V-Belt',
       category: 'Belts',
       quantityInStock: 6,

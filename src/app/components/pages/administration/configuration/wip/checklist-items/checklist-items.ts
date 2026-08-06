@@ -29,6 +29,8 @@ export class WipChecklistItems {
 
   columns: ChecklistItemColumn[] = [
     { key: 'itemId', label: 'Item ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'checklistId', label: 'Checklist ID', visible: true },
     { key: 'itemDescription', label: 'Item Description', visible: true },
     { key: 'responseType', label: 'Response Type', visible: true },
@@ -39,6 +41,8 @@ export class WipChecklistItems {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'itemId', label: 'Item ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'checklistId', label: 'Checklist ID' },
     { key: 'itemDescription', label: 'Item Description' },
     { key: 'responseType', label: 'Response Type' },
@@ -75,6 +79,8 @@ export class WipChecklistItems {
   private emptyForm(): ChecklistItem {
     return {
       itemId: '',
+      assetId: '',
+      assetName: '',
       checklistId: '',
       itemDescription: '',
       responseType: '',
@@ -184,6 +190,8 @@ export class WipChecklistItems {
   onImportRows(rows: Record<string, string>[]): void {
     const mapped: ChecklistItemRow[] = rows.map((row) => ({
       itemId: row['itemId'] ?? '',
+      assetId: row['assetId'] ?? '',
+      assetName: row['assetName'] ?? '',
       checklistId: row['checklistId'] ?? '',
       itemDescription: row['itemDescription'] ?? '',
       responseType: row['responseType'] ?? '',

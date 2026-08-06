@@ -6,6 +6,8 @@ export class LocationMasterService {
   private locations: LocationMaster[] = [
     {
       locationId: 'LOC-001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       site: 'Dubai Mall',
       building: 'Main Building',
       floor: 'Ground Floor',
@@ -15,6 +17,8 @@ export class LocationMasterService {
     },
     {
       locationId: 'LOC-002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       site: 'Marina Mall',
       building: 'Tower A',
       floor: '',
@@ -24,6 +28,8 @@ export class LocationMasterService {
     },
     {
       locationId: 'LOC-003',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
       site: 'Warehouse B',
       building: '',
       floor: '',

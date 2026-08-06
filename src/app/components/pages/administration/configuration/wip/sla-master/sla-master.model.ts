@@ -1,5 +1,7 @@
 export interface SlaMaster {
   slaId: string;
+  assetId: string;
+  assetName: string;
   slaName: string;
   workType: string;
   priority: string;

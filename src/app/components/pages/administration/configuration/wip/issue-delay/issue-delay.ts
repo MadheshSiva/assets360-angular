@@ -29,6 +29,8 @@ export class WipIssueDelay {
 
   columns: IssueDelayColumn[] = [
     { key: 'issueId', label: 'Issue ID', visible: true },
+    { key: 'assetId', label: 'Asset ID', visible: true },
+    { key: 'assetName', label: 'Asset Name', visible: true },
     { key: 'jobId', label: 'Job ID', visible: true },
     { key: 'taskId', label: 'Task ID', visible: true },
     { key: 'issueType', label: 'Issue Type', visible: true },
@@ -43,6 +45,8 @@ export class WipIssueDelay {
 
   readonly importColumns: ImportColumn[] = [
     { key: 'issueId', label: 'Issue ID' },
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'jobId', label: 'Job ID' },
     { key: 'taskId', label: 'Task ID' },
     { key: 'issueType', label: 'Issue Type' },
@@ -95,6 +99,8 @@ export class WipIssueDelay {
   private emptyForm(): IssueDelay {
     return {
       issueId: '',
+      assetId: '',
+      assetName: '',
       jobId: '',
       taskId: '',
       issueType: '',
@@ -208,6 +214,8 @@ export class WipIssueDelay {
   onImportRows(rows: Record<string, string>[]): void {
     const mapped: IssueDelayRow[] = rows.map((row) => ({
       issueId: row['issueId'] ?? '',
+      assetId: row['assetId'] ?? '',
+      assetName: row['assetName'] ?? '',
       jobId: row['jobId'] ?? '',
       taskId: row['taskId'] ?? '',
       issueType: (row['issueType'] ?? '') as IssueDelay['issueType'],

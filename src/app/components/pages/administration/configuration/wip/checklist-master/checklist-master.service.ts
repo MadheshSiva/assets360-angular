@@ -10,6 +10,8 @@ export class ChecklistMasterService {
   private readonly checklists: ChecklistMaster[] = [
     {
       checklistId: 'CHK-001',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
       checklistName: 'Electrical Safety Checklist',
       checklistType: 'Safety',
       applicableWorkType: ['Preventive', 'Corrective'],
@@ -18,6 +20,8 @@ export class ChecklistMasterService {
     },
     {
       checklistId: 'CHK-002',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
       checklistName: 'Confined Space Checklist',
       checklistType: 'Safety',
       applicableWorkType: ['Corrective', 'Inspection'],
