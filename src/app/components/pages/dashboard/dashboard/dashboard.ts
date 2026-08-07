@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MainDashboard } from '../main-dashboard/main-dashboard';
 import { WipDashboard } from '../wip-dashboard/wip-dashboard';
+import { InspectionDashboard } from '../inspection-dashboard/inspection-dashboard';
 import { MapComponent, MapPin } from '../../../shared/map/map';
 import { WidgetDragHandle } from '../../../shared/widget-drag-handle/widget-drag-handle';
 import { loadOrder, saveOrder, reorderByKey } from '../../../shared/dashboard-widgets/widget-order.util';
@@ -45,7 +46,7 @@ interface CardPopup {
   rows: PopupRow[];
 }
 
-export type ActiveTab = 'dashboard' | 'assets' | 'wip';
+export type ActiveTab = 'dashboard' | 'assets' | 'wip' | 'inspection';
 
 type DateCell = {
   date: Date;
@@ -75,7 +76,7 @@ interface AssetsData {
 @Component({
   standalone: true,
   selector: 'app-dashboard',
-  imports: [CommonModule, FormsModule, DragDropModule, MainDashboard, WipDashboard, MapComponent, WidgetDragHandle],
+  imports: [CommonModule, FormsModule, DragDropModule, MainDashboard, WipDashboard, InspectionDashboard, MapComponent, WidgetDragHandle],
   templateUrl: './dashboard.html',
   styleUrls: ['./dashboard.css'],
 })

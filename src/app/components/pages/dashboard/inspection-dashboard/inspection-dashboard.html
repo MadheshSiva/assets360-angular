@@ -1,0 +1,336 @@
+<section class="insp-page">
+  <!-- Header -->
+  <div class="insp-header">
+    <h1 class="insp-title">Inspection Dashboard</h1>
+    <div class="insp-header-actions">
+      <button class="insp-btn insp-btn-primary" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+          <path d="M12 5v14M5 12h14" />
+        </svg>
+        New Work Order
+      </button>
+      <button class="insp-btn insp-btn-outline" type="button">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
+          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
+        </svg>
+        Filter
+      </button>
+    </div>
+  </div>
+
+  <!-- Stat Cards Row -->
+  <div class="insp-stat-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onStatCardDrop($event)">
+    <article class="insp-stat-card" *ngFor="let card of statCards" cdkDrag>
+      <div class="insp-stat-top">
+        <app-widget-drag-handle></app-widget-drag-handle>
+        <div class="insp-stat-icon-wrap" [ngClass]="getIconClass(card.icon)">
+          <svg *ngIf="card.icon === 'clipboard'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <path d="M16 4h2a2 2 0 0 1 2 2v16H4V6a2 2 0 0 1 2-2h2" />
+            <rect x="8" y="2" width="8" height="4" rx="1" />
+            <path d="M8 12h8M8 16h5" />
+          </svg>
+          <svg *ngIf="card.icon === 'progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l3 2" />
+          </svg>
+          <svg *ngIf="card.icon === 'clock'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M12 7v5l4 2" />
+          </svg>
+          <svg *ngIf="card.icon === 'completed'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="20" height="20">
+            <circle cx="12" cy="12" r="9" />
+            <path d="M9 12l2 2 4-4" />
+          </svg>
+          <svg *ngIf="card.icon === 'overdue'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+            <line x1="12" y1="9" x2="12" y2="13" />
+            <line x1="12" y1="17" x2="12.01" y2="17" />
+          </svg>
+        </div>
+        <span class="insp-stat-label">{{ card.label }}</span>
+      </div>
+      <div class="insp-stat-bottom">
+        <strong class="insp-stat-value">{{ card.value }}</strong>
+        <a href="#" class="insp-stat-link" (click)="$event.preventDefault(); openStatPopup(card)">View all</a>
+      </div>
+    </article>
+  </div>
+
+  <!-- Row A: Work Orders (wide) + My Inspections (narrow) -->
+  <div class="insp-row-a" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRowADrop($event)">
+    <ng-container *ngFor="let widgetId of rowAOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
+
+      <!-- Work Orders -->
+      <article *ngSwitchCase="'workOrders'" cdkDrag class="insp-panel insp-workorders-panel">
+        <div class="insp-panel-header">
+          <app-widget-drag-handle></app-widget-drag-handle>
+          <h2>Work Orders</h2>
+        </div>
+
+        <div class="insp-wo-tabs">
+          <button
+            type="button"
+            class="insp-wo-tab"
+            *ngFor="let f of workOrderFilters"
+            [class.active]="workOrderFilter === f.key"
+            (click)="setWorkOrderFilter(f.key)"
+          >{{ f.label }}</button>
+        </div>
+
+        <div class="insp-table-scroll">
+          <table class="insp-table">
+            <thead>
+              <tr>
+                <th>WO No.</th>
+                <th>Title</th>
+                <th>Assets</th>
+                <th>Assigned To</th>
+                <th>Status</th>
+                <th>Due Date</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let wo of filteredWorkOrders">
+                <td><a href="#" class="insp-wo-link">{{ wo.id }}</a></td>
+                <td>{{ wo.title }}</td>
+                <td>{{ wo.assetsCount }}</td>
+                <td>
+                  <div class="insp-avatar-stack">
+                    <span
+                      class="insp-avatar"
+                      *ngFor="let name of wo.assignees.slice(0, 2); let i = index"
+                      [style.background]="avatarColor(i)"
+                      [title]="name"
+                    >{{ initials(name) }}</span>
+                    <span class="insp-avatar insp-avatar-more" *ngIf="wo.assignees.length > 2">+{{ wo.assignees.length - 2 }}</span>
+                  </div>
+                </td>
+                <td>
+                  <span class="insp-status-pill" [ngClass]="'insp-status-' + wo.statusClass">{{ wo.status }}</span>
+                </td>
+                <td>{{ wo.dueDate }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <a href="#" class="insp-view-all-link" (click)="$event.preventDefault(); openWorkOrdersPopup()">View all work orders</a>
+      </article>
+
+      <!-- My Inspections -->
+      <article *ngSwitchCase="'myInspections'" cdkDrag class="insp-panel insp-myinspections-panel">
+        <div class="insp-panel-header">
+          <app-widget-drag-handle></app-widget-drag-handle>
+          <h2>My Inspections</h2>
+        </div>
+
+        <div class="insp-myinsp-list">
+          <a href="#" class="insp-myinsp-row" *ngFor="let row of myInspections" (click)="$event.preventDefault(); openMyInspectionRowPopup(row)">
+            <span class="insp-myinsp-icon" [ngClass]="'insp-status-icon-' + row.statusClass">
+              <svg *ngIf="row.icon === 'notstarted'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+                <circle cx="12" cy="12" r="9" />
+              </svg>
+              <svg *ngIf="row.icon === 'progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                <polygon points="8 5 19 12 8 19 8 5" />
+              </svg>
+              <svg *ngIf="row.icon === 'clock'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M12 7v5l4 2" />
+              </svg>
+              <svg *ngIf="row.icon === 'completed'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" width="16" height="16">
+                <circle cx="12" cy="12" r="9" />
+                <path d="M9 12l2 2 4-4" />
+              </svg>
+            </span>
+            <span class="insp-myinsp-label">{{ row.label }}</span>
+            <span class="insp-myinsp-count">{{ row.count }}</span>
+            <svg class="insp-myinsp-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16">
+              <polyline points="9 18 15 12 9 6" />
+            </svg>
+          </a>
+        </div>
+
+        <a href="#" class="insp-view-all-link" (click)="$event.preventDefault(); openMyInspectionsAllPopup()">View all my inspections</a>
+      </article>
+
+    </ng-container>
+  </div>
+
+  <!-- Row B: Recent Inspections + Inspection Summary + Approval Summary -->
+  <div class="insp-row-b" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRowBDrop($event)">
+    <ng-container *ngFor="let widgetId of rowBOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
+
+      <!-- Recent Inspections -->
+      <article *ngSwitchCase="'recent'" cdkDrag class="insp-panel insp-recent-panel">
+        <div class="insp-panel-header">
+          <app-widget-drag-handle></app-widget-drag-handle>
+          <h2>Recent Inspections</h2>
+          <a href="#" class="insp-view-all" (click)="$event.preventDefault(); openRecentInspectionsPopup()">View all</a>
+        </div>
+        <div class="insp-recent-list">
+          <div class="insp-recent-row" *ngFor="let insp of recentInspections">
+            <div class="insp-recent-main">
+              <a href="#" class="insp-wo-link">{{ insp.id }}</a>
+              <span class="insp-recent-title">{{ insp.title }}</span>
+              <span class="insp-recent-meta">Asset: {{ insp.asset }} &middot; Inspected by: {{ insp.inspectedBy }}</span>
+            </div>
+            <div class="insp-recent-side">
+              <span class="insp-status-pill" [ngClass]="'insp-status-' + insp.statusClass">{{ insp.status }}</span>
+              <span class="insp-recent-time">{{ insp.time }}</span>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <!-- Inspection Summary -->
+      <article *ngSwitchCase="'summary'" cdkDrag class="insp-panel insp-summary-panel">
+        <div class="insp-panel-header">
+          <app-widget-drag-handle></app-widget-drag-handle>
+          <h2>Inspection Summary</h2>
+        </div>
+        <div class="insp-donut-body">
+          <div class="insp-donut-chart-wrap">
+            <div class="insp-donut-chart" [style.background]="donutGradient">
+              <div class="insp-donut-center">
+                <span class="insp-donut-label">Total</span>
+                <strong class="insp-donut-total">{{ inspectionSummaryTotal }}</strong>
+              </div>
+            </div>
+          </div>
+          <ul class="insp-donut-legend">
+            <li *ngFor="let seg of inspectionSummary">
+              <span class="insp-legend-dot" [style.background]="seg.color"></span>
+              <span class="insp-legend-text">{{ seg.label }}</span>
+              <span class="insp-legend-value">{{ seg.value }} ({{ seg.percent }}%)</span>
+            </li>
+          </ul>
+        </div>
+      </article>
+
+      <!-- Approval Summary -->
+      <article *ngSwitchCase="'approval'" cdkDrag class="insp-panel insp-approval-panel">
+        <div class="insp-panel-header">
+          <app-widget-drag-handle></app-widget-drag-handle>
+          <h2>Approval Summary</h2>
+          <a href="#" class="insp-view-all" (click)="$event.preventDefault(); openApprovalAllPopup()">View all</a>
+        </div>
+        <div class="insp-approval-list">
+          <a href="#" class="insp-approval-row" *ngFor="let row of approvalSummary" (click)="$event.preventDefault(); openApprovalRowPopup(row)">
+            <span class="insp-approval-icon">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="16" height="16">
+                <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+                <circle cx="12" cy="7" r="4" />
+              </svg>
+            </span>
+            <span class="insp-approval-label">{{ row.label }}</span>
+            <span class="insp-approval-pending">{{ row.pending }} Pending</span>
+          </a>
+        </div>
+      </article>
+
+    </ng-container>
+  </div>
+
+  <!-- Quick Actions -->
+  <article class="insp-panel insp-quickactions-panel">
+    <div class="insp-panel-header">
+      <h2>Quick Actions</h2>
+    </div>
+    <div class="insp-quickactions-grid">
+      <button type="button" class="insp-quickaction" *ngFor="let action of quickActions" (click)="onQuickAction(action)">
+        <span class="insp-quickaction-icon">
+          <svg *ngIf="action.icon === 'asset'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <circle cx="9" cy="8" r="3.5" />
+            <path d="M2.5 20a6.5 6.5 0 0 1 13 0" />
+            <path d="M17 8h4M19 6v4" />
+          </svg>
+          <svg *ngIf="action.icon === 'work-order'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <path d="M16 4h2a2 2 0 0 1 2 2v16H4V6a2 2 0 0 1 2-2h2" />
+            <rect x="8" y="2" width="8" height="4" rx="1" />
+            <path d="M12 12v4M10 14h4" />
+          </svg>
+          <svg *ngIf="action.icon === 'task'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <path d="M9 11l3 3L22 4" />
+            <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11" />
+          </svg>
+          <svg *ngIf="action.icon === 'signature'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <path d="M3 17s3-1 5-4 3-7 5-7 1 5-1 8-6 5-6 5" />
+            <path d="M3 21h18" />
+          </svg>
+          <svg *ngIf="action.icon === 'report'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="20" height="20">
+            <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+            <polyline points="14 2 14 8 20 8" />
+            <path d="M9 15h6M9 11h6" />
+          </svg>
+        </span>
+        {{ action.label }}
+      </button>
+    </div>
+  </article>
+
+  <!-- "View all" popup -->
+  <div class="insp-popup-backdrop" *ngIf="popup" (click)="closePopup()">
+    <section class="insp-popup" role="dialog" aria-modal="true" [attr.aria-label]="popup.title" (click)="$event.stopPropagation()">
+      <header class="insp-popup-header">
+        <div class="insp-popup-title">
+          <span class="insp-popup-icon" [ngClass]="popup.iconClass">
+            <svg *ngIf="popup.icon === 'clipboard'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M16 4h2a2 2 0 0 1 2 2v16H4V6a2 2 0 0 1 2-2h2" />
+              <rect x="8" y="2" width="8" height="4" rx="1" />
+              <path d="M8 12h8M8 16h5" />
+            </svg>
+            <svg *ngIf="popup.icon === 'progress'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l3 2" />
+            </svg>
+            <svg *ngIf="popup.icon === 'clock'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M12 7v5l4 2" />
+            </svg>
+            <svg *ngIf="popup.icon === 'notstarted'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <circle cx="12" cy="12" r="9" />
+            </svg>
+            <svg *ngIf="popup.icon === 'completed'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2">
+              <circle cx="12" cy="12" r="9" />
+              <path d="M9 12l2 2 4-4" />
+            </svg>
+            <svg *ngIf="popup.icon === 'overdue'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <line x1="12" y1="17" x2="12.01" y2="17" />
+            </svg>
+            <svg *ngIf="popup.icon === 'user'" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
+              <circle cx="12" cy="7" r="4" />
+            </svg>
+          </span>
+          <div>
+            <h2>{{ popup.title }}</h2>
+            <p>{{ popup.summary }}</p>
+          </div>
+        </div>
+        <button type="button" class="insp-popup-close" (click)="closePopup()" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </header>
+
+      <div class="insp-popup-table-wrap">
+        <table class="insp-popup-table" *ngIf="popup.rows.length; else emptyPopup">
+          <thead>
+            <tr>
+              <th *ngFor="let column of popup.columns">{{ column.label }}</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let row of popup.rows">
+              <td *ngFor="let column of popup.columns">{{ row[column.key] }}</td>
+            </tr>
+          </tbody>
+        </table>
+        <ng-template #emptyPopup>
+          <p class="insp-popup-empty">No records to show.</p>
+        </ng-template>
+      </div>
+    </section>
+  </div>
+</section>

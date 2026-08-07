@@ -101,6 +101,14 @@ export class Administration {
     { label: 'Role & Access', path: '/administration/configuration/wip/role-access' }
   ];
 
+  workflowsOptions: BreadcrumbOption[] = [
+    { label: 'Workflow List', path: '/administration/configuration/workflows/list' },
+    { label: 'Workflow Builder', path: '/administration/configuration/workflows/builder' },
+    { label: 'Workflow Instances', path: '/administration/configuration/workflows/instances' },
+    { label: 'My Tasks / Approvals', path: '/administration/configuration/workflows/tasks' },
+    { label: 'Insights', path: '/administration/configuration/workflows/insights' }
+  ];
+
   masterManagementOptions: BreadcrumbOption[] = [
     { label: 'Master Maintenance', path: '/administration/configuration/master-management/master-maintenance' },
     { label: 'Category / Sub-category', path: '/administration/configuration/master-management/category-subcategory' },
@@ -137,14 +145,38 @@ export class Administration {
     { label: 'Module Access Master', path: '/administration/configuration/master-management/module-access-master' }
   ];
 
+  inspectionOptions: BreadcrumbOption[] = [
+    { label: 'Organization', path: '/administration/configuration/inspection/organization' },
+    { label: 'Business Unit', path: '/administration/configuration/inspection/business-unit' },
+    { label: 'Department', path: '/administration/configuration/inspection/department' },
+    { label: 'Site', path: '/administration/configuration/inspection/site' },
+    { label: 'Manufacturer', path: '/administration/configuration/inspection/manufacturer' },
+    { label: 'Supplier', path: '/administration/configuration/inspection/supplier' },
+    { label: 'Inspection Type', path: '/administration/configuration/inspection/inspection-type' },
+    { label: 'Task Category', path: '/administration/configuration/inspection/task-category' },
+    { label: 'Inspection Task', path: '/administration/configuration/inspection/inspection-task' },
+    { label: 'Checklist', path: '/administration/configuration/inspection/checklist-template/list' },
+    { label: 'Failure Reason', path: '/administration/configuration/inspection/failure-reason' },
+    { label: 'Defect', path: '/administration/configuration/inspection/defect' },
+    { label: 'Severity', path: '/administration/configuration/inspection/severity' },
+    { label: 'Priority', path: '/administration/configuration/inspection/priority' },
+    { label: 'Signature and Stamp', path: '/administration/configuration/inspection/signature-stamp' },
+    { label: 'Notification Template', path: '/administration/configuration/inspection/notification-template' },
+    { label: 'Report Template', path: '/administration/configuration/inspection/report-template' },
+    { label: 'Numbering Sequence', path: '/administration/configuration/inspection/numbering-sequence' },
+    { label: 'Holiday and Working Calendar', path: '/administration/configuration/inspection/holiday-calendar' }
+  ];
+
   // Maps URL slug -> breadcrumb label, used when building the trail
   private configSlugLabelMap: Record<string, string> = {
     'projects': 'Projects',
     'devices': 'Devices',
     'assets': 'Assets',
     'maintenance': 'Maintenance',
+    'workflows': 'Workflows',
     'wip': 'WIP',
     'master-management': 'Master Management',
+    'inspection': 'Inspection',
     'people': 'People',
     'attendance': 'Attendance',
     'access-control': 'Access Control',
@@ -187,6 +219,15 @@ export class Administration {
     'downtime-tracking': 'Downtime Tracking',
     'performance': 'Performance',
     'compliance-inspection': 'Compliance & Inspection'
+  };
+
+  // Maps URL slug -> breadcrumb label for pages nested under Workflows
+  private workflowsSlugLabelMap: Record<string, string> = {
+    'list': 'Workflow List',
+    'builder': 'Workflow Builder',
+    'instances': 'Workflow Instances',
+    'tasks': 'My Tasks / Approvals',
+    'insights': 'Insights'
   };
 
   // Maps URL slug -> breadcrumb label for pages nested under WIP
@@ -246,6 +287,29 @@ export class Administration {
     'module-access-master': 'Module Access Master'
   };
 
+  // Maps URL slug -> breadcrumb label for pages nested under Inspection
+  private inspectionSlugLabelMap: Record<string, string> = {
+    'organization': 'Organization',
+    'business-unit': 'Business Unit',
+    'department': 'Department',
+    'site': 'Site',
+    'manufacturer': 'Manufacturer',
+    'supplier': 'Supplier',
+    'inspection-type': 'Inspection Type',
+    'task-category': 'Task Category',
+    'inspection-task': 'Inspection Task',
+    'checklist-template': 'Checklist ',
+    'failure-reason': 'Failure Reason',
+    'defect': 'Defect',
+    'severity': 'Severity',
+    'priority': 'Priority',
+    'signature-stamp': 'Signature and Stamp',
+    'notification-template': 'Notification Template',
+    'report-template': 'Report Template',
+    'numbering-sequence': 'Numbering Sequence',
+    'holiday-calendar': 'Holiday and Working Calendar'
+  };
+
   constructor(private router: Router) {
     this.router.events
       .pipe(filter(event => event instanceof NavigationEnd))
@@ -271,8 +335,10 @@ export class Administration {
     this.dropdownOptions.set('Configuration', this.configOptions);
     this.dropdownOptions.set('Assets', this.assetsOptions);
     this.dropdownOptions.set('Maintenance', this.maintenanceOptions);
+    this.dropdownOptions.set('Workflows', this.workflowsOptions);
     this.dropdownOptions.set('WIP', this.wipOptions);
     this.dropdownOptions.set('Master Management', this.masterManagementOptions);
+    this.dropdownOptions.set('Inspection', this.inspectionOptions);
 
     const userMgmtIdx = segments.indexOf('user-management');
     const configIdx = segments.indexOf('configuration');
@@ -288,8 +354,10 @@ export class Administration {
           const grandchildSlugMap: Record<string, Record<string, string>> = {
             'assets': this.assetsSlugLabelMap,
             'maintenance': this.maintenanceSlugLabelMap,
+            'workflows': this.workflowsSlugLabelMap,
             'wip': this.wipSlugLabelMap,
-            'master-management': this.masterManagementSlugLabelMap
+            'master-management': this.masterManagementSlugLabelMap,
+            'inspection': this.inspectionSlugLabelMap
           };
           const grandchildSlug = grandchildSlugMap[childSlug] ? segments[configIdx + 2] : undefined;
           const grandchildLabel = grandchildSlug ? grandchildSlugMap[childSlug][grandchildSlug] : undefined;
@@ -301,6 +369,21 @@ export class Administration {
 
           if (grandchildLabel) {
             this.breadcrumbItems.push({ label: grandchildLabel, path: null });
+          }
+
+          // Checklist Template Master has its own List/Builder sub-routes (like Workflows), one level deeper
+          // than the generic child/grandchild dispatch above handles.
+          if (childSlug === 'inspection' && grandchildSlug === 'checklist-template') {
+            const stepSlug = segments[configIdx + 3];
+            if (stepSlug === 'builder') {
+              const lastIndex = this.breadcrumbItems.length - 1;
+              this.breadcrumbItems[lastIndex] = {
+                ...this.breadcrumbItems[lastIndex],
+                path: '/administration/configuration/inspection/checklist-template/list'
+              };
+              const hasId = !!segments[configIdx + 4];
+              this.breadcrumbItems.push({ label: hasId ? 'Edit Template' : 'Create Template', path: null });
+            }
           }
         }
       }

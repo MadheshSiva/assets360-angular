@@ -80,6 +80,26 @@ import { MasterManagementUpdateSourceMaster } from './components/pages/administr
 import { MasterManagementChartTypeMaster } from './components/pages/administration/configuration/master-management/chart-type-master/chart-type-master';
 import { MasterManagementPermissionMaster } from './components/pages/administration/configuration/master-management/permission-master/permission-master';
 import { MasterManagementModuleAccessMaster } from './components/pages/administration/configuration/master-management/module-access-master/module-access-master';
+import { InspectionOrganization } from './components/pages/administration/configuration/inspection/organization/organization';
+import { InspectionBusinessUnit } from './components/pages/administration/configuration/inspection/business-unit/business-unit';
+import { InspectionDepartment } from './components/pages/administration/configuration/inspection/department/department';
+import { InspectionSite } from './components/pages/administration/configuration/inspection/site/site';
+import { InspectionManufacturer } from './components/pages/administration/configuration/inspection/manufacturer/manufacturer';
+import { InspectionSupplier } from './components/pages/administration/configuration/inspection/supplier/supplier';
+import { InspectionTypeMaster } from './components/pages/administration/configuration/inspection/inspection-type/inspection-type';
+import { InspectionTaskCategory } from './components/pages/administration/configuration/inspection/task-category/task-category';
+import { InspectionTask } from './components/pages/administration/configuration/inspection/inspection-task/inspection-task';
+import { InspectionChecklistTemplateList } from './components/pages/administration/configuration/inspection/checklist-template/checklist-template-list/checklist-template-list';
+import { InspectionChecklistTemplateBuilder } from './components/pages/administration/configuration/inspection/checklist-template/checklist-template-builder/checklist-template-builder';
+import { InspectionFailureReason } from './components/pages/administration/configuration/inspection/failure-reason/failure-reason';
+import { InspectionDefect } from './components/pages/administration/configuration/inspection/defect/defect';
+import { InspectionSeverity } from './components/pages/administration/configuration/inspection/severity/severity';
+import { InspectionPriority } from './components/pages/administration/configuration/inspection/priority/priority';
+import { InspectionSignatureStamp } from './components/pages/administration/configuration/inspection/signature-stamp/signature-stamp';
+import { InspectionNotificationTemplate } from './components/pages/administration/configuration/inspection/notification-template/notification-template';
+import { InspectionReportTemplate } from './components/pages/administration/configuration/inspection/report-template/report-template';
+import { InspectionNumberingSequence } from './components/pages/administration/configuration/inspection/numbering-sequence/numbering-sequence';
+import { InspectionHolidayCalendar } from './components/pages/administration/configuration/inspection/holiday-calendar/holiday-calendar';
 import { WorkflowList } from './components/pages/administration/configuration/workflows/workflow-list/workflow-list';
 import { WorkflowBuilder } from './components/pages/administration/configuration/workflows/workflow-builder/workflow-builder';
 import { WorkflowInstances } from './components/pages/administration/configuration/workflows/workflow-instances/workflow-instances';
@@ -220,7 +240,30 @@ export const routes: Routes = [
               { path: 'master-management/update-source-master', component: MasterManagementUpdateSourceMaster },
               { path: 'master-management/chart-type-master', component: MasterManagementChartTypeMaster },
               { path: 'master-management/permission-master', component: MasterManagementPermissionMaster },
-              { path: 'master-management/module-access-master', component: MasterManagementModuleAccessMaster }
+              { path: 'master-management/module-access-master', component: MasterManagementModuleAccessMaster },
+              { path: 'inspection', redirectTo: 'inspection/organization', pathMatch: 'full' },
+              { path: 'inspection/organization', component: InspectionOrganization },
+              { path: 'inspection/business-unit', component: InspectionBusinessUnit },
+              { path: 'inspection/department', component: InspectionDepartment },
+              { path: 'inspection/site', component: InspectionSite },
+              { path: 'inspection/manufacturer', component: InspectionManufacturer },
+              { path: 'inspection/supplier', component: InspectionSupplier },
+              { path: 'inspection/inspection-type', component: InspectionTypeMaster },
+              { path: 'inspection/task-category', component: InspectionTaskCategory },
+              { path: 'inspection/inspection-task', component: InspectionTask },
+              { path: 'inspection/checklist-template', redirectTo: 'inspection/checklist-template/list', pathMatch: 'full' },
+              { path: 'inspection/checklist-template/list', component: InspectionChecklistTemplateList },
+              { path: 'inspection/checklist-template/builder', component: InspectionChecklistTemplateBuilder },
+              { path: 'inspection/checklist-template/builder/:id', component: InspectionChecklistTemplateBuilder },
+              { path: 'inspection/failure-reason', component: InspectionFailureReason },
+              { path: 'inspection/defect', component: InspectionDefect },
+              { path: 'inspection/severity', component: InspectionSeverity },
+              { path: 'inspection/priority', component: InspectionPriority },
+              { path: 'inspection/signature-stamp', component: InspectionSignatureStamp },
+              { path: 'inspection/notification-template', component: InspectionNotificationTemplate },
+              { path: 'inspection/report-template', component: InspectionReportTemplate },
+              { path: 'inspection/numbering-sequence', component: InspectionNumberingSequence },
+              { path: 'inspection/holiday-calendar', component: InspectionHolidayCalendar }
             ]
           },
           { path: 'license', component: License },
