@@ -183,21 +183,33 @@
 
         <div class="form-field">
           <label>ORGANIZATION</label>
-          <div class="select-wrap">
-            <select name="organization" [(ngModel)]="form.organization">
-              <option value="" disabled selected>-- Select Organization --</option>
-              <option *ngFor="let o of organizationMaster" [value]="o">{{ o }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="organization" [(ngModel)]="form.organization">
+                <option value="" disabled selected>-- Select Organization --</option>
+                <option *ngFor="let o of organizationMaster" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/inspection/organization"
+              [currentValue]="form.organization"
+            ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
           <label>BUSINESS UNIT</label>
-          <div class="select-wrap">
-            <select name="businessUnit" [(ngModel)]="form.businessUnit">
-              <option value="" disabled selected>-- Select Business Unit --</option>
-              <option *ngFor="let b of businessUnitMaster" [value]="b">{{ b }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="businessUnit" [(ngModel)]="form.businessUnit">
+                <option value="" disabled selected>-- Select Business Unit --</option>
+                <option *ngFor="let b of businessUnitMaster" [value]="b">{{ b }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/inspection/business-unit"
+              [currentValue]="form.businessUnit"
+            ></app-master-link-icons>
           </div>
         </div>
 

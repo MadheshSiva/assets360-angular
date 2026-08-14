@@ -63,20 +63,6 @@
 
       <header class="cr-panel-header">
         <h1 class="cr-panel-title">New Reports</h1>
-
-        <div class="cr-status-row">
-          <span class="cr-status-label">
-            Connection Status:
-            <strong class="cr-status-value" [class.cr-status-value--offline]="!connectionStatus.online">
-              {{ connectionStatus.online ? 'Online' : 'Offline' }}/{{ connectionStatus.online ? 'Offline' : 'Online' }}
-            </strong>
-          </span>
-
-          <span class="cr-status-stat">TOTAL GATEWAY</span>
-          <span class="cr-status-stat">FIXED SENSOR</span>
-          <span class="cr-status-stat">MOBILE SENSOR (TRACKERS)</span>
-          <span class="cr-status-stat">ALARMS &vert;&vert;</span>
-        </div>
       </header>
 
       <hr class="cr-divider" />
@@ -133,7 +119,8 @@
                   type="radio"
                   name="module"
                   [value]="option.value"
-                  [(ngModel)]="selectedModule"
+                  [ngModel]="selectedModule"
+                  (ngModelChange)="selectModule($event)"
                 />
                 <span class="cr-radio-dot"></span>
                 <span class="cr-radio-text">{{ option.label }}</span>

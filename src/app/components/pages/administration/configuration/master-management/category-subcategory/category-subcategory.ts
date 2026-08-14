@@ -86,7 +86,13 @@ export class MasterManagementCategorySubcategory {
       this.onCreate();
     } else if (action === 'edit') {
       const value = params.get('linkValue') ?? '';
-      const match = this.records.find((r) => r.categoryName === value);
+      // Callers like Assets pass a combined "Category / Sub-category" value
+      // (e.g. "Mechanical / HVAC"); records here only store one flat
+      // categoryName. Try the sub-category name first (most specific),
+      // then the category name, then the raw value as a last resort.
+      const parts = value.split('/').map((p) => p.trim()).filter(Boolean);
+      const candidates = parts.length > 1 ? [parts[parts.length - 1], parts[0], value] : [value];
+      const match = this.records.find((r) => candidates.includes(r.categoryName));
       if (match) {
         this.isEditMode = true;
         this.editingRecord = match;

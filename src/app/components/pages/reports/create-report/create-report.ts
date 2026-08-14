@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { buildSampleRows, GeneratedReportService, TEMPLATE_HEADERS } from '../generated-report.service';
 
 interface TreeNode {
   label: string;
@@ -11,14 +12,49 @@ interface TreeNode {
 }
 
 type ReportModule =
-  | 'visitor'
-  | 'attendance'
-  | 'ot'
-  | 'meal'
-  | 'patrol'
-  | 'supervision'
-  | 'analytics'
-  | 'evacuation';
+  | 'asset-tracking'
+  | 'asset-management'
+  | 'maintenance'
+  | 'inspection'
+  | 'wip';
+
+const TEMPLATE_OPTIONS_BY_MODULE: Record<ReportModule, string[]> = {
+  'asset-tracking': [
+    'Asset Location & Movement Report',
+    'Asset Location History / Trail Report',
+    'Asset Missing / Not-Seen Report',
+    'Asset Movement & Exception Report',
+    'Asset Utilization & Dwell-Time Report'
+  ],
+  'asset-management': [
+    'Asset Register Report',
+    'Asset Lifecycle Report',
+    'Asset Allocation & Custodian Report',
+    'Asset Valuation & Depreciation Report',
+    'Warranty / AMC / Contract Expiry Report'
+  ],
+  maintenance: [
+    'Preventive Maintenance Compliance Report',
+    'Maintenance Work Order Report',
+    'Asset Maintenance History Report',
+    'Breakdown & Reliability Report',
+    'Maintenance Cost Report'
+  ],
+  inspection: [
+    'Detailed Inspection Report / Certificate',
+    'Inspection Compliance Summary Report',
+    'Failed Inspection & Findings Report',
+    'Corrective Action & Reinspection Report',
+    'Inspection & Approval Audit Trail Report'
+  ],
+  wip: [
+    'WIP Status Summary Report',
+    'WIP Ageing Report',
+    'WIP Movement & Stage History Report',
+    'WIP Delay / Bottleneck Report',
+    'WIP Completion & Turnaround-Time Report'
+  ]
+};
 
 type ReportFormat = 'url' | 'pdf' | 'csv';
 type Recurrence = 'once' | 'daily' | 'weekly' | 'monthly';
@@ -32,7 +68,7 @@ type TimeRangePreset = '1h' | '2h' | '4h' | '8h' | '24h' | 'custom';
   styleUrls: ['./create-report.css']
 })
 export class CreateReport {
-  constructor(private router: Router) {}
+  constructor(private router: Router, private generatedReportService: GeneratedReportService) {}
 
   // ---- Breadcrumb navigation ----
   navigateToReport(): void {
@@ -117,18 +153,18 @@ export class CreateReport {
   selectedModule: ReportModule | null = null;
 
   moduleOptions: { value: ReportModule; label: string }[] = [
-    { value: 'visitor', label: 'Visitor & Entrance Management' },
-    { value: 'attendance', label: 'Attendance' },
-    { value: 'ot', label: 'OT Management' },
-    { value: 'meal', label: 'Meal Management' },
-    { value: 'patrol', label: 'Patrol Management' },
-    { value: 'supervision', label: 'Personal Supervision' },
-    { value: 'analytics', label: 'Customer Analytics' },
-    { value: 'evacuation', label: 'Evacuation' }
+    { value: 'asset-tracking', label: 'Asset tracking' },
+    { value: 'asset-management', label: 'Asset Management' },
+    { value: 'maintenance', label: 'Maintanance management' },
+    { value: 'inspection', label: 'Inspection Management' },
+    { value: 'wip', label: 'Work in Progress' },
   ];
 
   selectedTemplate = '';
-  templateOptions: string[] = [];
+
+  get templateOptions(): string[] {
+    return this.selectedModule ? TEMPLATE_OPTIONS_BY_MODULE[this.selectedModule] : [];
+  }
 
   // ---- Format ----
   format: ReportFormat = 'url';
@@ -149,6 +185,7 @@ export class CreateReport {
 
   selectModule(value: ReportModule): void {
     this.selectedModule = value;
+    this.selectedTemplate = '';
   }
 
   setFormat(value: ReportFormat): void {
@@ -163,32 +200,42 @@ export class CreateReport {
     return !!this.reportName.trim() && !!this.selectedModule;
   }
 
+  private readonly recurrenceLabels: Record<Recurrence, string> = {
+    once: 'Once',
+    daily: 'Daily',
+    weekly: 'Weekly',
+    monthly: 'Monthly'
+  };
+
   onCreateReport(): void {
     if (!this.isFormValid) {
       return;
     }
 
-    const payload = {
-      reportName: this.reportName,
-      module: this.selectedModule,
-      template: this.selectedTemplate,
-      timeRangePreset: this.timeRangePreset,
-      format: this.format,
-      downloadCsvAlso: this.downloadCsvAlso,
-      recurrence: this.recurrence,
-      dailyTime: this.dailyTime,
-      weeklyDay: this.weeklyDay,
-      weeklyTime: this.weeklyTime,
-      monthlyDate: this.monthlyDate,
-      monthlyTime: this.monthlyTime,
+    const headers = this.selectedTemplate ? TEMPLATE_HEADERS[this.selectedTemplate] ?? [] : [];
+    const rows = buildSampleRows(headers, 5);
+    const today = new Date().toISOString().slice(0, 10);
+    const timeRangeLabel = this.timeRangePresets.find((p) => p.value === this.timeRangePreset)?.label ?? '';
+
+    this.generatedReportService.addReport({
+      title: this.reportName.trim(),
+      timeRange: timeRangeLabel,
+      expireOn: '',
+      recurrence: this.recurrenceLabels[this.recurrence],
+      createdOn: today,
+      type: this.format.toUpperCase(),
       shareWith: this.shareWith
         .split(',')
-        .map(email => email.trim())
+        .map((email) => email.trim())
         .filter(Boolean)
-    };
+        .join(', '),
+      generatedOn: today,
+      status: 'Completed',
+      headers,
+      rows
+    });
 
-    // Replace with actual API call, e.g. this.reportService.create(payload)
-    console.log('Create report payload', payload);
+    this.router.navigate(['/report']);
   }
 
   onCancel(): void {

@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
 import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
 import { InspectionDefectItem } from './defect.model';
 import { InspectionDefectService } from './defect.service';
 
@@ -20,7 +21,7 @@ interface InspectionDefectColumn {
 @Component({
   standalone: true,
   selector: 'app-inspection-defect',
-  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions, MasterLinkIcons],
   templateUrl: './defect.html',
   styleUrls: ['./defect.css']
 })

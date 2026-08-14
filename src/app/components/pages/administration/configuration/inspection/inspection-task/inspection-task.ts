@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
 import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
 import { InspectionTaskItem, InspectionTaskRow } from './inspection-task.model';
 import { InspectionTaskService } from './inspection-task.service';
 
@@ -16,7 +17,7 @@ interface InspectionTaskColumn {
 @Component({
   standalone: true,
   selector: 'app-inspection-task',
-  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions, MasterLinkIcons],
   templateUrl: './inspection-task.html',
   styleUrls: ['./inspection-task.css']
 })

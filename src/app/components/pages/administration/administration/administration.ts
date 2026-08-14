@@ -64,7 +64,13 @@ export class Administration {
     { label: 'Activity / Audit Trail', path: '/administration/configuration/assets/activity-audit-trail' },
     { label: 'Custom / Domain-specific Asset Type Fields', path: '/administration/configuration/assets/custom-domain-fields' },
     { label: 'Integration', path: '/administration/configuration/assets/integration' },
-    { label: 'Compliance & Certification', path: '/administration/configuration/assets/compliance-certification' }
+    { label: 'Compliance & Certification', path: '/administration/configuration/assets/compliance-certification' },
+    { label: 'Assets Audit', path: '/administration/configuration/assets/assets-audit' },
+    { label: 'Asset Movement', path: '/administration/configuration/assets/asset-movement' },
+    { label: 'Asset Disposal', path: '/administration/configuration/assets/asset-disposal' },
+    { label: 'Tagged Assets', path: '/administration/configuration/assets/tagged-assets' },
+    { label: 'Asset Check-Out', path: '/administration/configuration/assets/asset-checkout' },
+    { label: 'Asset Check-In', path: '/administration/configuration/assets/asset-checkin' }
   ];
 
   maintenanceOptions: BreadcrumbOption[] = [
@@ -202,7 +208,13 @@ export class Administration {
     'activity-audit-trail': 'Activity / Audit Trail',
     'custom-domain-fields': 'Custom / Domain-specific Asset Type Fields',
     'integration': 'Integration',
-    'compliance-certification': 'Compliance & Certification'
+    'compliance-certification': 'Compliance & Certification',
+    'assets-audit': 'Assets Audit',
+    'asset-movement': 'Asset Movement',
+    'asset-disposal': 'Asset Disposal',
+    'tagged-assets': 'Tagged Assets',
+    'asset-checkout': 'Asset Check-Out',
+    'asset-checkin': 'Asset Check-In'
   };
 
   // Maps URL slug -> breadcrumb label for pages nested under Maintenance

@@ -52,10 +52,64 @@ export class InspectionTaskCategoryService {
       description: 'Instrument accuracy and calibration checks',
       displayOrder: 4,
       status: false
+    },
+    {
+      categoryCode: 'TCAT-1005',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
+      categoryName: 'Measurement',
+      description: 'Recording readings such as temperature, pressure or vibration',
+      displayOrder: 5,
+      status: true
+    },
+    {
+      categoryCode: 'TCAT-1006',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
+      categoryName: 'Documentation',
+      description: 'Capturing photos, notes and paperwork during inspection',
+      displayOrder: 6,
+      status: true
+    },
+    {
+      categoryCode: 'TCAT-1007',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
+      categoryName: 'Compliance',
+      description: 'Checks tied to regulatory or statutory requirements',
+      displayOrder: 7,
+      status: true
+    },
+    {
+      categoryCode: 'TCAT-1008',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
+      categoryName: 'Cleaning',
+      description: 'Cleaning and housekeeping tasks around the asset',
+      displayOrder: 8,
+      status: true
+    },
+    {
+      categoryCode: 'TCAT-1009',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
+      categoryName: 'Mechanical',
+      description: 'Mechanical component wear, alignment and lubrication checks',
+      displayOrder: 9,
+      status: true
+    },
+    {
+      categoryCode: 'TCAT-1010',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
+      categoryName: 'Electrical',
+      description: 'Electrical connection, wiring and panel checks',
+      displayOrder: 10,
+      status: true
     }
   ];
 
-  private nextSequence = 1005;
+  private nextSequence = 1011;
 
   getRecords(): InspectionTaskCategoryItem[] {
     return this.records;

@@ -62,10 +62,76 @@ export class InspectionTypeMasterService {
       defaultApprovalWorkflow: 'Single-Level Approval',
       defaultReportTemplate: 'Pre-op Checklist Report',
       status: true
+    },
+    {
+      inspectionTypeCode: 'ITY-1005',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
+      inspectionTypeName: 'Quality Inspection',
+      description: 'Verifies workmanship and output meet quality standards',
+      defaultPriority: 'Normal',
+      defaultApprovalWorkflow: 'Single-Level Approval',
+      defaultReportTemplate: 'Standard Inspection Report',
+      status: true
+    },
+    {
+      inspectionTypeCode: 'ITY-1006',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
+      inspectionTypeName: 'Post-maintenance Inspection',
+      description: 'Performed after maintenance work to confirm the asset is safe to return to service',
+      defaultPriority: 'High',
+      defaultApprovalWorkflow: 'Single-Level Approval',
+      defaultReportTemplate: 'Standard Inspection Report',
+      status: true
+    },
+    {
+      inspectionTypeCode: 'ITY-1007',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
+      inspectionTypeName: 'Incident Inspection',
+      description: 'Triggered by a reported incident, breakdown or near-miss',
+      defaultPriority: 'Urgent',
+      defaultApprovalWorkflow: 'Two-Level Approval',
+      defaultReportTemplate: 'Compliance Report',
+      status: true
+    },
+    {
+      inspectionTypeCode: 'ITY-1008',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
+      inspectionTypeName: 'Condition Inspection',
+      description: 'Assesses general wear and remaining useful condition of the asset',
+      defaultPriority: 'Normal',
+      defaultApprovalWorkflow: 'Single-Level Approval',
+      defaultReportTemplate: 'Standard Inspection Report',
+      status: true
+    },
+    {
+      inspectionTypeCode: 'ITY-1009',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
+      inspectionTypeName: 'Handover Inspection',
+      description: 'Performed when transferring custody or ownership of an asset',
+      defaultPriority: 'Normal',
+      defaultApprovalWorkflow: 'Two-Level Approval',
+      defaultReportTemplate: 'Standard Inspection Report',
+      status: true
+    },
+    {
+      inspectionTypeCode: 'ITY-1010',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
+      inspectionTypeName: 'Audit Inspection',
+      description: 'Independent review performed for audit and governance purposes',
+      defaultPriority: 'High',
+      defaultApprovalWorkflow: 'Three-Level Approval',
+      defaultReportTemplate: 'Compliance Report',
+      status: true
     }
   ];
 
-  private nextSequence = 1005;
+  private nextSequence = 1011;
 
   getRecords(): InspectionTypeMasterItem[] {
     return this.records;

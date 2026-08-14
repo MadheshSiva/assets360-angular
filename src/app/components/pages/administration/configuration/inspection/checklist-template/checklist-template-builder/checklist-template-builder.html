@@ -67,11 +67,17 @@
 
         <div class="form-field">
           <label>Inspection Type</label>
-          <div class="select-wrap">
-            <select name="inspectionType" [(ngModel)]="template.inspectionType">
-              <option value="">-- Select Inspection Type --</option>
-              <option *ngFor="let t of inspectionTypeOptions" [value]="t">{{ t }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="inspectionType" [(ngModel)]="template.inspectionType">
+                <option value="">-- Select Inspection Type --</option>
+                <option *ngFor="let t of inspectionTypeOptions" [value]="t">{{ t }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/inspection/inspection-type"
+              [currentValue]="template.inspectionType"
+            ></app-master-link-icons>
           </div>
         </div>
 

@@ -1,0 +1,151 @@
+<div class="lh-container">
+
+  <!-- Header Row -->
+  <div class="lh-header">
+    <h1 class="lh-title">Tagged Assets</h1>
+
+    <div class="icon-toolbar">
+      <button class="icon-btn" title="Add" (click)="onAdd()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="12" y1="5" x2="12" y2="19"></line>
+          <line x1="5" y1="12" x2="19" y2="12"></line>
+        </svg>
+      </button>
+      <button class="icon-btn" title="Upload" (click)="onUpload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 19V6"></path>
+          <path d="M6 12l6-6 6 6"></path>
+          <path d="M5 21h14"></path>
+        </svg>
+      </button>
+      <button class="icon-btn" title="Download" (click)="onDownload()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M12 5v13"></path>
+          <path d="M6 12l6 6 6-6"></path>
+          <path d="M5 21h14"></path>
+        </svg>
+      </button>
+      <button class="icon-btn" title="Refresh" (click)="onRefresh()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21 12a9 9 0 1 1-2.64-6.36"></path>
+          <path d="M21 4v5h-5"></path>
+        </svg>
+      </button>
+      <button class="icon-btn" title="Delete" (click)="onDelete()">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  <!-- Filter panels -->
+  <div class="filter-panels">
+    <div class="filter-panel">
+      <div class="filter-panel-header">Location Details</div>
+      <div class="filter-panel-body">
+        <select class="filter-select" [(ngModel)]="locationFilter">
+          <option value="" disabled>Select a value...</option>
+          <option *ngFor="let option of locationFilterOptions" [value]="option">{{ option }}</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-panel">
+      <div class="filter-panel-header">Category Details</div>
+      <div class="filter-panel-body">
+        <select class="filter-select" [(ngModel)]="categoryFilter">
+          <option value="" disabled>Select a value...</option>
+          <option *ngFor="let option of categoryFilterOptions" [value]="option">{{ option }}</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="filter-actions">
+    <button type="button" class="filter-btn filter-btn-primary" (click)="onSearch()">Search</button>
+    <button type="button" class="filter-btn filter-btn-secondary" (click)="onClearFilters()">Clear All</button>
+  </div>
+
+  <!-- Table -->
+  <div class="table-wrapper">
+    <table class="lh-table">
+      <thead>
+        <tr>
+          <th>Asset Code</th>
+          <th>Asset Description</th>
+          <th>Company</th>
+          <th>Site</th>
+          <th>Building</th>
+          <th>Floor</th>
+          <th>Room</th>
+          <th>Main Category</th>
+          <th>Sub Category</th>
+          <th>Sub Sub Category</th>
+          <th>Brand</th>
+          <th class="actions-col">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let entry of filteredEntries">
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. EMC-14-CTA-000004" [(ngModel)]="entry.assetCode" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. office table" [(ngModel)]="entry.assetDescription" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Mezzan Holding" [(ngModel)]="entry.company" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Subhan Industrial" [(ngModel)]="entry.site" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Corporate Office" [(ngModel)]="entry.building" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. First Floor" [(ngModel)]="entry.floor" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. 1F Conference Room" [(ngModel)]="entry.room" />
+          </td>
+          <td>
+            <div class="select-wrap">
+              <select class="cell-select" [(ngModel)]="entry.mainCategory">
+                <option value="">-</option>
+                <option *ngFor="let option of mainCategoryOptions" [value]="option">{{ option }}</option>
+              </select>
+            </div>
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Table" [(ngModel)]="entry.subCategory" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Office Table" [(ngModel)]="entry.subSubCategory" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Dell" [(ngModel)]="entry.brand" />
+          </td>
+          <td class="actions-col">
+            <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
+          </td>
+        </tr>
+
+        <tr *ngIf="filteredEntries.length === 0">
+          <td colspan="12" class="empty-row">No tagged assets found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+</div>
+
+<app-import-file-modal
+  *ngIf="showImportModal"
+  [columns]="importColumns"
+  fileBaseName="tagged-assets"
+  (cancelled)="showImportModal = false"
+  (imported)="onImportRows($event)"
+></app-import-file-modal>

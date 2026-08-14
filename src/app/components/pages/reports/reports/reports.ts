@@ -5,22 +5,10 @@ import { Router } from '@angular/router';
 import { environment } from '../../../../../environments/environment';
 import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
 import { RowActions } from '@shared/row-actions/row-actions';
+import { downloadReportAsExcel, downloadReportsAsWorkbook, GeneratedReportService, Report } from '../generated-report.service';
 
+export type { Report };
 export type FrequencyFilter = 'Monthly' | 'Weekly' | 'Daily' | 'Once';
-
-export interface Report {
-  id: string;
-  slNo: number;
-  title: string;
-  timeRange: string;
-  expireOn: string;
-  recurrence: string;
-  createdOn: string;
-  type: string;
-  shareWith: string;
-  generatedOn: string;
-  status: 'Completed' | 'Pending' | 'Failed';
-}
 
 @Component({
   standalone: true,
@@ -32,6 +20,7 @@ export interface Report {
 export class Reports {
   private http = inject(HttpClient);
   private router = inject(Router);
+  private generatedReportService = inject(GeneratedReportService);
   private apiUrl = environment.reportsApiUrl || environment.apiUrl;
 
   readonly importColumns: ImportColumn[] = [
@@ -55,6 +44,12 @@ export class Reports {
   filters: FrequencyFilter[] = ['Monthly', 'Weekly', 'Daily', 'Once'];
 
   ngOnInit() {
+    // If a report was just created, jump to whichever frequency tab it
+    // belongs under so it's actually visible without the user hunting for it.
+    const recent = this.generatedReportService.mostRecent;
+    if (recent && (this.filters as string[]).includes(recent.recurrence)) {
+      this.activeFilter = recent.recurrence as FrequencyFilter;
+    }
     this.loadReports();
   }
 
@@ -62,38 +57,12 @@ export class Reports {
     this.loading = true;
     this.http.get(`${this.apiUrl}api/reports`).subscribe({
       next: (res: any) => {
-        this.reports = res.data || res;
+        this.reports = [...this.generatedReportService.getAll(), ...(res.data || res)];
         this.loading = false;
       },
       error: () => {
         this.loading = false;
-        // Fallback mock data matching the screenshot
-        this.reports = [
-          {
-            id: '1', slNo: 1, title: 'OT Report', timeRange: '1 - Month',
-            expireOn: '2027-07-01', recurrence: 'Once', createdOn: '2026-05-01',
-            type: 'URL', shareWith: 'piq@gmail.com', generatedOn: '2026-05-01',
-            status: 'Completed'
-          },
-          {
-            id: '2', slNo: 2, title: 'Patient Report', timeRange: '1 - Month',
-            expireOn: '2027-07-01', recurrence: 'Once', createdOn: '2026-05-01',
-            type: 'URL', shareWith: 'piq@gmail.com', generatedOn: '2026-05-01',
-            status: 'Completed'
-          },
-          {
-            id: '3', slNo: 3, title: 'Customer', timeRange: '1 - Month',
-            expireOn: '2027-07-01', recurrence: 'Once', createdOn: '2026-05-01',
-            type: 'URL', shareWith: 'piq@gmail.com', generatedOn: '2026-05-01',
-            status: 'Completed'
-          },
-          {
-            id: '4', slNo: 4, title: 'People', timeRange: '1 - Month',
-            expireOn: '2027-07-01', recurrence: 'Once', createdOn: '2026-05-01',
-            type: 'URL', shareWith: 'piq@gmail.com', generatedOn: '2026-05-01',
-            status: 'Pending'
-          }
-        ];
+        this.reports = this.generatedReportService.getAll();
       }
     });
   }
@@ -109,6 +78,10 @@ export class Reports {
 
   addReport() {
     this.router.navigate(['/report/create']);
+  }
+
+  viewReport(report: Report): void {
+    this.router.navigate(['/report/view', report.id]);
   }
 
   uploadReport() {
@@ -140,8 +113,15 @@ export class Reports {
     this.showImportModal = false;
   }
 
-  downloadReport() {
-    // Download action
+  downloadReport(report: Report): void {
+    downloadReportAsExcel({ headers: [], rows: [], ...report });
+  }
+
+  downloadAllReports(): void {
+    downloadReportsAsWorkbook(
+      this.filteredReports.map((report) => ({ headers: [], rows: [], ...report })),
+      `reports-export-${new Date().toISOString().slice(0, 10)}.xlsx`
+    );
   }
 
   refreshReports() {

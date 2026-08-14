@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { CdkDragDrop, DragDropModule, moveItemInArray } from '@angular/cdk/drag-drop';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
 import { InspectionChecklistTemplateService } from '../services/checklist-template.service';
 import {
   ChecklistTemplate,
@@ -41,7 +42,7 @@ interface ControlDef {
 @Component({
   standalone: true,
   selector: 'app-inspection-checklist-template-builder',
-  imports: [CommonModule, FormsModule, RouterModule, DragDropModule],
+  imports: [CommonModule, FormsModule, RouterModule, DragDropModule, MasterLinkIcons],
   templateUrl: './checklist-template-builder.html',
   styleUrls: ['./checklist-template-builder.css']
 })

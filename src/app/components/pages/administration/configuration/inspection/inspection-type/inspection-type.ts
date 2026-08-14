@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
 import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
 import { InspectionTypeMasterItem, InspectionTypeMasterRow } from './inspection-type.model';
 import { InspectionTypeMasterService } from './inspection-type.service';
 
@@ -16,7 +17,7 @@ interface InspectionTypeMasterColumn {
 @Component({
   standalone: true,
   selector: 'app-inspection-type-master',
-  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions, MasterLinkIcons],
   templateUrl: './inspection-type.html',
   styleUrls: ['./inspection-type.css']
 })

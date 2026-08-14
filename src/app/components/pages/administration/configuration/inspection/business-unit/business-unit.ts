@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
 import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
 import { InspectionBusinessUnitItem, InspectionBusinessUnitRow } from './business-unit.model';
 import { InspectionBusinessUnitService } from './business-unit.service';
 
@@ -16,7 +17,7 @@ interface InspectionBusinessUnitColumn {
 @Component({
   standalone: true,
   selector: 'app-inspection-business-unit',
-  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions, MasterLinkIcons],
   templateUrl: './business-unit.html',
   styleUrls: ['./business-unit.css']
 })

@@ -6,6 +6,7 @@ import { Locating } from './components/pages/locating/locating/locating';
 import { Events } from './components/pages/events/events/events';
 import { Reports } from './components/pages/reports/reports/reports';
 import { CreateReport } from './components/pages/reports/create-report/create-report';
+import { ReportView } from './components/pages/reports/report-view/report-view';
 import { Layout } from './components/shared/layout/layout';
 // DEMO MODE: Auth guard import kept for reference
 // import { authGuard } from './components/guard/auth-guard';
@@ -35,6 +36,12 @@ import { AssetActivityAuditTrail } from './components/pages/administration/confi
 import { AssetCustomDomainFields } from './components/pages/administration/configuration/assets/custom-domain-fields/custom-domain-fields';
 import { AssetIntegration } from './components/pages/administration/configuration/assets/integration/integration';
 import { AssetComplianceCertification } from './components/pages/administration/configuration/assets/compliance-certification/compliance-certification';
+import { AssetAuditConfig } from './components/pages/administration/configuration/assets/assets-audit/assets-audit';
+import { AssetMovement } from './components/pages/administration/configuration/assets/asset-movement/asset-movement';
+import { AssetDisposal } from './components/pages/administration/configuration/assets/asset-disposal/asset-disposal';
+import { AssetTaggedAssets } from './components/pages/administration/configuration/assets/tagged-assets/tagged-assets';
+import { AssetCheckout } from './components/pages/administration/configuration/assets/asset-checkout/asset-checkout';
+import { AssetCheckin } from './components/pages/administration/configuration/assets/asset-checkin/asset-checkin';
 import { MaintenanceWorkOrder } from './components/pages/administration/configuration/maintenance/work-order/work-order';
 import { MaintenanceTask } from './components/pages/administration/configuration/maintenance/maintenance-task/maintenance-task';
 import { MaintenancePreventive } from './components/pages/administration/configuration/maintenance/preventive-maintenance/preventive-maintenance';
@@ -139,6 +146,7 @@ export const routes: Routes = [
       { path: 'events', component: Events },
       { path: 'report', component: Reports },
       { path: 'report/create', component: CreateReport },
+      { path: 'report/view/:id', component: ReportView },
       { path: 'process-automation', component: ProcessAutomation },
       { path: 'process-automation/add', component: ProcessAutomationAdd },
       {
@@ -170,6 +178,12 @@ export const routes: Routes = [
               { path: 'assets/custom-domain-fields', component: AssetCustomDomainFields },
               { path: 'assets/integration', component: AssetIntegration },
               { path: 'assets/compliance-certification', component: AssetComplianceCertification },
+              { path: 'assets/assets-audit', component: AssetAuditConfig },
+              { path: 'assets/asset-movement', component: AssetMovement },
+              { path: 'assets/asset-disposal', component: AssetDisposal },
+              { path: 'assets/tagged-assets', component: AssetTaggedAssets },
+              { path: 'assets/asset-checkout', component: AssetCheckout },
+              { path: 'assets/asset-checkin', component: AssetCheckin },
               { path: 'maintenance', redirectTo: 'maintenance/work-order', pathMatch: 'full' },
               { path: 'maintenance/work-order', component: MaintenanceWorkOrder },
               { path: 'maintenance/maintenance-task', component: MaintenanceTask },

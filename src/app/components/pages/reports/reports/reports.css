@@ -127,6 +127,16 @@
   color: var(--pu);
 }
 
+.row-actions-cell {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.icon-btn--row {
+  flex: 0 0 auto;
+}
+
 /* ── Frequency filter tabs ── */
 .filter-tabs {
   display: flex;

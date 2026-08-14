@@ -172,11 +172,17 @@
 
         <div class="form-field">
           <label>TASK CATEGORY <span class="required">*</span></label>
-          <div class="select-wrap">
-            <select name="taskCategory" [(ngModel)]="form.taskCategory" required>
-              <option value="" disabled selected>-- Select Task Category --</option>
-              <option *ngFor="let c of taskCategoryMaster" [value]="c">{{ c }}</option>
-            </select>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="taskCategory" [(ngModel)]="form.taskCategory" required>
+                <option value="" disabled selected>-- Select Task Category --</option>
+                <option *ngFor="let c of taskCategoryMaster" [value]="c">{{ c }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/inspection/task-category"
+              [currentValue]="form.taskCategory"
+            ></app-master-link-icons>
           </div>
         </div>
 

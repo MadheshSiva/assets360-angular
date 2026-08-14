@@ -71,7 +71,13 @@ export class Sidebar {
                 { label: 'Activity / Audit Trail', path: '/administration/configuration/assets/activity-audit-trail', icon: '' },
                 { label: 'Custom / Domain-specific Asset Type Fields', path: '/administration/configuration/assets/custom-domain-fields', icon: '' },
                 { label: 'Integration', path: '/administration/configuration/assets/integration', icon: '' },
-                { label: 'Compliance & Certification', path: '/administration/configuration/assets/compliance-certification', icon: '' }
+                { label: 'Compliance & Certification', path: '/administration/configuration/assets/compliance-certification', icon: '' },
+                { label: 'Assets Audit', path: '/administration/configuration/assets/assets-audit', icon: '' },
+                { label: 'Asset Movement', path: '/administration/configuration/assets/asset-movement', icon: '' },
+                { label: 'Asset Disposal', path: '/administration/configuration/assets/asset-disposal', icon: '' },
+                { label: 'Tagged Assets', path: '/administration/configuration/assets/tagged-assets', icon: '' },
+                { label: 'Asset Check-Out', path: '/administration/configuration/assets/asset-checkout', icon: '' },
+                { label: 'Asset Check-In', path: '/administration/configuration/assets/asset-checkin', icon: '' }
               ]
             },
             {

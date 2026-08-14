@@ -57,10 +57,87 @@ export class MasterManagementCategorySubcategoryService {
       level: 'Sub Category',
       status: 'Inactive',
       relatedAssetId: 'AST-2078'
+    },
+    {
+      categoryId: 'CAT-1005',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
+      categoryName: 'Safety',
+      categoryCode: 'SAFE',
+      description: 'Top-level safety and fire protection equipment category',
+      level: 'Category',
+      status: 'Active',
+      relatedAssetId: ''
+    },
+    {
+      categoryId: 'CAT-1006',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
+      categoryName: 'IT',
+      categoryCode: 'IT',
+      description: 'Top-level information technology equipment category',
+      level: 'Category',
+      status: 'Active',
+      relatedAssetId: ''
+    },
+    {
+      categoryId: 'CAT-1007',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
+      categoryName: 'HVAC',
+      categoryCode: 'MECH-HVAC',
+      description: 'Heating, ventilation and air conditioning equipment',
+      level: 'Sub Category',
+      status: 'Active',
+      relatedAssetId: 'AST-2114'
+    },
+    {
+      categoryId: 'CAT-1008',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
+      categoryName: 'Plumbing',
+      categoryCode: 'MECH-PLB',
+      description: 'Plumbing fixtures, piping and water distribution equipment',
+      level: 'Sub Category',
+      status: 'Active',
+      relatedAssetId: ''
+    },
+    {
+      categoryId: 'CAT-1009',
+      assetId: 'AST-1003',
+      assetName: 'Chiller Pump 2',
+      categoryName: 'Fire Detection',
+      categoryCode: 'SAFE-FIRE',
+      description: 'Fire alarm panels, detectors and associated safety equipment',
+      level: 'Sub Category',
+      status: 'Active',
+      relatedAssetId: ''
+    },
+    {
+      categoryId: 'CAT-1010',
+      assetId: 'AST-1001',
+      assetName: 'HVAC Unit 1',
+      categoryName: 'Power Distribution',
+      categoryCode: 'ELEC-PWR',
+      description: 'Distribution panels, transformers and power routing equipment',
+      level: 'Sub Category',
+      status: 'Active',
+      relatedAssetId: 'AST-2041'
+    },
+    {
+      categoryId: 'CAT-1011',
+      assetId: 'AST-1002',
+      assetName: 'Fire Panel A',
+      categoryName: 'Network',
+      categoryCode: 'IT-NET',
+      description: 'Networking equipment including switches, routers and access points',
+      level: 'Sub Category',
+      status: 'Active',
+      relatedAssetId: ''
     }
   ];
 
-  private nextSequence = 1005;
+  private nextSequence = 1012;
 
   getRecords(): MasterManagementCategorySubcategoryItem[] {
     return this.records;

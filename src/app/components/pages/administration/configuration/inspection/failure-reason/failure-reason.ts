@@ -4,6 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
 import { RowActions } from '@shared/row-actions/row-actions';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
 import { InspectionFailureReasonItem } from './failure-reason.model';
 import { InspectionFailureReasonService } from './failure-reason.service';
 
@@ -20,7 +21,7 @@ interface InspectionFailureReasonColumn {
 @Component({
   standalone: true,
   selector: 'app-inspection-failure-reason',
-  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions, MasterLinkIcons],
   templateUrl: './failure-reason.html',
   styleUrls: ['./failure-reason.css']
 })
