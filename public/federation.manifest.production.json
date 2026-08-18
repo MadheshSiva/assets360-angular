@@ -1,0 +1,8 @@
+{
+	"dashboard": "https://assets360-dashboard.YOUR_SUBDOMAIN.workers.dev/remoteEntry.json",
+	"locating": "https://assets360-locating.YOUR_SUBDOMAIN.workers.dev/remoteEntry.json",
+	"events": "https://assets360-events.YOUR_SUBDOMAIN.workers.dev/remoteEntry.json",
+	"reports": "https://assets360-reports.YOUR_SUBDOMAIN.workers.dev/remoteEntry.json",
+	"processAutomation": "https://assets360-process-automation.YOUR_SUBDOMAIN.workers.dev/remoteEntry.json",
+	"administration": "https://assets360-administration.YOUR_SUBDOMAIN.workers.dev/remoteEntry.json"
+}
