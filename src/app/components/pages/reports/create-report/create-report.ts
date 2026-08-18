@@ -17,7 +17,7 @@ type ReportModule =
   | 'maintenance'
   | 'inspection'
   | 'wip';
-
+ 
 const TEMPLATE_OPTIONS_BY_MODULE: Record<ReportModule, string[]> = {
   'asset-tracking': [
     'Asset Location & Movement Report',
