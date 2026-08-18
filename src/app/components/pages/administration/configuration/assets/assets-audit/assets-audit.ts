@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface AuditConfigEntry {
+  assetId: string;
+  assetName: string;
   auditCode: string;
   auditName: string;
   auditStartDate: string;
@@ -33,6 +35,8 @@ export class AssetAuditConfig {
   activeTab: AuditTab = 'configuration';
 
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'auditCode', label: 'Audit Code' },
     { key: 'auditName', label: 'Audit Name' },
     { key: 'auditStartDate', label: 'Audit Start Date' },
@@ -45,21 +49,21 @@ export class AssetAuditConfig {
   showImportModal = false;
 
   entries: AuditConfigEntry[] = [
-    { auditCode: '210526', auditName: '210526', auditStartDate: '2026-05-21', auditEndDate: '', active: true, createdDate: '2026-05-21', createdBy: 'Admin' },
-    { auditCode: '06042026-01', auditName: '06042026-01', auditStartDate: '2026-04-06', auditEndDate: '', active: true, createdDate: '2026-04-06', createdBy: 'Admin' },
-    { auditCode: '110326', auditName: '110326', auditStartDate: '2026-03-11', auditEndDate: '', active: true, createdDate: '2026-03-11', createdBy: 'Admin' },
-    { auditCode: '030226-02', auditName: '030226-02', auditStartDate: '2026-02-03', auditEndDate: '', active: true, createdDate: '2026-02-03', createdBy: 'Admin' },
-    { auditCode: '030226-01', auditName: '030226-01', auditStartDate: '2026-02-03', auditEndDate: '', active: true, createdDate: '2026-02-03', createdBy: 'Admin' },
-    { auditCode: '060126-01', auditName: '060126-01', auditStartDate: '2026-01-06', auditEndDate: '', active: true, createdDate: '2026-01-06', createdBy: 'Admin' },
-    { auditCode: 'GFR050126', auditName: 'Galfar 05JAN26', auditStartDate: '2026-01-05', auditEndDate: '', active: true, createdDate: '2026-01-05', createdBy: 'Admin' },
-    { auditCode: 'GFR040126-01', auditName: 'Galfar 04JAN26', auditStartDate: '2026-01-04', auditEndDate: '', active: true, createdDate: '2026-01-04', createdBy: 'Admin' },
-    { auditCode: 'KNET231025-01', auditName: 'KNET231025-01', auditStartDate: '2025-10-22', auditEndDate: '', active: true, createdDate: '2025-10-22', createdBy: 'Admin' },
-    { auditCode: 'HC24072501', auditName: 'HC24072501', auditStartDate: '2025-07-24', auditEndDate: '2025-10-22', active: false, createdDate: '2025-07-24', createdBy: 'Admin' },
-    { auditCode: 'HC160725', auditName: 'HC160725', auditStartDate: '2025-07-16', auditEndDate: '2025-10-22', active: false, createdDate: '2025-07-16', createdBy: 'Admin' },
-    { auditCode: 'MH150725-01', auditName: 'MH150725-01', auditStartDate: '2025-07-15', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-15', createdBy: 'Admin' },
-    { auditCode: 'MH030725-02', auditName: 'MH030725-02', auditStartDate: '2025-07-03', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-03', createdBy: 'Admin' },
-    { auditCode: 'MH030725-01', auditName: 'MH030725-01', auditStartDate: '2025-07-03', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-03', createdBy: 'Admin' },
-    { auditCode: 'WB180625', auditName: 'WB180625', auditStartDate: '2025-06-18', auditEndDate: '2025-07-15', active: false, createdDate: '2025-06-18', createdBy: 'Admin' }
+    { assetId: 'AST-0001', assetName: 'Forklift Unit 4', auditCode: '210526', auditName: '210526', auditStartDate: '2026-05-21', auditEndDate: '', active: true, createdDate: '2026-05-21', createdBy: 'Admin' },
+    { assetId: 'AST-0002', assetName: 'HVAC Compressor B', auditCode: '06042026-01', auditName: '06042026-01', auditStartDate: '2026-04-06', auditEndDate: '', active: true, createdDate: '2026-04-06', createdBy: 'Admin' },
+    { assetId: 'AST-0003', assetName: 'Laptop Dell XPS 15', auditCode: '110326', auditName: '110326', auditStartDate: '2026-03-11', auditEndDate: '', active: true, createdDate: '2026-03-11', createdBy: 'Admin' },
+    { assetId: 'AST-0004', assetName: 'Industrial Generator 2', auditCode: '030226-02', auditName: '030226-02', auditStartDate: '2026-02-03', auditEndDate: '', active: true, createdDate: '2026-02-03', createdBy: 'Admin' },
+    { assetId: 'AST-0005', assetName: 'Conveyor Belt System', auditCode: '030226-01', auditName: '030226-01', auditStartDate: '2026-02-03', auditEndDate: '', active: true, createdDate: '2026-02-03', createdBy: 'Admin' },
+    { assetId: 'AST-0006', assetName: 'Office Printer HP LaserJet', auditCode: '060126-01', auditName: '060126-01', auditStartDate: '2026-01-06', auditEndDate: '', active: true, createdDate: '2026-01-06', createdBy: 'Admin' },
+    { assetId: 'AST-0007', assetName: 'Security Camera Unit 12', auditCode: 'GFR050126', auditName: 'Galfar 05JAN26', auditStartDate: '2026-01-05', auditEndDate: '', active: true, createdDate: '2026-01-05', createdBy: 'Admin' },
+    { assetId: 'AST-0008', assetName: 'Pallet Jack Model X', auditCode: 'GFR040126-01', auditName: 'Galfar 04JAN26', auditStartDate: '2026-01-04', auditEndDate: '', active: true, createdDate: '2026-01-04', createdBy: 'Admin' },
+    { assetId: 'AST-0009', assetName: 'Desktop Workstation 07', auditCode: 'KNET231025-01', auditName: 'KNET231025-01', auditStartDate: '2025-10-22', auditEndDate: '', active: true, createdDate: '2025-10-22', createdBy: 'Admin' },
+    { assetId: 'AST-0010', assetName: 'Water Pump Unit 3', auditCode: 'HC24072501', auditName: 'HC24072501', auditStartDate: '2025-07-24', auditEndDate: '2025-10-22', active: false, createdDate: '2025-07-24', createdBy: 'Admin' },
+    { assetId: 'AST-0011', assetName: 'Air Compressor Unit', auditCode: 'HC160725', auditName: 'HC160725', auditStartDate: '2025-07-16', auditEndDate: '2025-10-22', active: false, createdDate: '2025-07-16', createdBy: 'Admin' },
+    { assetId: 'AST-0012', assetName: 'Handheld Scanner 5', auditCode: 'MH150725-01', auditName: 'MH150725-01', auditStartDate: '2025-07-15', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-15', createdBy: 'Admin' },
+    { assetId: 'AST-0013', assetName: 'Backup Power Generator', auditCode: 'MH030725-02', auditName: 'MH030725-02', auditStartDate: '2025-07-03', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-03', createdBy: 'Admin' },
+    { assetId: 'AST-0014', assetName: 'Cooling Tower Fan', auditCode: 'MH030725-01', auditName: 'MH030725-01', auditStartDate: '2025-07-03', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-03', createdBy: 'Admin' },
+    { assetId: 'AST-0015', assetName: 'Server Rack Unit 2', auditCode: 'WB180625', auditName: 'WB180625', auditStartDate: '2025-06-18', auditEndDate: '2025-07-15', active: false, createdDate: '2025-06-18', createdBy: 'Admin' }
   ];
 
   private today(): string {
@@ -72,6 +76,8 @@ export class AssetAuditConfig {
     this.entries = [
       ...this.entries,
       {
+        assetId: '',
+        assetName: '',
         auditCode: '',
         auditName: '',
         auditStartDate: '',
@@ -93,6 +99,8 @@ export class AssetAuditConfig {
       ...rows.map((row) => {
         const activeRaw = (row['active'] ?? '').trim().toLowerCase();
         return {
+          assetId: row['assetId'] ?? '',
+          assetName: row['assetName'] ?? '',
           auditCode: row['auditCode'] ?? '',
           auditName: row['auditName'] ?? '',
           auditStartDate: row['auditStartDate'] ?? '',

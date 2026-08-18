@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SparePartRecord, SparePartForm } from './spare-parts.model';
 import { SparePartsService } from './spare-parts.service';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 interface SparePartColumn {
   key: string;

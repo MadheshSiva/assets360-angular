@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface MaintenanceServiceEntry {
+  assetId: string;
+  assetName: string;
   maintenanceSchedule: string;
   workOrders: string;
   serviceHistory: string;
@@ -22,6 +24,8 @@ export interface MaintenanceServiceEntry {
 })
 export class AssetMaintenanceService {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'maintenanceSchedule', label: 'Maintenance Schedule' },
     { key: 'workOrders', label: 'Work Orders' },
     { key: 'serviceHistory', label: 'Service History' },
@@ -35,6 +39,8 @@ export class AssetMaintenanceService {
 
   entries: MaintenanceServiceEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'HVAC Compressor Unit 2',
       maintenanceSchedule: '2026-08-15',
       workOrders: 'WO-2041',
       serviceHistory: '4 services completed',
@@ -44,6 +50,8 @@ export class AssetMaintenanceService {
       vendorServiceProvider: 'Al Futtaim Technical Services'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'Backup Power Generator',
       maintenanceSchedule: '2026-09-01',
       workOrders: 'WO-2078',
       serviceHistory: '2 services completed',
@@ -66,6 +74,8 @@ export class AssetMaintenanceService {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         maintenanceSchedule: row['maintenanceSchedule'] ?? '',
         workOrders: row['workOrders'] ?? '',
         serviceHistory: row['serviceHistory'] ?? '',

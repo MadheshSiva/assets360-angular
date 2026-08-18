@@ -46,6 +46,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Asset Type</th>
           <th>Field Name</th>
           <th>Field Value</th>
@@ -54,6 +56,12 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Forklift Unit 4" [(ngModel)]="entry.assetName" />
+          </td>
           <td>
             <div style="display: flex; align-items: center; gap: 8px;">
               <div class="select-wrap cell-select-wrap" style="flex: 1;">
@@ -89,7 +97,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="4" class="empty-row">No custom / domain-specific field records found.</td>
+          <td colspan="6" class="empty-row">No custom / domain-specific field records found.</td>
         </tr>
       </tbody>
     </table>

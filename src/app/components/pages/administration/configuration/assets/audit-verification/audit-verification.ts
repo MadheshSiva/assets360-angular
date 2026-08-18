@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { RowActions } from 'shared-ui';
 
 export interface AuditVerificationEntry {
+  assetId: string;
+  assetName: string;
   auditDate: string;
   auditorDetails: string;
   physicalVerificationResult: string;
@@ -22,6 +24,8 @@ export interface AuditVerificationEntry {
 })
 export class AssetAuditVerification {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'auditDate', label: 'Audit Date' },
     { key: 'auditorDetails', label: 'Auditor Details' },
     { key: 'physicalVerificationResult', label: 'Physical Verification Result' },
@@ -39,6 +43,8 @@ export class AssetAuditVerification {
 
   entries: AuditVerificationEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Forklift Unit 4',
       auditDate: '2026-06-28',
       auditorDetails: 'J. Fernando',
       physicalVerificationResult: 'Verified',
@@ -46,6 +52,8 @@ export class AssetAuditVerification {
       auditHistoryLogs: 'Logged automatically on 2026-06-28 09:12'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'HVAC Compressor B',
       auditDate: '2026-06-20',
       auditorDetails: 'A. Perera',
       physicalVerificationResult: 'Verified with Exceptions',
@@ -60,6 +68,8 @@ export class AssetAuditVerification {
     this.entries = [
       ...this.entries,
       {
+        assetId: '',
+        assetName: '',
         auditDate: '',
         auditorDetails: this.auditorOptions[0],
         physicalVerificationResult: this.verificationResultOptions[0],
@@ -77,6 +87,8 @@ export class AssetAuditVerification {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         auditDate: row['auditDate'] ?? '',
         auditorDetails: row['auditorDetails'] ?? '',
         physicalVerificationResult: row['physicalVerificationResult'] ?? '',

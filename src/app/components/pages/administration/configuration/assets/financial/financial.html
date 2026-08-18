@@ -46,6 +46,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Purchase Cost</th>
           <th>Purchase Date</th>
           <th>Vendor Details</th>
@@ -59,6 +61,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
           <td>{{ entry.purchaseCost }}</td>
           <td>{{ entry.purchaseDate }}</td>
           <td>{{ entry.vendorDetails }}</td>
@@ -73,7 +77,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="9" class="empty-row">No financial records found.</td>
+          <td colspan="11" class="empty-row">No financial records found.</td>
         </tr>
       </tbody>
     </table>

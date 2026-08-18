@@ -59,6 +59,8 @@
       <table class="lh-table">
         <thead>
           <tr>
+            <th>Asset ID</th>
+            <th>Asset Name</th>
             <th>Audit Code</th>
             <th>Audit Name</th>
             <th>Audit Start Date</th>
@@ -71,6 +73,12 @@
         </thead>
         <tbody>
           <tr *ngFor="let entry of entries">
+            <td>
+              <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
+            </td>
+            <td>
+              <input type="text" class="cell-input" placeholder="e.g. Forklift Unit 4" [(ngModel)]="entry.assetName" />
+            </td>
             <td>
               <input type="text" class="cell-input" placeholder="e.g. 210526" [(ngModel)]="entry.auditCode" />
             </td>
@@ -94,7 +102,7 @@
           </tr>
 
           <tr *ngIf="entries.length === 0">
-            <td colspan="8" class="empty-row">No audit records found.</td>
+            <td colspan="10" class="empty-row">No audit records found.</td>
           </tr>
         </tbody>
       </table>

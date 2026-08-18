@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import * as XLSX from 'xlsx';
 import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface Asset {
   assetId: string;

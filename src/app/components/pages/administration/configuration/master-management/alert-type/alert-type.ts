@@ -2,8 +2,8 @@ import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 import { MasterManagementAlertTypeItem, AlertCategory, AlertSeverity, AlertNotificationType, AlertStatus } from './alert-type.model';
 import { MasterManagementAlertTypeService } from './alert-type.service';
 

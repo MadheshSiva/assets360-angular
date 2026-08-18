@@ -167,51 +167,51 @@ export function downloadReportsAsWorkbook(reports: GeneratedReport[], fileName: 
 // clicking through to "View" shows something structured instead of nothing.
 const SEED_REPORTS: GeneratedReport[] = [
   {
-    id: 'RPT-SEED-OT', slNo: 1, title: 'OT Report', timeRange: '1 - Month',
+    id: 'RPT-SEED-ASSET-TRACKING', slNo: 1, title: 'Asset Tracking', timeRange: '1 - Month',
     expireOn: '2027-07-01', recurrence: 'Once', createdOn: '2026-05-01',
     type: 'URL', shareWith: 'piq@gmail.com', generatedOn: '2026-05-01',
     status: 'Completed',
-    headers: ['In Location/Device', 'Last Out Time', 'Out Location/Device', 'Break In Time', 'Break Out Time', 'Work Schedule', 'Result'],
+    headers: ['Asset ID', 'Asset Name', 'Current Location', 'Previous Location', 'Movement Date/Time', 'Duration at Location'],
     rows: [
-      { 'In Location/Device': 'Main Gate Reader', 'Last Out Time': '18:45', 'Out Location/Device': 'Main Gate Reader', 'Break In Time': '13:00', 'Break Out Time': '13:30', 'Work Schedule': 'General Shift 08:00-17:00', Result: 'Overtime Approved' },
-      { 'In Location/Device': 'Warehouse Turnstile', 'Last Out Time': '17:10', 'Out Location/Device': 'Warehouse Turnstile', 'Break In Time': '12:30', 'Break Out Time': '13:00', 'Work Schedule': 'General Shift 08:00-17:00', Result: 'Present' },
-      { 'In Location/Device': '-', 'Last Out Time': '-', 'Out Location/Device': '-', 'Break In Time': '-', 'Break Out Time': '-', 'Work Schedule': 'General Shift 08:00-17:00', Result: 'Leave' }
+      { 'Asset ID': 'AST-1001', 'Asset Name': 'HVAC Unit 1', 'Current Location': 'Dubai HQ Tower', 'Previous Location': 'Sharjah Gate Tower', 'Movement Date/Time': '2026-05-01 08:15', 'Duration at Location': '3 days' },
+      { 'Asset ID': 'AST-1002', 'Asset Name': 'Fire Panel A', 'Current Location': 'Sharjah Gate Tower', 'Previous Location': 'Abudhabi ADDAX Tower', 'Movement Date/Time': '2026-05-08 09:05', 'Duration at Location': '5 days' },
+      { 'Asset ID': 'AST-1003', 'Asset Name': 'Chiller Pump 2', 'Current Location': 'Abudhabi ADDAX Tower', 'Previous Location': 'Dubai HQ Tower', 'Movement Date/Time': '2026-05-15 07:50', 'Duration at Location': '2 days' }
     ]
   },
   {
-    id: 'RPT-SEED-PATIENT', slNo: 2, title: 'Patient Report', timeRange: '1 - Month',
+    id: 'RPT-SEED-ASSET-MANAGEMENT', slNo: 2, title: 'Asset Management', timeRange: '1 - Month',
     expireOn: '2027-07-01', recurrence: 'Once', createdOn: '2026-05-01',
     type: 'URL', shareWith: 'piq@gmail.com', generatedOn: '2026-05-01',
     status: 'Completed',
-    headers: ['Sr No', 'Patient Name', 'Visit Date', 'Department', 'Attending Staff', 'Status'],
+    headers: ['Asset ID', 'Category', 'Make/Model', 'Serial Number', 'Status', 'Location', 'Custodian'],
     rows: [
-      { 'Sr No': 1, 'Patient Name': 'John Carter', 'Visit Date': '2026-05-01', Department: 'Occupational Health', 'Attending Staff': 'Dr. Amina Rao', Status: 'Completed' },
-      { 'Sr No': 2, 'Patient Name': 'Lisa Meyer', 'Visit Date': '2026-05-03', Department: 'Occupational Health', 'Attending Staff': 'Dr. Amina Rao', Status: 'Completed' },
-      { 'Sr No': 3, 'Patient Name': 'Ahmed Al Farsi', 'Visit Date': '2026-05-05', Department: 'Occupational Health', 'Attending Staff': 'Dr. Samuel Lee', Status: 'Pending' }
+      { 'Asset ID': 'AST-1001', Category: 'HVAC', 'Make/Model': 'Carrier 30XA', 'Serial Number': 'CR-30XA-8841', Status: 'Completed', Location: 'Dubai HQ Tower', Custodian: 'David Smith' },
+      { 'Asset ID': 'AST-1002', Category: 'Fire Safety', 'Make/Model': 'Siemens FC901', 'Serial Number': 'SM-FC901-2207', Status: 'Pending', Location: 'Sharjah Gate Tower', Custodian: 'Sarah Wilson' },
+      { 'Asset ID': 'AST-1003', Category: 'Plumbing', 'Make/Model': 'Kirloskar KDS-150', 'Serial Number': 'KP-KDS-5563', Status: 'In Progress', Location: 'Abudhabi ADDAX Tower', Custodian: 'Faseeh Akthar' }
     ]
   },
   {
-    id: 'RPT-SEED-CUSTOMER', slNo: 3, title: 'Customer', timeRange: '1 - Month',
+    id: 'RPT-SEED-MAINTENANCE-MANAGEMENT', slNo: 3, title: 'Maintenance Management', timeRange: '1 - Month',
     expireOn: '2027-07-01', recurrence: 'Once', createdOn: '2026-05-01',
     type: 'URL', shareWith: 'piq@gmail.com', generatedOn: '2026-05-01',
     status: 'Completed',
-    headers: ['Company', 'National ID', 'Start Date', 'End Date', 'SOW ID / Vehicle ID', 'Phone No', 'Card Badge Number', 'First In Time'],
+    headers: ['WO Number', 'Asset', 'Maintenance Type', 'Technician', 'Priority', 'Status', 'Completion'],
     rows: [
-      { Company: 'Meridian Facilities Ltd.', 'National ID': '784-1990-1234567-1', 'Start Date': '2026-01-10', 'End Date': '2026-01-15', 'SOW ID / Vehicle ID': 'SOW-4021', 'Phone No': '+971-4-555-0199', 'Card Badge Number': 'VB-2201', 'First In Time': '08:15' },
-      { Company: 'Northbridge Manufacturing Inc.', 'National ID': '784-1985-7654321-2', 'Start Date': '2026-02-02', 'End Date': '2026-02-04', 'SOW ID / Vehicle ID': 'VEH-1187', 'Phone No': '+1-212-555-0142', 'Card Badge Number': 'VB-2202', 'First In Time': '09:05' },
-      { Company: 'PurpleIQ Global Holdings', 'National ID': '784-1992-1122334-5', 'Start Date': '2026-03-01', 'End Date': '2026-03-01', 'SOW ID / Vehicle ID': 'SOW-4088', 'Phone No': '+971-4-555-0166', 'Card Badge Number': 'VB-2203', 'First In Time': '07:50' }
+      { 'WO Number': 'WO-4021', Asset: 'HVAC Unit 1', 'Maintenance Type': 'Preventive', Technician: 'David Smith', Priority: 'Medium', Status: 'Completed', Completion: '100%' },
+      { 'WO Number': 'WO-4022', Asset: 'Fire Panel A', 'Maintenance Type': 'Corrective', Technician: 'Sarah Wilson', Priority: 'High', Status: 'In Progress', Completion: '60%' },
+      { 'WO Number': 'WO-4023', Asset: 'Chiller Pump 2', 'Maintenance Type': 'Preventive', Technician: 'Faseeh Akthar', Priority: 'Low', Status: 'Pending', Completion: '0%' }
     ]
   },
   {
-    id: 'RPT-SEED-PEOPLE', slNo: 4, title: 'People', timeRange: '1 - Month',
+    id: 'RPT-SEED-INSPECTION', slNo: 4, title: 'Inspection', timeRange: '1 - Month',
     expireOn: '2027-07-01', recurrence: 'Once', createdOn: '2026-05-01',
     type: 'URL', shareWith: 'piq@gmail.com', generatedOn: '2026-05-01',
     status: 'Pending',
-    headers: ['Sr No', 'Date', 'ID Number', 'First Name', 'Last Name', 'Designation', 'Department', 'Company'],
+    headers: ['Asset Information', 'Task/Checkpoint', 'Result (Pass/Fail/N/A)', 'Remarks', 'Inspector', 'Approval Information'],
     rows: [
-      { 'Sr No': 1, Date: '2026-05-01', 'ID Number': 'EMP-1001', 'First Name': 'David', 'Last Name': 'Smith', Designation: 'Site Engineer', Department: 'Facilities Operations', Company: 'PurpleIQ Global Holdings' },
-      { 'Sr No': 2, Date: '2026-05-02', 'ID Number': 'EMP-1002', 'First Name': 'Sarah', 'Last Name': 'Wilson', Designation: 'QA Inspector', Department: 'Engineering', Company: 'Northbridge Manufacturing Inc.' },
-      { 'Sr No': 3, Date: '2026-05-03', 'ID Number': 'EMP-1003', 'First Name': 'Faseeh', 'Last Name': 'Akthar', Designation: 'IT Support', Department: 'IT/Hardware', Company: 'Central Bank of Oman' }
+      { 'Asset Information': 'AST-1001 · HVAC Unit 1', 'Task/Checkpoint': 'Filter Condition', 'Result (Pass/Fail/N/A)': 'Pass', Remarks: 'No action needed', Inspector: 'David Smith', 'Approval Information': 'Approved' },
+      { 'Asset Information': 'AST-1002 · Fire Panel A', 'Task/Checkpoint': 'Alarm Trigger Test', 'Result (Pass/Fail/N/A)': 'Fail', Remarks: 'Sensor requires replacement', Inspector: 'Sarah Wilson', 'Approval Information': 'Pending Review' },
+      { 'Asset Information': 'AST-1003 · Chiller Pump 2', 'Task/Checkpoint': 'Vibration Levels', 'Result (Pass/Fail/N/A)': 'N/A', Remarks: 'Scheduled for next cycle', Inspector: 'Faseeh Akthar', 'Approval Information': 'Awaiting Inspection' }
     ]
   }
 ];

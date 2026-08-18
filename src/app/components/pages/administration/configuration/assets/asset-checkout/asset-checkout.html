@@ -46,6 +46,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Asset Code</th>
           <th>Asset Description</th>
           <th>Company</th>
@@ -62,6 +64,12 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Honeywell CT60 Mobile Computer" [(ngModel)]="entry.assetName" />
+          </td>
           <td>
             <input type="text" class="cell-input" placeholder="e.g. 00188417" [(ngModel)]="entry.assetCode" />
           </td>
@@ -106,7 +114,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="12" class="empty-row">No checked-out assets found.</td>
+          <td colspan="14" class="empty-row">No checked-out assets found.</td>
         </tr>
       </tbody>
     </table>

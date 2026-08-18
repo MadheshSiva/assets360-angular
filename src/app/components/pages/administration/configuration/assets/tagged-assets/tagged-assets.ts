@@ -1,10 +1,12 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface TaggedAssetEntry {
+  assetId: string;
+  assetName: string;
   assetCode: string;
   assetDescription: string;
   company: string;
@@ -27,6 +29,8 @@ export interface TaggedAssetEntry {
 })
 export class AssetTaggedAssets {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'assetCode', label: 'Asset Code' },
     { key: 'assetDescription', label: 'Asset Description' },
     { key: 'company', label: 'Company' },
@@ -62,11 +66,11 @@ export class AssetTaggedAssets {
   categoryFilter = '';
 
   entries: TaggedAssetEntry[] = [
-    { assetCode: 'EMC-14-CTA-000004', assetDescription: 'office table', company: 'Mezzan Holding', site: 'Subhan Industrial', building: 'Corporate Office', floor: 'First Floor', room: '1F Conference Room', mainCategory: 'Furniture & Fixture', subCategory: 'Table', subSubCategory: 'Office Table', brand: '' },
-    { assetCode: 'B-0000022', assetDescription: 'Lenovo ThinkPad E14', company: 'Mezzan Holding', site: 'Subhan Industrial', building: 'Corporate Office', floor: 'First Floor', room: '1F Conference Room', mainCategory: 'IT/Hardware', subCategory: 'Laptop', subSubCategory: '', brand: '' },
-    { assetCode: 'ABC001', assetDescription: 'Laptop', company: 'Central Bank of Oman', site: 'Head Office', building: 'CAFETERIA', floor: 'FIRST FLOOR', room: '33', mainCategory: 'Computer Hardware & Peripherals', subCategory: 'Laptop', subSubCategory: '', brand: '' },
-    { assetCode: '78009', assetDescription: 'Digital Camera', company: 'Central Bank of Oman', site: 'Head Office', building: 'CAFETERIA', floor: 'FIRST FLOOR', room: '33', mainCategory: 'Audio Video Equipment', subCategory: 'Digital Camera', subSubCategory: '', brand: '' },
-    { assetCode: '6889', assetDescription: 'Laptop', company: 'Central Bank of Oman', site: 'Head Office', building: 'CAFETERIA', floor: 'FIRST FLOOR', room: '33', mainCategory: 'Computer Hardware & Peripherals', subCategory: 'Laptop', subSubCategory: '', brand: '' }
+    { assetId: 'AST-0001', assetName: 'Office Table Unit 4', assetCode: 'EMC-14-CTA-000004', assetDescription: 'office table', company: 'Mezzan Holding', site: 'Subhan Industrial', building: 'Corporate Office', floor: 'First Floor', room: '1F Conference Room', mainCategory: 'Furniture & Fixture', subCategory: 'Table', subSubCategory: 'Office Table', brand: '' },
+    { assetId: 'AST-0002', assetName: 'Laptop Lenovo ThinkPad E14', assetCode: 'B-0000022', assetDescription: 'Lenovo ThinkPad E14', company: 'Mezzan Holding', site: 'Subhan Industrial', building: 'Corporate Office', floor: 'First Floor', room: '1F Conference Room', mainCategory: 'IT/Hardware', subCategory: 'Laptop', subSubCategory: '', brand: '' },
+    { assetId: 'AST-0003', assetName: 'Laptop Workstation 07', assetCode: 'ABC001', assetDescription: 'Laptop', company: 'Central Bank of Oman', site: 'Head Office', building: 'CAFETERIA', floor: 'FIRST FLOOR', room: '33', mainCategory: 'Computer Hardware & Peripherals', subCategory: 'Laptop', subSubCategory: '', brand: '' },
+    { assetId: 'AST-0004', assetName: 'Digital Camera Unit 2', assetCode: '78009', assetDescription: 'Digital Camera', company: 'Central Bank of Oman', site: 'Head Office', building: 'CAFETERIA', floor: 'FIRST FLOOR', room: '33', mainCategory: 'Audio Video Equipment', subCategory: 'Digital Camera', subSubCategory: '', brand: '' },
+    { assetId: 'AST-0005', assetName: 'Laptop Dell XPS 15', assetCode: '6889', assetDescription: 'Laptop', company: 'Central Bank of Oman', site: 'Head Office', building: 'CAFETERIA', floor: 'FIRST FLOOR', room: '33', mainCategory: 'Computer Hardware & Peripherals', subCategory: 'Laptop', subSubCategory: '', brand: '' }
   ];
 
   // Live-computed view of `entries` filtered by the two dropdown panels above
@@ -99,6 +103,8 @@ export class AssetTaggedAssets {
     this.entries = [
       ...this.entries,
       {
+        assetId: '',
+        assetName: '',
         assetCode: '',
         assetDescription: '',
         company: '',
@@ -122,6 +128,8 @@ export class AssetTaggedAssets {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         assetCode: row['assetCode'] ?? '',
         assetDescription: row['assetDescription'] ?? '',
         company: row['company'] ?? '',

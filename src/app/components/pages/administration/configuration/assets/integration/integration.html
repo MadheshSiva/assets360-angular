@@ -46,6 +46,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>ERP ID (SAP/Oracle)</th>
           <th>WMS Reference</th>
           <th>API Sync Status</th>
@@ -55,6 +57,12 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. HVAC Compressor Unit 2" [(ngModel)]="entry.assetName" />
+          </td>
           <td>
             <input type="text" class="cell-input" placeholder="e.g. SAP-AST-88213" [(ngModel)]="entry.erpId" />
           </td>
@@ -81,7 +89,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="5" class="empty-row">No integration records found.</td>
+          <td colspan="7" class="empty-row">No integration records found.</td>
         </tr>
       </tbody>
     </table>

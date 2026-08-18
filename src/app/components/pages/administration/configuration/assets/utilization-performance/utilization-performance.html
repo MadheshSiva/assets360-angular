@@ -46,6 +46,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Usage Hours</th>
           <th>Idle Time</th>
           <th>Movement Frequency</th>
@@ -56,6 +58,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
           <td>{{ entry.usageHours }}</td>
           <td>{{ entry.idleTime }}</td>
           <td>{{ entry.movementFrequency }}</td>
@@ -67,7 +71,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="6" class="empty-row">No utilization & performance records found.</td>
+          <td colspan="8" class="empty-row">No utilization & performance records found.</td>
         </tr>
       </tbody>
     </table>

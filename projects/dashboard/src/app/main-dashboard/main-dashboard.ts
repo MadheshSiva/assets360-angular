@@ -1,9 +1,9 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { MapComponent, MapPin } from '../../../shared/map/map';
-import { WidgetDragHandle } from '../../../shared/widget-drag-handle/widget-drag-handle';
-import { loadOrder, saveOrder, reorderByKey } from '../../../shared/dashboard-widgets/widget-order.util';
+import { MapComponent, MapPin } from 'shared-ui';
+import { WidgetDragHandle } from '../shared/widget-drag-handle/widget-drag-handle';
+import { loadOrder, saveOrder, reorderByKey } from '../shared/dashboard-widgets/widget-order.util';
 
 interface StatCard {
   label: string;

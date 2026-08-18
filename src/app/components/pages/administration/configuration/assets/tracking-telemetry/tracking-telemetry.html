@@ -46,6 +46,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Device ID / IMEI / MAC</th>
           <th>Tag IDs (QR / RFID / BLE / GPS)</th>
           <th>Movement Logs (Timestamp + Location)</th>
@@ -57,6 +59,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
           <td class="mono">{{ entry.deviceId }}</td>
           <td>{{ entry.tagIds }}</td>
           <td>{{ entry.movementLogs }}</td>
@@ -69,7 +73,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="7" class="empty-row">No tracking &amp; telemetry records found.</td>
+          <td colspan="9" class="empty-row">No tracking &amp; telemetry records found.</td>
         </tr>
       </tbody>
     </table>

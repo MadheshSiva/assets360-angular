@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface TrackingTelemetryEntry {
+  assetId: string;
+  assetName: string;
   deviceId: string;
   tagIds: string;
   movementLogs: string;
@@ -21,6 +23,8 @@ export interface TrackingTelemetryEntry {
 })
 export class AssetTrackingTelemetry {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'deviceId', label: 'Device ID / IMEI / MAC' },
     { key: 'tagIds', label: 'Tag IDs (QR / RFID / BLE / GPS)' },
     { key: 'movementLogs', label: 'Movement Logs (Timestamp + Location)' },
@@ -33,6 +37,8 @@ export class AssetTrackingTelemetry {
 
   entries: TrackingTelemetryEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Forklift Unit 4',
       deviceId: 'IMEI-356938035643809',
       tagIds: 'BLE',
       movementLogs: '12 logs today',
@@ -41,6 +47,8 @@ export class AssetTrackingTelemetry {
       sensorData: 'Temp 24°C, Vibration Low, Battery 78%'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'Delivery Van 2',
       deviceId: 'MAC-3C:5A:B4:12:9E:01',
       tagIds: 'RFID',
       movementLogs: '5 logs today',
@@ -62,6 +70,8 @@ export class AssetTrackingTelemetry {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         deviceId: row['deviceId'] ?? '',
         tagIds: row['tagIds'] ?? '',
         movementLogs: row['movementLogs'] ?? '',

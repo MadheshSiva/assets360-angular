@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface WarrantyContractEntry {
+  assetId: string;
+  assetName: string;
   warrantyPeriod: string;
   amc: string;
   slaDetails: string;
@@ -19,6 +21,8 @@ export interface WarrantyContractEntry {
 })
 export class AssetWarrantyContract {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'warrantyPeriod', label: 'Warranty Start & End Date' },
     { key: 'amc', label: 'AMC (Annual Maintenance Contract)' },
     { key: 'slaDetails', label: 'SLA Details' },
@@ -29,12 +33,16 @@ export class AssetWarrantyContract {
 
   entries: WarrantyContractEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Industrial Generator 2',
       warrantyPeriod: '2025-02-14 to 2027-02-13',
       amc: 'AMC Active - Al Futtaim Technical Services',
       slaDetails: '24hr response, 99% uptime',
       vendorContractDocuments: 'amc_contract_88213.pdf'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'Water Pump Unit 3',
       warrantyPeriod: '2023-08-05 to 2025-08-04',
       amc: 'AMC Expired',
       slaDetails: '48hr response, 95% uptime',
@@ -54,6 +62,8 @@ export class AssetWarrantyContract {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         warrantyPeriod: row['warrantyPeriod'] ?? '',
         amc: row['amc'] ?? '',
         slaDetails: row['slaDetails'] ?? '',

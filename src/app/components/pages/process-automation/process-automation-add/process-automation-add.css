@@ -226,7 +226,9 @@
 }
 
 .pa-time-row {
-  grid-template-columns: 60px 90px auto;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }
 
 .pa-checkbox {

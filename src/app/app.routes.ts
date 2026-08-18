@@ -1,8 +1,8 @@
 import { Routes } from '@angular/router';
+import { loadRemoteModule } from '@angular-architects/native-federation';
 import { Login } from './components/pages/login/login/login';
 import { Signup } from './components/pages/signup/signup/signup';
-import { Dashboard } from './components/pages/dashboard/dashboard/dashboard';
-import { Locating } from './components/pages/locating/locating/locating';
+import { SectionUnavailable } from './section-unavailable/section-unavailable';
 import { Events } from './components/pages/events/events/events';
 import { Reports } from './components/pages/reports/reports/reports';
 import { CreateReport } from './components/pages/reports/create-report/create-report';
@@ -131,6 +131,16 @@ import { WipAlerts } from './components/pages/administration/configuration/wip/a
 import { WipKpiConfig } from './components/pages/administration/configuration/wip/kpi-config/kpi-config';
 import { WipRoleAccess } from './components/pages/administration/configuration/wip/role-access/role-access';
 
+function remoteRoutes(remoteName: string) {
+  return () =>
+    loadRemoteModule({ remoteName, exposedModule: './routes' })
+      .then((m) => m.routes)
+      .catch((err) => {
+        console.error(`Failed to load remote "${remoteName}":`, err);
+        return [{ path: '', component: SectionUnavailable }];
+      });
+}
+
 export const routes: Routes = [
   { path: '', redirectTo: 'login', pathMatch: 'full' },
   { path: 'login', component: Login },
@@ -141,8 +151,8 @@ export const routes: Routes = [
     // DEMO MODE: Auth guard is disabled
     // canActivate: [authGuard],
     children: [
-      { path: 'dashboard', component: Dashboard },
-      { path: 'locating', component: Locating },
+      { path: 'dashboard', loadChildren: remoteRoutes('dashboard') },
+      { path: 'locating', loadChildren: remoteRoutes('locating') },
       { path: 'events', component: Events },
       { path: 'report', component: Reports },
       { path: 'report/create', component: CreateReport },

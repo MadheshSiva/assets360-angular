@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { TechnicianRecord, TechnicianForm } from './technician.model';
 import { TechnicianService } from './technician.service';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { RowActions } from 'shared-ui';
 
 interface TechnicianColumn {
   key: string;

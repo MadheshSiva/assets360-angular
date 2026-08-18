@@ -1,8 +1,10 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { RowActions } from 'shared-ui';
 
 export interface ActivityAuditTrailEntry {
+  assetId: string;
+  assetName: string;
   whoCreatedUpdatedAsset: string;
   changesMade: string;
   timestampLogs: string;
@@ -20,12 +22,16 @@ export class AssetActivityAuditTrail {
   // All columns in this module are system-generated — there is no manual "Add" entry.
   entries: ActivityAuditTrailEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Forklift Unit 4',
       whoCreatedUpdatedAsset: 'N. Silva',
       changesMade: 'Location changed: Warehouse A → Warehouse B',
       timestampLogs: '2026-07-04 09:10',
       accessLogs: 'Viewed by A. Perera at 2026-07-04 09:15'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'HVAC Compressor B',
       whoCreatedUpdatedAsset: 'System',
       changesMade: 'Status changed: Active → Under Maintenance',
       timestampLogs: '2026-07-03 16:42',

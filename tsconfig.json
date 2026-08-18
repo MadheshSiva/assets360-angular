@@ -5,7 +5,12 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "@shared/*": ["src/app/components/shared/*"]
+      "@shared/*": [
+        "src/app/components/shared/*"
+      ],
+      "shared-ui": [
+        "./projects/shared-ui/src/public-api.ts"
+      ]
     },
     "strict": true,
     "noImplicitOverride": true,
@@ -33,6 +38,48 @@
     },
     {
       "path": "./tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/shared-ui/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/shared-ui/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/dashboard/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/dashboard/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/locating/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/locating/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/events/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/events/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/reports/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/reports/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/process-automation/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/process-automation/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/administration/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/administration/tsconfig.spec.json"
     }
   ]
 }

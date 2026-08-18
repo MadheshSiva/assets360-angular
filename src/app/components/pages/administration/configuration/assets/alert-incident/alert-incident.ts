@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { RowActions } from 'shared-ui';
 
 export interface AlertIncidentEntry {
+  assetId: string;
+  assetName: string;
   alertType: string;
   incidentReports: string;
   damageReports: string;
@@ -22,6 +24,8 @@ export interface AlertIncidentEntry {
 })
 export class AssetAlertIncident {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'alertType', label: 'Alert Type' },
     { key: 'incidentReports', label: 'Incident Reports' },
     { key: 'damageReports', label: 'Damage Reports' },
@@ -45,6 +49,8 @@ export class AssetAlertIncident {
 
   entries: AlertIncidentEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Forklift Unit 8',
       alertType: 'Geofence Breach',
       incidentReports: 'Forklift FL-08 exited designated zone',
       damageReports: '-',
@@ -52,6 +58,8 @@ export class AssetAlertIncident {
       resolutionStatus: 'Open'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'GPS Tracker Unit 12',
       alertType: 'Low Battery',
       incidentReports: 'Tracker battery below 10%',
       damageReports: '-',
@@ -66,6 +74,8 @@ export class AssetAlertIncident {
     this.entries = [
       ...this.entries,
       {
+        assetId: '',
+        assetName: '',
         alertType: this.alertTypeOptions[0],
         incidentReports: '',
         damageReports: '',
@@ -83,6 +93,8 @@ export class AssetAlertIncident {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         alertType: row['alertType'] ?? '',
         incidentReports: row['incidentReports'] ?? '',
         damageReports: row['damageReports'] ?? '',

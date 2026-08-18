@@ -46,6 +46,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Maintenance Schedule</th>
           <th>Work Orders</th>
           <th>Service History</th>
@@ -58,6 +60,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
           <td>{{ entry.maintenanceSchedule }}</td>
           <td>{{ entry.workOrders }}</td>
           <td>{{ entry.serviceHistory }}</td>
@@ -71,7 +75,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="8" class="empty-row">No maintenance & service records found.</td>
+          <td colspan="10" class="empty-row">No maintenance & service records found.</td>
         </tr>
       </tbody>
     </table>

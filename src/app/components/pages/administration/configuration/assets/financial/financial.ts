@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface FinancialEntry {
+  assetId: string;
+  assetName: string;
   purchaseCost: string;
   purchaseDate: string;
   vendorDetails: string;
@@ -23,6 +25,8 @@ export interface FinancialEntry {
 })
 export class AssetFinancial {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'purchaseCost', label: 'Purchase Cost' },
     { key: 'purchaseDate', label: 'Purchase Date' },
     { key: 'vendorDetails', label: 'Vendor Details' },
@@ -37,6 +41,8 @@ export class AssetFinancial {
 
   entries: FinancialEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'HVAC Compressor Unit 2',
       purchaseCost: 'AED 42,500',
       purchaseDate: '2025-02-10',
       vendorDetails: 'Gulf Technical Supplies',
@@ -47,6 +53,8 @@ export class AssetFinancial {
       costCenterAllocation: 'Facilities - CC-102'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'Safety Barrier Set A',
       purchaseCost: 'AED 18,900',
       purchaseDate: '2023-08-01',
       vendorDetails: 'Al Noor Safety Equipment',
@@ -70,6 +78,8 @@ export class AssetFinancial {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         purchaseCost: row['purchaseCost'] ?? '',
         purchaseDate: row['purchaseDate'] ?? '',
         vendorDetails: row['vendorDetails'] ?? '',

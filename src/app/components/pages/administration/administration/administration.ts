@@ -2,7 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule, RouterOutlet, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { Breadcrumb } from '../../../shared/breadcrumb/breadcrumb';
+import { Breadcrumb } from 'shared-ui';
 
 interface BreadcrumbItem {
   label: string;
@@ -49,7 +49,7 @@ export class Administration {
   ];
 
   assetsOptions: BreadcrumbOption[] = [
-    { label: 'Asset Registry', path: '/administration/configuration/assets/asset-registry' },
+    { label: 'Asset registration', path: '/administration/configuration/assets/asset-registry' },
     { label: 'Location History', path: '/administration/configuration/assets/location-history' },
     { label: 'Assignment / Ownership', path: '/administration/configuration/assets/assignment-ownership' },
     { label: 'Asset Lifecycle', path: '/administration/configuration/assets/asset-lifecycle' },
@@ -193,7 +193,7 @@ export class Administration {
 
   // Maps URL slug -> breadcrumb label for pages nested under Assets
   private assetsSlugLabelMap: Record<string, string> = {
-    'asset-registry': 'Asset Registry',
+    'asset-registry': 'Asset registration',
     'location-history': 'Location History',
     'assignment-ownership': 'Assignment / Ownership',
     'asset-lifecycle': 'Asset Lifecycle',

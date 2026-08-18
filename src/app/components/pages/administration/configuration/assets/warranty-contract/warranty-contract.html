@@ -46,6 +46,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Warranty Start & End Date</th>
           <th>AMC (Annual Maintenance Contract)</th>
           <th>SLA Details</th>
@@ -55,6 +57,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
           <td>{{ entry.warrantyPeriod }}</td>
           <td>{{ entry.amc }}</td>
           <td>{{ entry.slaDetails }}</td>
@@ -65,7 +69,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="5" class="empty-row">No warranty & contract records found.</td>
+          <td colspan="7" class="empty-row">No warranty & contract records found.</td>
         </tr>
       </tbody>
     </table>

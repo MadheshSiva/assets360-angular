@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { RowActions } from 'shared-ui';
 
 export interface ComplianceCertificationEntry {
+  assetId: string;
+  assetName: string;
   certificationType: string;
   issuedDate: string;
   expiryDate: string;
@@ -21,6 +23,8 @@ export interface ComplianceCertificationEntry {
 })
 export class AssetComplianceCertification {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'certificationType', label: 'Certification Type' },
     { key: 'issuedDate', label: 'Issued Date' },
     { key: 'expiryDate', label: 'Expiry Date' },
@@ -40,12 +44,16 @@ export class AssetComplianceCertification {
 
   entries: ComplianceCertificationEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Pressure Vessel Tank 3',
       certificationType: 'ISO 55000 Asset Management',
       issuedDate: '2025-01-10',
       expiryDate: '2028-01-10',
       inspectionLogs: 'Last inspected 2026-01-10 - Compliant'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'Boiler Unit 2',
       certificationType: 'Pressure Vessel Safety Certificate',
       issuedDate: '2024-05-22',
       expiryDate: '2026-05-22',
@@ -59,6 +67,8 @@ export class AssetComplianceCertification {
     this.entries = [
       ...this.entries,
       {
+        assetId: '',
+        assetName: '',
         certificationType: this.certificationTypeOptions[0],
         issuedDate: '',
         expiryDate: '',
@@ -75,6 +85,8 @@ export class AssetComplianceCertification {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         certificationType: row['certificationType'] ?? '',
         issuedDate: row['issuedDate'] ?? '',
         expiryDate: row['expiryDate'] ?? '',

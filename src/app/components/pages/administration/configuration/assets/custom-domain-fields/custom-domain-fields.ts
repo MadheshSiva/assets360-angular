@@ -1,11 +1,13 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { RowActions } from 'shared-ui';
 
 export interface CustomDomainFieldEntry {
+  assetId: string;
+  assetName: string;
   assetType: string;
   fieldName: string;
   fieldValue: string;
@@ -27,6 +29,8 @@ const DYNAMIC_FIELD_MAP: Record<string, string[]> = {
 })
 export class AssetCustomDomainFields {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'assetType', label: 'Asset Type' },
     { key: 'fieldName', label: 'Field Name' },
     { key: 'fieldValue', label: 'Field Value' }
@@ -38,13 +42,13 @@ export class AssetCustomDomainFields {
   assetTypeOptions: string[] = Object.keys(DYNAMIC_FIELD_MAP);
 
   entries: CustomDomainFieldEntry[] = [
-    { assetType: 'Forklift', fieldName: 'Load Capacity', fieldValue: '2.5 Tons' },
-    { assetType: 'Forklift', fieldName: 'Engine Hours', fieldValue: '1,240 hrs' },
-    { assetType: 'Forklift', fieldName: 'Fuel Type', fieldValue: 'Diesel' },
-    { assetType: 'Pallet', fieldName: 'Weight Capacity', fieldValue: '1.2 Tons' },
-    { assetType: 'Pallet', fieldName: 'Material Type', fieldValue: 'Plastic' },
-    { assetType: 'Vehicle', fieldName: 'Registration Number', fieldValue: 'WP-CAB-4521' },
-    { assetType: 'Vehicle', fieldName: 'Insurance Details', fieldValue: 'Policy #INS-88213, expires 2027-02-01' }
+    { assetId: 'AST-0001', assetName: 'Forklift Unit 4', assetType: 'Forklift', fieldName: 'Load Capacity', fieldValue: '2.5 Tons' },
+    { assetId: 'AST-0002', assetName: 'Forklift Unit 5', assetType: 'Forklift', fieldName: 'Engine Hours', fieldValue: '1,240 hrs' },
+    { assetId: 'AST-0003', assetName: 'Forklift Unit 6', assetType: 'Forklift', fieldName: 'Fuel Type', fieldValue: 'Diesel' },
+    { assetId: 'AST-0004', assetName: 'Pallet Jack Model X', assetType: 'Pallet', fieldName: 'Weight Capacity', fieldValue: '1.2 Tons' },
+    { assetId: 'AST-0005', assetName: 'Pallet Jack Model Y', assetType: 'Pallet', fieldName: 'Material Type', fieldValue: 'Plastic' },
+    { assetId: 'AST-0006', assetName: 'Company Vehicle Van 1', assetType: 'Vehicle', fieldName: 'Registration Number', fieldValue: 'WP-CAB-4521' },
+    { assetId: 'AST-0007', assetName: 'Company Vehicle Van 2', assetType: 'Vehicle', fieldName: 'Insurance Details', fieldValue: 'Policy #INS-88213, expires 2027-02-01' }
   ];
 
   // Field Name options depend on that row's currently selected Asset Type (Dynamic Master).
@@ -63,6 +67,8 @@ export class AssetCustomDomainFields {
     this.entries = [
       ...this.entries,
       {
+        assetId: '',
+        assetName: '',
         assetType,
         fieldName: this.fieldNameOptionsFor(assetType)[0] ?? '',
         fieldValue: ''
@@ -78,6 +84,8 @@ export class AssetCustomDomainFields {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         assetType: row['assetType'] ?? '',
         fieldName: row['fieldName'] ?? '',
         fieldValue: row['fieldValue'] ?? ''

@@ -56,7 +56,7 @@ export class Sidebar {
               path: '/administration/configuration/assets',
               icon: '',
               children: [
-                { label: 'Asset Registry', path: '/administration/configuration/assets/asset-registry', icon: '' },
+                { label: 'Asset registration', path: '/administration/configuration/assets/asset-registry', icon: '' },
                 { label: 'Location History', path: '/administration/configuration/assets/location-history', icon: '' },
                 { label: 'Assignment / Ownership', path: '/administration/configuration/assets/assignment-ownership', icon: '' },
                 { label: 'Asset Lifecycle', path: '/administration/configuration/assets/asset-lifecycle', icon: '' },

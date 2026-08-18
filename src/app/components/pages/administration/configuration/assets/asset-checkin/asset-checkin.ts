@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
 export interface CheckedOutAssetRow {
+  assetId: string;
+  assetName: string;
   assetCode: string;
   assetDescription: string;
   company: string;
@@ -27,14 +29,14 @@ export class AssetCheckin {
   // each Assets tab keeps its own local copy, this app has no shared services
   // between tabs).
   rows: CheckedOutAssetRow[] = [
-    { assetCode: '00188417', assetDescription: 'Honeywell CT60 Mobile Computer', company: 'Central Bank of Oman', site: 'Sharjah', building: 'Gate Tower', floor: 'First Floor', room: 'Main Conference Room', departmentName: 'Projects & Solutions', custodianName: 'Faseeh Akthar' },
-    { assetCode: '00000258', assetDescription: 'Mobile Device-3', company: 'Central Bank of Oman', site: 'Sharjah', building: 'Gate Tower', floor: 'First Floor', room: 'Main Conference Room', departmentName: 'Engineering', custodianName: 'Faseeh Akthar' },
-    { assetCode: '00000257', assetDescription: 'DELL OPTIPLEX 7010 CPU', company: 'Central Bank of Oman', site: 'Abudhabi', building: 'ADDAX Tower', floor: '8th Floor', room: 'IT Store', departmentName: 'Stores', custodianName: 'Joseph' },
-    { assetCode: '00000256', assetDescription: 'DELL OPTIPLEX 7010 CPU', company: 'Central Bank of Oman', site: 'Abudhabi', building: 'ADDAX Tower', floor: '8th Floor', room: 'IT Store', departmentName: 'Stores', custodianName: 'IT Store In Charge' },
-    { assetCode: '00000255', assetDescription: 'zebra TC 21 mobile computer', company: 'Central Bank of Oman', site: 'Abudhabi', building: 'ADDAX Tower', floor: '8th Floor', room: 'Meeting Room', departmentName: 'Projects & Solutions', custodianName: 'IT Store In Charge' },
-    { assetCode: '00000254', assetDescription: 'zebra TC 21 mobile computer', company: 'Central Bank of Oman', site: 'Abudhabi', building: 'ADDAX Tower', floor: '8th Floor', room: 'IT Store', departmentName: 'Stores', custodianName: 'Joseph' },
-    { assetCode: '00000253', assetDescription: 'Mobile Device-2', company: 'Central Bank of Oman', site: 'Sharjah', building: 'Gate Tower', floor: 'First Floor', room: 'Main Conference Room', departmentName: 'Projects & Solutions', custodianName: 'Faseeh Akthar' },
-    { assetCode: '00000250', assetDescription: 'Fridge West Point 170 Ltr', company: 'Central Bank of Oman', site: 'Sharjah', building: 'Gate Tower', floor: 'First Floor', room: 'Main Conference Room', departmentName: 'Administration', custodianName: 'Manisha' }
+    { assetId: 'AST-0001', assetName: 'Honeywell CT60 Mobile Computer', assetCode: '00188417', assetDescription: 'Honeywell CT60 Mobile Computer', company: 'Central Bank of Oman', site: 'Sharjah', building: 'Gate Tower', floor: 'First Floor', room: 'Main Conference Room', departmentName: 'Projects & Solutions', custodianName: 'Faseeh Akthar' },
+    { assetId: 'AST-0002', assetName: 'Mobile Device-3', assetCode: '00000258', assetDescription: 'Mobile Device-3', company: 'Central Bank of Oman', site: 'Sharjah', building: 'Gate Tower', floor: 'First Floor', room: 'Main Conference Room', departmentName: 'Engineering', custodianName: 'Faseeh Akthar' },
+    { assetId: 'AST-0003', assetName: 'DELL OPTIPLEX 7010 CPU', assetCode: '00000257', assetDescription: 'DELL OPTIPLEX 7010 CPU', company: 'Central Bank of Oman', site: 'Abudhabi', building: 'ADDAX Tower', floor: '8th Floor', room: 'IT Store', departmentName: 'Stores', custodianName: 'Joseph' },
+    { assetId: 'AST-0004', assetName: 'DELL OPTIPLEX 7010 CPU', assetCode: '00000256', assetDescription: 'DELL OPTIPLEX 7010 CPU', company: 'Central Bank of Oman', site: 'Abudhabi', building: 'ADDAX Tower', floor: '8th Floor', room: 'IT Store', departmentName: 'Stores', custodianName: 'IT Store In Charge' },
+    { assetId: 'AST-0005', assetName: 'Zebra TC21 Mobile Computer', assetCode: '00000255', assetDescription: 'zebra TC 21 mobile computer', company: 'Central Bank of Oman', site: 'Abudhabi', building: 'ADDAX Tower', floor: '8th Floor', room: 'Meeting Room', departmentName: 'Projects & Solutions', custodianName: 'IT Store In Charge' },
+    { assetId: 'AST-0006', assetName: 'Zebra TC21 Mobile Computer', assetCode: '00000254', assetDescription: 'zebra TC 21 mobile computer', company: 'Central Bank of Oman', site: 'Abudhabi', building: 'ADDAX Tower', floor: '8th Floor', room: 'IT Store', departmentName: 'Stores', custodianName: 'Joseph' },
+    { assetId: 'AST-0007', assetName: 'Mobile Device-2', assetCode: '00000253', assetDescription: 'Mobile Device-2', company: 'Central Bank of Oman', site: 'Sharjah', building: 'Gate Tower', floor: 'First Floor', room: 'Main Conference Room', departmentName: 'Projects & Solutions', custodianName: 'Faseeh Akthar' },
+    { assetId: 'AST-0008', assetName: 'Fridge West Point 170 Ltr', assetCode: '00000250', assetDescription: 'Fridge West Point 170 Ltr', company: 'Central Bank of Oman', site: 'Sharjah', building: 'Gate Tower', floor: 'First Floor', room: 'Main Conference Room', departmentName: 'Administration', custodianName: 'Manisha' }
   ];
 
   get custodianOptions(): string[] {

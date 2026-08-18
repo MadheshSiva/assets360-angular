@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 
 export interface LocationHistoryEntry {
+  assetId: string;
+  assetName: string;
   currentLocation: string;
   gpsCoordinates: string;
   locationHistory: string;
@@ -19,6 +21,8 @@ export interface LocationHistoryEntry {
 export class AssetLocationHistory {
   entries: LocationHistoryEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Forklift Unit 4',
       currentLocation: 'Dubai Mall - Ground Floor',
       gpsCoordinates: '25.1972, 55.2795',
       locationHistory: '5 location changes',
@@ -26,6 +30,8 @@ export class AssetLocationHistory {
       lastSeenLocation: 'Dubai Mall - Store 12 (2 min ago)'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'HVAC Compressor Unit 2',
       currentLocation: 'Marina Mall - Tower A',
       gpsCoordinates: '25.0805, 55.1403',
       locationHistory: '3 location changes',

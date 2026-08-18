@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface AssetLifecycleEntry {
+  assetId: string;
+  assetName: string;
   procurementDate: string;
   deploymentDate: string;
   status: string;
@@ -20,6 +22,8 @@ export interface AssetLifecycleEntry {
 })
 export class AssetLifecycle {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'procurementDate', label: 'Procurement Date' },
     { key: 'deploymentDate', label: 'Deployment Date' },
     { key: 'status', label: 'Status' },
@@ -31,6 +35,8 @@ export class AssetLifecycle {
 
   entries: AssetLifecycleEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Forklift Unit 4',
       procurementDate: '2025-02-14',
       deploymentDate: '2025-03-01',
       status: 'Active',
@@ -38,6 +44,8 @@ export class AssetLifecycle {
       reasonForRetirement: '-'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'HVAC Compressor B',
       procurementDate: '2023-08-05',
       deploymentDate: '2023-08-20',
       status: 'Retired',
@@ -58,6 +66,8 @@ export class AssetLifecycle {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         procurementDate: row['procurementDate'] ?? '',
         deploymentDate: row['deploymentDate'] ?? '',
         status: row['status'] ?? '',

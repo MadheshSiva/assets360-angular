@@ -33,6 +33,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Who Created / Updated Asset</th>
           <th>Changes Made (Field-level)</th>
           <th>Timestamp Logs</th>
@@ -42,6 +44,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td class="system-cell">{{ entry.assetId }}</td>
+          <td class="system-cell">{{ entry.assetName }}</td>
           <td class="system-cell">{{ entry.whoCreatedUpdatedAsset }}</td>
           <td class="system-cell">{{ entry.changesMade }}</td>
           <td class="system-cell">{{ entry.timestampLogs }}</td>
@@ -52,7 +56,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="5" class="empty-row">No activity / audit trail records found.</td>
+          <td colspan="7" class="empty-row">No activity / audit trail records found.</td>
         </tr>
       </tbody>
     </table>

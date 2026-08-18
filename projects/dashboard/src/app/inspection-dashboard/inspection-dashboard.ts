@@ -1,8 +1,8 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
-import { WidgetDragHandle } from '../../../shared/widget-drag-handle/widget-drag-handle';
-import { loadOrder, saveOrder, reorderByKey } from '../../../shared/dashboard-widgets/widget-order.util';
+import { WidgetDragHandle } from '../shared/widget-drag-handle/widget-drag-handle';
+import { loadOrder, saveOrder, reorderByKey } from '../shared/dashboard-widgets/widget-order.util';
 
 export type WorkOrderFilter = 'all' | 'inprogress' | 'pendingapproval' | 'completed' | 'overdue';
 

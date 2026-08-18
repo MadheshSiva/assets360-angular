@@ -33,6 +33,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Current Location</th>
           <th>GPS Coordinates</th>
           <th>Location History</th>
@@ -42,6 +44,8 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
           <td>{{ entry.currentLocation }}</td>
           <td class="mono">{{ entry.gpsCoordinates }}</td>
           <td>{{ entry.locationHistory }}</td>
@@ -50,7 +54,7 @@
         </tr>
 
         <tr *ngIf="entries.length === 0">
-          <td colspan="5" class="empty-row">No location history records found.</td>
+          <td colspan="7" class="empty-row">No location history records found.</td>
         </tr>
       </tbody>
     </table>

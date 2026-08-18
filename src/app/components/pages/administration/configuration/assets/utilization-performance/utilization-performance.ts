@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface UtilizationPerformanceEntry {
+  assetId: string;
+  assetName: string;
   usageHours: string;
   idleTime: string;
   movementFrequency: string;
@@ -20,6 +22,8 @@ export interface UtilizationPerformanceEntry {
 })
 export class AssetUtilizationPerformance {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'usageHours', label: 'Usage Hours' },
     { key: 'idleTime', label: 'Idle Time' },
     { key: 'movementFrequency', label: 'Movement Frequency' },
@@ -31,6 +35,8 @@ export class AssetUtilizationPerformance {
 
   entries: UtilizationPerformanceEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'HVAC Compressor B',
       usageHours: '128 hrs this month',
       idleTime: '14 hrs',
       movementFrequency: '36 moves this month',
@@ -38,6 +44,8 @@ export class AssetUtilizationPerformance {
       productivityMetrics: 'Above target'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'Conveyor Belt System',
       usageHours: '96 hrs this month',
       idleTime: '22 hrs',
       movementFrequency: '18 moves this month',
@@ -58,6 +66,8 @@ export class AssetUtilizationPerformance {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         usageHours: row['usageHours'] ?? '',
         idleTime: row['idleTime'] ?? '',
         movementFrequency: row['movementFrequency'] ?? '',

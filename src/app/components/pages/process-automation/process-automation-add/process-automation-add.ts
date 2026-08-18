@@ -10,7 +10,7 @@ export type ConditionType =
   | ''
   | 'When the device is'
   | 'When the time is'
-  | 'When the people is'
+  | 'When the asset is'
   | 'When the zone is';
 
 // which single dropdown (across all levels) is currently open on a row
@@ -123,7 +123,7 @@ export class ProcessAutomationAdd {
   conditionTypeOptions: ConditionType[] = [
     'When the device is',
     'When the time is',
-    'When the people is',
+    'When the asset is',
     'When the zone is'
   ];
 
@@ -134,7 +134,7 @@ export class ProcessAutomationAdd {
   compareOptionsStatus = ['Online', 'Offline'];
 
   // People / Zone options (placeholder single-level lists — extend if these need their own cascade)
-  peopleOptions = ['Person 1', 'Person 2', 'Person 3'];
+  peopleOptions = ['Asset 1', 'Asset 2', 'Asset 3'];
   zoneOptions = ['Zone 1', 'Zone 2', 'Zone 3'];
 
   // Time cascade options

@@ -193,15 +193,15 @@
             </div>
           </div>
 
-          <!-- ===== "When the people is" ===== -->
-          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the people is'">
+          <!-- ===== "When the asset is" ===== -->
+          <div class="pa-rule-row pa-rule-subrow" *ngIf="cond.type === 'When the asset is'">
             <div class="pa-dropdown-wrap">
               <input
                 type="text"
                 class="pa-input pa-dropdown-trigger"
                 [class.open]="cond.openField === 'people'"
                 [value]="cond.people"
-                placeholder="Select people"
+                placeholder="Select asset"
                 readonly
                 (click)="toggleField(cond, 'people')"
               />

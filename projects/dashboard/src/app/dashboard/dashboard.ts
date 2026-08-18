@@ -5,9 +5,9 @@ import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-
 import { MainDashboard } from '../main-dashboard/main-dashboard';
 import { WipDashboard } from '../wip-dashboard/wip-dashboard';
 import { InspectionDashboard } from '../inspection-dashboard/inspection-dashboard';
-import { MapComponent, MapPin } from '../../../shared/map/map';
-import { WidgetDragHandle } from '../../../shared/widget-drag-handle/widget-drag-handle';
-import { loadOrder, saveOrder, reorderByKey } from '../../../shared/dashboard-widgets/widget-order.util';
+import { MapComponent, MapPin } from 'shared-ui';
+import { WidgetDragHandle } from '../shared/widget-drag-handle/widget-drag-handle';
+import { loadOrder, saveOrder, reorderByKey } from '../shared/dashboard-widgets/widget-order.util';
 
 interface AssetsStatCard {
   label: string;

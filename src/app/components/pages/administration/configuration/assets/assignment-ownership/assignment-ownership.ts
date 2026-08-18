@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface AssignmentOwnershipEntry {
+  assetId: string;
+  assetName: string;
   assignedCustodian: string;
   assignmentPeriod: string;
   transferHistory: string;
@@ -20,6 +22,8 @@ export interface AssignmentOwnershipEntry {
 })
 export class AssetAssignmentOwnership {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'assignedCustodian', label: 'Assigned Custodian / Department' },
     { key: 'assignmentPeriod', label: 'Assignment Start & End Date' },
     { key: 'transferHistory', label: 'Transfer History' },
@@ -31,6 +35,8 @@ export class AssetAssignmentOwnership {
 
   entries: AssignmentOwnershipEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'Forklift Unit 4',
       assignedCustodian: 'John Doe / Facilities',
       assignmentPeriod: '2026-01-10 to 2026-06-30',
       transferHistory: '3 transfers',
@@ -38,6 +44,8 @@ export class AssetAssignmentOwnership {
       checkInOutLogs: 'Checked in: 2026-06-30 09:12'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'HVAC Compressor B',
       assignedCustodian: 'Aisha Khan / OT Management',
       assignmentPeriod: '2026-03-01 to Present',
       transferHistory: '1 transfer',
@@ -58,6 +66,8 @@ export class AssetAssignmentOwnership {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         assignedCustodian: row['assignedCustodian'] ?? '',
         assignmentPeriod: row['assignmentPeriod'] ?? '',
         transferHistory: row['transferHistory'] ?? '',

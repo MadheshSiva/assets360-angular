@@ -1,9 +1,11 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 
 export interface DocumentAttachmentEntry {
+  assetId: string;
+  assetName: string;
   purchaseInvoice: string;
   warrantyCertificate: string;
   manuals: string;
@@ -20,6 +22,8 @@ export interface DocumentAttachmentEntry {
 })
 export class AssetDocumentAttachment {
   readonly importColumns: ImportColumn[] = [
+    { key: 'assetId', label: 'Asset ID' },
+    { key: 'assetName', label: 'Asset Name' },
     { key: 'purchaseInvoice', label: 'Purchase Invoice' },
     { key: 'warrantyCertificate', label: 'Warranty Certificate' },
     { key: 'manuals', label: 'Manuals' },
@@ -31,6 +35,8 @@ export class AssetDocumentAttachment {
 
   entries: DocumentAttachmentEntry[] = [
     {
+      assetId: 'AST-0001',
+      assetName: 'HVAC Compressor B',
       purchaseInvoice: 'invoice_88213.pdf',
       warrantyCertificate: 'warranty_cert_88213.pdf',
       manuals: 'hvac_unit_manual.pdf',
@@ -38,6 +44,8 @@ export class AssetDocumentAttachment {
       complianceCertificates: 'fire_safety_compliance.pdf'
     },
     {
+      assetId: 'AST-0002',
+      assetName: 'Fire Alarm Panel Unit 2',
       purchaseInvoice: 'invoice_44120.pdf',
       warrantyCertificate: 'warranty_cert_44120.pdf',
       manuals: 'fire_panel_manual.pdf',
@@ -58,6 +66,8 @@ export class AssetDocumentAttachment {
     this.entries = [
       ...this.entries,
       ...rows.map((row) => ({
+        assetId: row['assetId'] ?? '',
+        assetName: row['assetName'] ?? '',
         purchaseInvoice: row['purchaseInvoice'] ?? '',
         warrantyCertificate: row['warrantyCertificate'] ?? '',
         manuals: row['manuals'] ?? '',

@@ -74,8 +74,6 @@
   border-radius: 10px;
   padding: 18px 18px 22px;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-  height: 100vh;
-  width: 260px;
   flex: 0 0 auto;
   width: 30%;
 }
@@ -128,9 +126,7 @@
   border-radius: 10px;
   padding: 18px 18px 22px;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
-  min-height: 100vh;   /* add this */
-  width: 30%;         /* add this */
- 
+  width: 30%;
 }
 
 

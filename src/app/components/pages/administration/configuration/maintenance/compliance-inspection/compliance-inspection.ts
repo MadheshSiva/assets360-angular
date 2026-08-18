@@ -1,8 +1,8 @@
 import { Component, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ImportColumn, ImportFileModal } from '@shared/import-file-modal/import-file-modal';
-import { RowActions } from '@shared/row-actions/row-actions';
+import { ImportColumn, ImportFileModal } from 'shared-ui';
+import { RowActions } from 'shared-ui';
 import { ComplianceInspectionRecord, ComplianceInspectionForm } from './compliance-inspection.model';
 import { ComplianceInspectionService } from './compliance-inspection.service';
 

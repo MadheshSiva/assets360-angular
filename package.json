@@ -7,7 +7,8 @@
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:frontend": "node dist/frontend/server/server.mjs"
+    "serve:ssr:frontend": "node dist/frontend/server/server.mjs",
+    "start:mf": "concurrently -n shell,dashboard,locating -c blue,green,magenta \"ng serve frontend\" \"ng serve dashboard\" \"ng serve locating\""
   },
   "prettier": {
     "printWidth": 100,
@@ -23,6 +24,8 @@
   },
   "private": true,
   "dependencies": {
+    "@angular-architects/native-federation": "20.3.1",
+    "@angular/animations": "^20.3.0",
     "@angular/cdk": "^20.2.14",
     "@angular/common": "^20.3.0",
     "@angular/compiler": "^20.3.0",
@@ -32,7 +35,9 @@
     "@angular/platform-server": "^20.3.0",
     "@angular/router": "^20.3.0",
     "@angular/ssr": "^20.3.27",
+    "@softarc/native-federation-node": "^3.3.4",
     "@types/leaflet": "^1.9.21",
+    "es-module-shims": "^1.5.12",
     "express": "^5.1.0",
     "leaflet": "^1.9.4",
     "rxjs": "~7.8.0",
@@ -42,6 +47,7 @@
     "zone.js": "^0.15.1"
   },
   "devDependencies": {
+    "@angular-devkit/build-angular": "^20.3.27",
     "@angular/build": "^20.3.27",
     "@angular/cli": "^20.3.27",
     "@angular/compiler-cli": "^20.3.0",
@@ -50,12 +56,14 @@
     "@types/jasmine": "~5.1.0",
     "@types/node": "^20.17.19",
     "autoprefixer": "^10.5.0",
+    "concurrently": "^10.0.4",
     "jasmine-core": "~5.9.0",
     "karma": "~6.4.0",
     "karma-chrome-launcher": "~3.2.0",
     "karma-coverage": "~2.2.0",
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
+    "ng-packagr": "^20.3.0",
     "postcss": "^8.5.15",
     "typescript": "~5.9.2"
   }

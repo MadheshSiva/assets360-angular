@@ -74,6 +74,8 @@
     <table class="lh-table">
       <thead>
         <tr>
+          <th>Asset ID</th>
+          <th>Asset Name</th>
           <th>Asset Code</th>
           <th>Asset Description</th>
           <th>Company</th>
@@ -90,6 +92,12 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of filteredEntries">
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
+          </td>
+          <td>
+            <input type="text" class="cell-input" placeholder="e.g. Forklift Unit 4" [(ngModel)]="entry.assetName" />
+          </td>
           <td>
             <input type="text" class="cell-input" placeholder="e.g. EMC-14-CTA-000004" [(ngModel)]="entry.assetCode" />
           </td>
@@ -134,7 +142,7 @@
         </tr>
 
         <tr *ngIf="filteredEntries.length === 0">
-          <td colspan="12" class="empty-row">No tagged assets found.</td>
+          <td colspan="14" class="empty-row">No tagged assets found.</td>
         </tr>
       </tbody>
     </table>
