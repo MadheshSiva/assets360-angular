@@ -58,22 +58,12 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Forklift Unit 4" [(ngModel)]="entry.assetName" />
-          </td>
-          <td>
-            <input type="date" class="cell-input" [(ngModel)]="entry.auditDate" />
-          </td>
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
+          <td>{{ entry.auditDate }}</td>
           <td>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="select-wrap cell-select-wrap" style="flex: 1;">
-                <select class="cell-select" [(ngModel)]="entry.auditorDetails">
-                  <option *ngFor="let a of auditorOptions" [value]="a">{{ a }}</option>
-                </select>
-              </div>
+              {{ entry.auditorDetails }}
               <app-master-link-icons
                 masterPath="/administration/configuration/master-management/auditor-details"
                 [currentValue]="entry.auditorDetails"
@@ -82,20 +72,14 @@
           </td>
           <td>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="select-wrap cell-select-wrap" style="flex: 1;">
-                <select class="cell-select" [(ngModel)]="entry.physicalVerificationResult">
-                  <option *ngFor="let r of verificationResultOptions" [value]="r">{{ r }}</option>
-                </select>
-              </div>
+              {{ entry.physicalVerificationResult }}
               <app-master-link-icons
                 masterPath="/administration/configuration/master-management/physical-verification-result"
                 [currentValue]="entry.physicalVerificationResult"
               ></app-master-link-icons>
             </div>
           </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Serial number mismatch" [(ngModel)]="entry.discrepanciesFound" />
-          </td>
+          <td>{{ entry.discrepanciesFound }}</td>
           <td class="system-cell">{{ entry.auditHistoryLogs }}</td>
           <td class="actions-col">
             <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
@@ -118,3 +102,66 @@
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="showFormModal" (click)="closeFormModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="2" width="16" height="20" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="7" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="7" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="10" width="2.2" height="2.2" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Audit &amp; Verification' : 'Add Audit &amp; Verification' }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeFormModal()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <form class="modal-form" (ngSubmit)="submitForm()" #entryForm="ngForm">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Asset ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+        <div class="form-field">
+          <label>Asset Name</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+        <div class="form-field">
+          <label>Audit Date</label>
+          <input type="text" name="auditDate" [(ngModel)]="form.auditDate" />
+        </div>
+        <div class="form-field">
+          <label>Auditor Details</label>
+          <input type="text" name="auditorDetails" [(ngModel)]="form.auditorDetails" />
+        </div>
+        <div class="form-field">
+          <label>Physical Verification Result</label>
+          <input type="text" name="physicalVerificationResult" [(ngModel)]="form.physicalVerificationResult" />
+        </div>
+        <div class="form-field">
+          <label>Discrepancies Found</label>
+          <input type="text" name="discrepanciesFound" [(ngModel)]="form.discrepanciesFound" />
+        </div>
+        <div class="form-field form-field-wide">
+          <label>Audit History Logs</label>
+          <input type="text" name="auditHistoryLogs" [(ngModel)]="form.auditHistoryLogs" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
+        <button type="submit" class="btn btn-submit">{{ isEditMode ? 'Save Changes' : 'Add' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

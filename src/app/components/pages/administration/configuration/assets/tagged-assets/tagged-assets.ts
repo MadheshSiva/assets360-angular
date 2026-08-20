@@ -20,6 +20,22 @@ export interface TaggedAssetEntry {
   brand: string;
 }
 
+export interface TaggedAssetForm {
+  assetId: string;
+  assetName: string;
+  assetCode: string;
+  assetDescription: string;
+  company: string;
+  site: string;
+  building: string;
+  floor: string;
+  room: string;
+  mainCategory: string;
+  subCategory: string;
+  subSubCategory: string;
+  brand: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-asset-tagged-assets',
@@ -97,27 +113,37 @@ export class AssetTaggedAssets {
     this.categoryFilter = '';
   }
 
-  // Adds a new row directly to the table — each editable cell is already a
-  // live textbox/select, so there's no separate add form.
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: TaggedAssetEntry | null = null;
+  form: TaggedAssetForm = this.emptyForm();
+
+  private emptyForm(): TaggedAssetForm {
+    return {
+      assetId: '', assetName: '', assetCode: '', assetDescription: '', company: '', site: '',
+      building: '', floor: '', room: '', mainCategory: '', subCategory: '', subSubCategory: '', brand: ''
+    };
+  }
+
   onAdd(): void {
-    this.entries = [
-      ...this.entries,
-      {
-        assetId: '',
-        assetName: '',
-        assetCode: '',
-        assetDescription: '',
-        company: '',
-        site: '',
-        building: '',
-        floor: '',
-        room: '',
-        mainCategory: '',
-        subCategory: '',
-        subSubCategory: '',
-        brand: ''
-      }
-    ];
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -159,7 +185,10 @@ export class AssetTaggedAssets {
   }
 
   editRow(entry: TaggedAssetEntry): void {
-    // Rows here are already inline-editable; no separate edit flow to mirror.
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = { ...entry };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: TaggedAssetEntry): void {

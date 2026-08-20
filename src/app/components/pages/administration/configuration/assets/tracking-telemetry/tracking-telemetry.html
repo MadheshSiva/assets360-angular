@@ -88,3 +88,70 @@
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="showFormModal" (click)="closeFormModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="2" width="16" height="20" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="7" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="7" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="10" width="2.2" height="2.2" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Tracking & Telemetry' : 'Add Tracking & Telemetry' }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeFormModal()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <form class="modal-form" (ngSubmit)="submitForm()" #entryForm="ngForm">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Asset ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+        <div class="form-field">
+          <label>Asset Name</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+        <div class="form-field">
+          <label>Device ID / IMEI / MAC</label>
+          <input type="text" name="deviceId" [(ngModel)]="form.deviceId" />
+        </div>
+        <div class="form-field">
+          <label>Tag IDs (QR / RFID / BLE / GPS)</label>
+          <input type="text" name="tagIds" [(ngModel)]="form.tagIds" />
+        </div>
+        <div class="form-field form-field-wide">
+          <label>Movement Logs (Timestamp + Location)</label>
+          <input type="text" name="movementLogs" [(ngModel)]="form.movementLogs" />
+        </div>
+        <div class="form-field">
+          <label>Last Seen Timestamp</label>
+          <input type="text" name="lastSeenTimestamp" [(ngModel)]="form.lastSeenTimestamp" />
+        </div>
+        <div class="form-field">
+          <label>Speed / Route (Vehicles)</label>
+          <input type="text" name="speedRoute" [(ngModel)]="form.speedRoute" />
+        </div>
+        <div class="form-field form-field-wide">
+          <label>Sensor Data (Temp / Vibration / Battery)</label>
+          <input type="text" name="sensorData" [(ngModel)]="form.sensorData" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
+        <button type="submit" class="btn btn-submit">{{ isEditMode ? 'Save Changes' : 'Add' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

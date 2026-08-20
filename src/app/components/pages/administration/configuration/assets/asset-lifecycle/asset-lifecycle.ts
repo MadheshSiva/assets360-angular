@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 
@@ -13,10 +14,12 @@ export interface AssetLifecycleEntry {
   reasonForRetirement: string;
 }
 
+type AssetLifecycleEntryForm = AssetLifecycleEntry;
+
 @Component({
   standalone: true,
   selector: 'app-asset-lifecycle',
-  imports: [CommonModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './asset-lifecycle.html',
   styleUrls: ['./asset-lifecycle.css']
 })
@@ -32,6 +35,11 @@ export class AssetLifecycle {
   ];
 
   showImportModal = false;
+
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: AssetLifecycleEntry | null = null;
+  form: AssetLifecycleEntryForm = this.emptyForm();
 
   entries: AssetLifecycleEntry[] = [
     {
@@ -54,8 +62,37 @@ export class AssetLifecycle {
     }
   ];
 
+  private emptyForm(): AssetLifecycleEntryForm {
+    return {
+      assetId: '',
+      assetName: '',
+      procurementDate: '',
+      deploymentDate: '',
+      status: '',
+      disposalDetails: '',
+      reasonForRetirement: ''
+    };
+  }
+
   onAdd(): void {
-    // TODO: open add asset lifecycle entry flow
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -91,7 +128,18 @@ export class AssetLifecycle {
   }
 
   editRow(entry: AssetLifecycleEntry): void {
-    // TODO: open edit asset lifecycle entry flow for this entry
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      procurementDate: entry.procurementDate,
+      deploymentDate: entry.deploymentDate,
+      status: entry.status,
+      disposalDetails: entry.disposalDetails,
+      reasonForRetirement: entry.reasonForRetirement
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: AssetLifecycleEntry): void {

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 
@@ -14,10 +15,12 @@ export interface TrackingTelemetryEntry {
   sensorData: string;
 }
 
+type TrackingTelemetryEntryForm = TrackingTelemetryEntry;
+
 @Component({
   standalone: true,
   selector: 'app-asset-tracking-telemetry',
-  imports: [CommonModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './tracking-telemetry.html',
   styleUrls: ['./tracking-telemetry.css']
 })
@@ -34,6 +37,11 @@ export class AssetTrackingTelemetry {
   ];
 
   showImportModal = false;
+
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: TrackingTelemetryEntry | null = null;
+  form: TrackingTelemetryEntryForm = this.emptyForm();
 
   entries: TrackingTelemetryEntry[] = [
     {
@@ -58,8 +66,38 @@ export class AssetTrackingTelemetry {
     }
   ];
 
+  private emptyForm(): TrackingTelemetryEntryForm {
+    return {
+      assetId: '',
+      assetName: '',
+      deviceId: '',
+      tagIds: '',
+      movementLogs: '',
+      lastSeenTimestamp: '',
+      speedRoute: '',
+      sensorData: ''
+    };
+  }
+
   onAdd(): void {
-    // TODO: open add tracking & telemetry entry flow
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -96,7 +134,19 @@ export class AssetTrackingTelemetry {
   }
 
   editRow(record: TrackingTelemetryEntry): void {
-    // TODO: open edit tracking & telemetry entry flow for the given record
+    this.isEditMode = true;
+    this.editingEntry = record;
+    this.form = {
+      assetId: record.assetId,
+      assetName: record.assetName,
+      deviceId: record.deviceId,
+      tagIds: record.tagIds,
+      movementLogs: record.movementLogs,
+      lastSeenTimestamp: record.lastSeenTimestamp,
+      speedRoute: record.speedRoute,
+      sensorData: record.sensorData
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(record: TrackingTelemetryEntry): void {

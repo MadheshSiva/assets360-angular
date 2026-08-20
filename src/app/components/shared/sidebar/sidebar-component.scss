@@ -398,17 +398,7 @@
   }
 }
 
-// ============= Flyout panel (Administration right-side menu) =============
-// position: fixed (not absolute) is deliberate: it makes the panel escape any
-// ancestor's overflow:hidden / overflow-x:hidden (e.g. the app's layout-shell
-// wrapper), since fixed positioning is relative to the viewport, not a
-// clipping ancestor. top/left are set inline via [style.top.px]/[style.left.px]
-// in the template, computed from the trigger element's live bounding rect.
-//
-// Background/border/shadow are hard-coded here (not var(--piq-surface) etc.)
-// because this panel is rendered outside the sidebar's own stacking context as
-// a fixed-position layer, so it can't rely on an ancestor's background to show
-// through — it needs to be fully opaque on its own.
+
 .nav-flyout {
   position: fixed;
   top: 0;

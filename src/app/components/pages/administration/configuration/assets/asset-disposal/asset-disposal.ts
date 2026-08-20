@@ -16,6 +16,18 @@ export interface AssetDisposalEntry {
   nextApprovalWorkflow: string;
 }
 
+export interface AssetDisposalForm {
+  assetId: string;
+  assetName: string;
+  referenceNumber: string;
+  requestedBy: string;
+  disposalReason: string;
+  status: string;
+  disposalDate: string;
+  lastApprovalWorkflow: string;
+  nextApprovalWorkflow: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-asset-disposal',
@@ -61,23 +73,44 @@ export class AssetDisposal {
     { assetId: 'AST-0014', assetName: 'Cooling Tower Fan', referenceNumber: 'DISP-27112024-163934', requestedBy: 'suhail', disposalReason: 'Fully Depreciated', status: 'Created', disposalDate: '', lastApprovalWorkflow: '', nextApprovalWorkflow: 'CBO Level1 Manager' }
   ];
 
-  // Adds a new row directly to the table — each editable cell is already a
-  // live dropdown/textbox/date picker, so there's no separate add form.
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: AssetDisposalEntry | null = null;
+  form: AssetDisposalForm = this.emptyForm();
+
+  private emptyForm(): AssetDisposalForm {
+    return {
+      assetId: '',
+      assetName: '',
+      referenceNumber: '',
+      requestedBy: '',
+      disposalReason: '',
+      status: '',
+      disposalDate: '',
+      lastApprovalWorkflow: '',
+      nextApprovalWorkflow: ''
+    };
+  }
+
   onAdd(): void {
-    this.entries = [
-      ...this.entries,
-      {
-        assetId: '',
-        assetName: '',
-        referenceNumber: '',
-        requestedBy: '',
-        disposalReason: this.disposalReasonOptions[0],
-        status: this.statusOptions[0],
-        disposalDate: '',
-        lastApprovalWorkflow: '',
-        nextApprovalWorkflow: ''
-      }
-    ];
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -115,7 +148,20 @@ export class AssetDisposal {
   }
 
   editRow(entry: AssetDisposalEntry): void {
-    // TODO: open edit flow for a single row (rows here are already inline-editable; no separate edit flow to mirror)
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      referenceNumber: entry.referenceNumber,
+      requestedBy: entry.requestedBy,
+      disposalReason: entry.disposalReason,
+      status: entry.status,
+      disposalDate: entry.disposalDate,
+      lastApprovalWorkflow: entry.lastApprovalWorkflow,
+      nextApprovalWorkflow: entry.nextApprovalWorkflow
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: AssetDisposalEntry): void {

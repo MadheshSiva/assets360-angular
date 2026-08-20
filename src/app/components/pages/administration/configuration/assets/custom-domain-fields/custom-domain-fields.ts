@@ -13,12 +13,13 @@ export interface CustomDomainFieldEntry {
   fieldValue: string;
 }
 
-// Dynamic Master: the set of attribute fields shown depends on the selected asset type.
-const DYNAMIC_FIELD_MAP: Record<string, string[]> = {
-  Forklift: ['Load Capacity', 'Engine Hours', 'Fuel Type'],
-  Pallet: ['Weight Capacity', 'Material Type'],
-  Vehicle: ['Registration Number', 'Insurance Details']
-};
+export interface CustomDomainFieldForm {
+  assetId: string;
+  assetName: string;
+  assetType: string;
+  fieldName: string;
+  fieldValue: string;
+}
 
 @Component({
   standalone: true,
@@ -38,8 +39,10 @@ export class AssetCustomDomainFields {
 
   showImportModal = false;
 
-  // Master: asset types with domain-specific attribute sets
-  assetTypeOptions: string[] = Object.keys(DYNAMIC_FIELD_MAP);
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: CustomDomainFieldEntry | null = null;
+  form: CustomDomainFieldForm = this.emptyForm();
 
   entries: CustomDomainFieldEntry[] = [
     { assetId: 'AST-0001', assetName: 'Forklift Unit 4', assetType: 'Forklift', fieldName: 'Load Capacity', fieldValue: '2.5 Tons' },
@@ -51,29 +54,21 @@ export class AssetCustomDomainFields {
     { assetId: 'AST-0007', assetName: 'Company Vehicle Van 2', assetType: 'Vehicle', fieldName: 'Insurance Details', fieldValue: 'Policy #INS-88213, expires 2027-02-01' }
   ];
 
-  // Field Name options depend on that row's currently selected Asset Type (Dynamic Master).
-  fieldNameOptionsFor(assetType: string): string[] {
-    return DYNAMIC_FIELD_MAP[assetType] ?? [];
+  private emptyForm(): CustomDomainFieldForm {
+    return {
+      assetId: '',
+      assetName: '',
+      assetType: '',
+      fieldName: '',
+      fieldValue: ''
+    };
   }
 
-  // Switching Asset Type on a row invalidates its Field Name — snap to the first valid option.
-  onRowAssetTypeChange(entry: CustomDomainFieldEntry): void {
-    entry.fieldName = this.fieldNameOptionsFor(entry.assetType)[0] ?? '';
-  }
-
-  // Adds a new row directly to the table — each cell is already a live dropdown/textbox.
   onAdd(): void {
-    const assetType = this.assetTypeOptions[0];
-    this.entries = [
-      ...this.entries,
-      {
-        assetId: '',
-        assetName: '',
-        assetType,
-        fieldName: this.fieldNameOptionsFor(assetType)[0] ?? '',
-        fieldValue: ''
-      }
-    ];
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
   }
 
   onUpload(): void {
@@ -106,14 +101,34 @@ export class AssetCustomDomainFields {
     // TODO: delete selected entries
   }
 
-  // No separate edit mode exists for this table — each row's fields (Asset Type, Field Name,
-  // Field Value) are already live, directly-editable inline controls, so there is no existing
-  // per-row "start editing" affordance to mirror here. Kept as a no-op to satisfy the Actions
-  // column contract.
   editRow(entry: CustomDomainFieldEntry): void {
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      assetType: entry.assetType,
+      fieldName: entry.fieldName,
+      fieldValue: entry.fieldValue
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: CustomDomainFieldEntry): void {
     this.entries = this.entries.filter((e) => e !== entry);
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 }

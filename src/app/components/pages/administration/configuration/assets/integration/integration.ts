@@ -14,6 +14,15 @@ export interface AssetIntegrationEntry {
   lastSyncTimestamp: string;
 }
 
+export interface AssetIntegrationForm {
+  assetId: string;
+  assetName: string;
+  erpId: string;
+  wmsReference: string;
+  apiSyncStatus: string;
+  lastSyncTimestamp: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-asset-integration',
@@ -55,20 +64,27 @@ export class AssetIntegration {
     }
   ];
 
-  // Adds a new row directly to the table — each editable cell is already a
-  // live textbox/dropdown, so there's no separate add form.
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: AssetIntegrationEntry | null = null;
+  form: AssetIntegrationForm = this.emptyForm();
+
+  private emptyForm(): AssetIntegrationForm {
+    return {
+      assetId: '',
+      assetName: '',
+      erpId: '',
+      wmsReference: '',
+      apiSyncStatus: '',
+      lastSyncTimestamp: ''
+    };
+  }
+
   onAdd(): void {
-    this.entries = [
-      ...this.entries,
-      {
-        assetId: '',
-        assetName: '',
-        erpId: '',
-        wmsReference: '',
-        apiSyncStatus: this.syncStatusOptions[0],
-        lastSyncTimestamp: 'Pending first sync'
-      }
-    ];
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
   }
 
   onUpload(): void {
@@ -102,11 +118,32 @@ export class AssetIntegration {
     // TODO: delete selected entries
   }
 
-  // No separate edit mode exists on this page — every cell is already a live,
-  // directly-editable input/select. Kept as a no-op to satisfy the shared
-  // row-actions contract without inventing a modal/edit flow that isn't here.
   editRow(entry: AssetIntegrationEntry): void {
-    // TODO: no per-row edit affordance exists yet; rows are inline-editable.
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      erpId: entry.erpId,
+      wmsReference: entry.wmsReference,
+      apiSyncStatus: entry.apiSyncStatus,
+      lastSyncTimestamp: entry.lastSyncTimestamp
+    };
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   deleteRow(entry: AssetIntegrationEntry): void {

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 
@@ -13,10 +14,20 @@ export interface AssignmentOwnershipEntry {
   checkInOutLogs: string;
 }
 
+export interface AssignmentOwnershipForm {
+  assetId: string;
+  assetName: string;
+  assignedCustodian: string;
+  assignmentPeriod: string;
+  transferHistory: string;
+  custodianDetails: string;
+  checkInOutLogs: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-asset-assignment-ownership',
-  imports: [CommonModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './assignment-ownership.html',
   styleUrls: ['./assignment-ownership.css']
 })
@@ -54,8 +65,42 @@ export class AssetAssignmentOwnership {
     }
   ];
 
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: AssignmentOwnershipEntry | null = null;
+  form: AssignmentOwnershipForm = this.emptyForm();
+
+  private emptyForm(): AssignmentOwnershipForm {
+    return {
+      assetId: '',
+      assetName: '',
+      assignedCustodian: '',
+      assignmentPeriod: '',
+      transferHistory: '',
+      custodianDetails: '',
+      checkInOutLogs: ''
+    };
+  }
+
   onAdd(): void {
-    // TODO: open add assignment flow
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -91,7 +136,18 @@ export class AssetAssignmentOwnership {
   }
 
   editRow(entry: AssignmentOwnershipEntry): void {
-    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      assignedCustodian: entry.assignedCustodian,
+      assignmentPeriod: entry.assignmentPeriod,
+      transferHistory: entry.transferHistory,
+      custodianDetails: entry.custodianDetails,
+      checkInOutLogs: entry.checkInOutLogs
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: AssignmentOwnershipEntry): void {

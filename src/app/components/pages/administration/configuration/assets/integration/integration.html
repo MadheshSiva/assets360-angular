@@ -57,25 +57,13 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. HVAC Compressor Unit 2" [(ngModel)]="entry.assetName" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. SAP-AST-88213" [(ngModel)]="entry.erpId" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. WMS-REF-2201" [(ngModel)]="entry.wmsReference" />
-          </td>
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
+          <td>{{ entry.erpId }}</td>
+          <td>{{ entry.wmsReference }}</td>
           <td>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="select-wrap cell-select-wrap" style="flex: 1;">
-                <select class="cell-select" [(ngModel)]="entry.apiSyncStatus">
-                  <option *ngFor="let s of syncStatusOptions" [value]="s">{{ s }}</option>
-                </select>
-              </div>
+              {{ entry.apiSyncStatus }}
               <app-master-link-icons
                 masterPath="/administration/configuration/master-management/api-sync-status-master"
                 [currentValue]="entry.apiSyncStatus"
@@ -104,3 +92,62 @@
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="showFormModal" (click)="closeFormModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="2" width="16" height="20" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="7" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="7" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="10" width="2.2" height="2.2" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Integration' : 'Add Integration' }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeFormModal()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <form class="modal-form" (ngSubmit)="submitForm()" #entryForm="ngForm">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>Asset ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+        <div class="form-field">
+          <label>Asset Name</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+        <div class="form-field">
+          <label>ERP ID (SAP/Oracle)</label>
+          <input type="text" name="erpId" [(ngModel)]="form.erpId" />
+        </div>
+        <div class="form-field">
+          <label>WMS Reference</label>
+          <input type="text" name="wmsReference" [(ngModel)]="form.wmsReference" />
+        </div>
+        <div class="form-field">
+          <label>API Sync Status</label>
+          <input type="text" name="apiSyncStatus" [(ngModel)]="form.apiSyncStatus" />
+        </div>
+        <div class="form-field">
+          <label>Last Sync Timestamp</label>
+          <input type="text" name="lastSyncTimestamp" [(ngModel)]="form.lastSyncTimestamp" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
+        <button type="submit" class="btn btn-submit">{{ isEditMode ? 'Save Changes' : 'Add' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

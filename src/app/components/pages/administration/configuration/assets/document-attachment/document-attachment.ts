@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 
@@ -13,10 +14,12 @@ export interface DocumentAttachmentEntry {
   complianceCertificates: string;
 }
 
+type DocumentAttachmentEntryForm = DocumentAttachmentEntry;
+
 @Component({
   standalone: true,
   selector: 'app-asset-document-attachment',
-  imports: [CommonModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './document-attachment.html',
   styleUrls: ['./document-attachment.css']
 })
@@ -32,6 +35,11 @@ export class AssetDocumentAttachment {
   ];
 
   showImportModal = false;
+
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: DocumentAttachmentEntry | null = null;
+  form: DocumentAttachmentEntryForm = this.emptyForm();
 
   entries: DocumentAttachmentEntry[] = [
     {
@@ -54,8 +62,37 @@ export class AssetDocumentAttachment {
     }
   ];
 
+  private emptyForm(): DocumentAttachmentEntryForm {
+    return {
+      assetId: '',
+      assetName: '',
+      purchaseInvoice: '',
+      warrantyCertificate: '',
+      manuals: '',
+      images: '',
+      complianceCertificates: ''
+    };
+  }
+
   onAdd(): void {
-    // TODO: open add document & attachment entry flow
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -91,7 +128,18 @@ export class AssetDocumentAttachment {
   }
 
   editRow(entry: DocumentAttachmentEntry): void {
-    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      purchaseInvoice: entry.purchaseInvoice,
+      warrantyCertificate: entry.warrantyCertificate,
+      manuals: entry.manuals,
+      images: entry.images,
+      complianceCertificates: entry.complianceCertificates
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: DocumentAttachmentEntry): void {

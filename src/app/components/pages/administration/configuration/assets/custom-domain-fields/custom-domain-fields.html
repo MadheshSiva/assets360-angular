@@ -56,19 +56,11 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Forklift Unit 4" [(ngModel)]="entry.assetName" />
-          </td>
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
           <td>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="select-wrap cell-select-wrap" style="flex: 1;">
-                <select class="cell-select" [(ngModel)]="entry.assetType" (ngModelChange)="onRowAssetTypeChange(entry)">
-                  <option *ngFor="let t of assetTypeOptions" [value]="t">{{ t }}</option>
-                </select>
-              </div>
+              {{ entry.assetType }}
               <app-master-link-icons
                 masterPath="/administration/configuration/master-management/asset-type"
                 [currentValue]="entry.assetType"
@@ -77,20 +69,14 @@
           </td>
           <td>
             <div style="display: flex; align-items: center; gap: 8px;">
-              <div class="select-wrap cell-select-wrap" style="flex: 1;">
-                <select class="cell-select" [(ngModel)]="entry.fieldName">
-                  <option *ngFor="let f of fieldNameOptionsFor(entry.assetType)" [value]="f">{{ f }}</option>
-                </select>
-              </div>
+              {{ entry.fieldName }}
               <app-master-link-icons
                 masterPath="/administration/configuration/master-management/asset-type-fields"
                 [currentValue]="entry.fieldName"
               ></app-master-link-icons>
             </div>
           </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="Enter value" [(ngModel)]="entry.fieldValue" />
-          </td>
+          <td>{{ entry.fieldValue }}</td>
           <td class="actions-col">
             <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
           </td>
@@ -112,3 +98,58 @@
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="showFormModal" (click)="closeFormModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="2" width="16" height="20" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="7" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="7" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="10" width="2.2" height="2.2" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Custom / Domain-specific Asset Type Field' : 'Add Custom / Domain-specific Asset Type Field' }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeFormModal()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <form class="modal-form" (ngSubmit)="submitForm()" #entryForm="ngForm">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+        <div class="form-field">
+          <label>ASSET TYPE</label>
+          <input type="text" name="assetType" [(ngModel)]="form.assetType" />
+        </div>
+        <div class="form-field">
+          <label>FIELD NAME</label>
+          <input type="text" name="fieldName" [(ngModel)]="form.fieldName" />
+        </div>
+        <div class="form-field">
+          <label>FIELD VALUE</label>
+          <input type="text" name="fieldValue" [(ngModel)]="form.fieldValue" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
+        <button type="submit" class="btn btn-submit">{{ isEditMode ? 'Save Changes' : 'Add' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 
@@ -15,10 +16,12 @@ export interface MaintenanceServiceEntry {
   vendorServiceProvider: string;
 }
 
+type MaintenanceServiceEntryForm = MaintenanceServiceEntry;
+
 @Component({
   standalone: true,
   selector: 'app-asset-maintenance-service',
-  imports: [CommonModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './maintenance-service.html',
   styleUrls: ['./maintenance-service.css']
 })
@@ -36,6 +39,11 @@ export class AssetMaintenanceService {
   ];
 
   showImportModal = false;
+
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: MaintenanceServiceEntry | null = null;
+  form: MaintenanceServiceEntryForm = this.emptyForm();
 
   entries: MaintenanceServiceEntry[] = [
     {
@@ -62,8 +70,39 @@ export class AssetMaintenanceService {
     }
   ];
 
+  private emptyForm(): MaintenanceServiceEntryForm {
+    return {
+      assetId: '',
+      assetName: '',
+      maintenanceSchedule: '',
+      workOrders: '',
+      serviceHistory: '',
+      repairLogs: '',
+      downtimeDuration: '',
+      sparePartsUsed: '',
+      vendorServiceProvider: ''
+    };
+  }
+
   onAdd(): void {
-    // TODO: open add maintenance & service entry flow
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -101,7 +140,20 @@ export class AssetMaintenanceService {
   }
 
   editRow(entry: MaintenanceServiceEntry): void {
-    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      maintenanceSchedule: entry.maintenanceSchedule,
+      workOrders: entry.workOrders,
+      serviceHistory: entry.serviceHistory,
+      repairLogs: entry.repairLogs,
+      downtimeDuration: entry.downtimeDuration,
+      sparePartsUsed: entry.sparePartsUsed,
+      vendorServiceProvider: entry.vendorServiceProvider
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: MaintenanceServiceEntry): void {

@@ -58,39 +58,13 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Forklift Unit 4" [(ngModel)]="entry.assetName" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. MOV-26042026-152645" [(ngModel)]="entry.referenceNumber" />
-          </td>
-          <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.status">
-                <option *ngFor="let s of statusOptions" [value]="s">{{ s }}</option>
-              </select>
-            </div>
-          </td>
-          <td>
-            <input type="date" class="cell-input" [(ngModel)]="entry.movementDate" />
-          </td>
-          <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.lastApprovalWorkflow">
-                <option *ngFor="let w of approvalWorkflowOptions" [value]="w">{{ w }}</option>
-              </select>
-            </div>
-          </td>
-          <td>
-            <div class="select-wrap cell-select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.nextApprovalWorkflow">
-                <option *ngFor="let w of approvalWorkflowOptions" [value]="w">{{ w }}</option>
-              </select>
-            </div>
-          </td>
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
+          <td>{{ entry.referenceNumber }}</td>
+          <td>{{ entry.status }}</td>
+          <td>{{ entry.movementDate || '-' }}</td>
+          <td>{{ entry.lastApprovalWorkflow || '-' }}</td>
+          <td>{{ entry.nextApprovalWorkflow || '-' }}</td>
           <td class="actions-col">
             <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
           </td>
@@ -112,3 +86,66 @@
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="showFormModal" (click)="closeFormModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="2" width="16" height="20" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="7" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="7" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="10" width="2.2" height="2.2" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Asset Movement' : 'Add Asset Movement' }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeFormModal()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <form class="modal-form" (ngSubmit)="submitForm()" #entryForm="ngForm">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+        <div class="form-field">
+          <label>REFERENCE NUMBER</label>
+          <input type="text" name="referenceNumber" [(ngModel)]="form.referenceNumber" />
+        </div>
+        <div class="form-field">
+          <label>STATUS</label>
+          <input type="text" name="status" [(ngModel)]="form.status" />
+        </div>
+        <div class="form-field">
+          <label>MOVEMENT DATE</label>
+          <input type="text" name="movementDate" [(ngModel)]="form.movementDate" />
+        </div>
+        <div class="form-field">
+          <label>LAST APPROVAL WORKFLOW</label>
+          <input type="text" name="lastApprovalWorkflow" [(ngModel)]="form.lastApprovalWorkflow" />
+        </div>
+        <div class="form-field">
+          <label>NEXT APPROVAL WORKFLOW</label>
+          <input type="text" name="nextApprovalWorkflow" [(ngModel)]="form.nextApprovalWorkflow" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
+        <button type="submit" class="btn btn-submit">{{ isEditMode ? 'Save Changes' : 'Add' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

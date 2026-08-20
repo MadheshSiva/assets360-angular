@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 
@@ -13,10 +14,20 @@ export interface UtilizationPerformanceEntry {
   productivityMetrics: string;
 }
 
+interface UtilizationPerformanceForm {
+  assetId: string;
+  assetName: string;
+  usageHours: string;
+  idleTime: string;
+  movementFrequency: string;
+  utilizationPercent: string;
+  productivityMetrics: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-asset-utilization-performance',
-  imports: [CommonModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './utilization-performance.html',
   styleUrls: ['./utilization-performance.css']
 })
@@ -54,8 +65,42 @@ export class AssetUtilizationPerformance {
     }
   ];
 
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: UtilizationPerformanceEntry | null = null;
+  form: UtilizationPerformanceForm = this.emptyForm();
+
+  private emptyForm(): UtilizationPerformanceForm {
+    return {
+      assetId: '',
+      assetName: '',
+      usageHours: '',
+      idleTime: '',
+      movementFrequency: '',
+      utilizationPercent: '',
+      productivityMetrics: ''
+    };
+  }
+
   onAdd(): void {
-    // TODO: open add utilization & performance entry flow
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -91,7 +136,18 @@ export class AssetUtilizationPerformance {
   }
 
   editRow(entry: UtilizationPerformanceEntry): void {
-    // TODO: open edit utilization & performance entry flow
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      usageHours: entry.usageHours,
+      idleTime: entry.idleTime,
+      movementFrequency: entry.movementFrequency,
+      utilizationPercent: entry.utilizationPercent,
+      productivityMetrics: entry.productivityMetrics
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: UtilizationPerformanceEntry): void {

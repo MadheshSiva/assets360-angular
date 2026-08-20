@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 
@@ -16,10 +17,12 @@ export interface FinancialEntry {
   costCenterAllocation: string;
 }
 
+type FinancialEntryForm = FinancialEntry;
+
 @Component({
   standalone: true,
   selector: 'app-asset-financial',
-  imports: [CommonModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './financial.html',
   styleUrls: ['./financial.css']
 })
@@ -66,8 +69,45 @@ export class AssetFinancial {
     }
   ];
 
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: FinancialEntry | null = null;
+  form: FinancialEntryForm = this.emptyForm();
+
+  private emptyForm(): FinancialEntryForm {
+    return {
+      assetId: '',
+      assetName: '',
+      purchaseCost: '',
+      purchaseDate: '',
+      vendorDetails: '',
+      invoiceNumber: '',
+      depreciationMethod: '',
+      currentBookValue: '',
+      residualValue: '',
+      costCenterAllocation: ''
+    };
+  }
+
   onAdd(): void {
-    // TODO: open add financial entry flow
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -106,7 +146,21 @@ export class AssetFinancial {
   }
 
   editRow(entry: FinancialEntry): void {
-    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      purchaseCost: entry.purchaseCost,
+      purchaseDate: entry.purchaseDate,
+      vendorDetails: entry.vendorDetails,
+      invoiceNumber: entry.invoiceNumber,
+      depreciationMethod: entry.depreciationMethod,
+      currentBookValue: entry.currentBookValue,
+      residualValue: entry.residualValue,
+      costCenterAllocation: entry.costCenterAllocation
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: FinancialEntry): void {

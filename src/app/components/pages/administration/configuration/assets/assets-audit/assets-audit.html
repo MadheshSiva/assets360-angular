@@ -73,26 +73,14 @@
         </thead>
         <tbody>
           <tr *ngFor="let entry of entries">
-            <td>
-              <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
-            </td>
-            <td>
-              <input type="text" class="cell-input" placeholder="e.g. Forklift Unit 4" [(ngModel)]="entry.assetName" />
-            </td>
-            <td>
-              <input type="text" class="cell-input" placeholder="e.g. 210526" [(ngModel)]="entry.auditCode" />
-            </td>
-            <td>
-              <input type="text" class="cell-input" placeholder="e.g. Galfar 05JAN26" [(ngModel)]="entry.auditName" />
-            </td>
-            <td>
-              <input type="date" class="cell-input" [(ngModel)]="entry.auditStartDate" />
-            </td>
-            <td>
-              <input type="date" class="cell-input" [(ngModel)]="entry.auditEndDate" />
-            </td>
+            <td>{{ entry.assetId }}</td>
+            <td>{{ entry.assetName }}</td>
+            <td>{{ entry.auditCode }}</td>
+            <td>{{ entry.auditName }}</td>
+            <td>{{ entry.auditStartDate }}</td>
+            <td>{{ entry.auditEndDate || '-' }}</td>
             <td class="active-cell">
-              <input type="checkbox" class="active-checkbox" [(ngModel)]="entry.active" />
+              <span class="status-badge" [class.status-active]="entry.active" [class.status-inactive]="!entry.active">{{ entry.active ? 'Active' : 'Inactive' }}</span>
             </td>
             <td class="system-cell">{{ entry.createdDate || '-' }}</td>
             <td class="system-cell">{{ entry.createdBy || '-' }}</td>
@@ -118,3 +106,66 @@
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="showFormModal" (click)="closeFormModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="2" width="16" height="20" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="7" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="7" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="10" width="2.2" height="2.2" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Assets Audit' : 'Add Assets Audit' }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeFormModal()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <form class="modal-form" (ngSubmit)="submitForm()" #entryForm="ngForm">
+      <div class="form-grid">
+        <div class="form-field">
+          <label>ASSET ID</label>
+          <input type="text" name="assetId" [(ngModel)]="form.assetId" />
+        </div>
+        <div class="form-field">
+          <label>ASSET NAME</label>
+          <input type="text" name="assetName" [(ngModel)]="form.assetName" />
+        </div>
+        <div class="form-field">
+          <label>AUDIT CODE</label>
+          <input type="text" name="auditCode" [(ngModel)]="form.auditCode" />
+        </div>
+        <div class="form-field">
+          <label>AUDIT NAME</label>
+          <input type="text" name="auditName" [(ngModel)]="form.auditName" />
+        </div>
+        <div class="form-field">
+          <label>AUDIT START DATE</label>
+          <input type="text" name="auditStartDate" [(ngModel)]="form.auditStartDate" />
+        </div>
+        <div class="form-field">
+          <label>AUDIT END DATE</label>
+          <input type="text" name="auditEndDate" [(ngModel)]="form.auditEndDate" />
+        </div>
+        <div class="form-field">
+          <label>ACTIVE</label>
+          <input type="text" name="active" placeholder="Yes / No" [(ngModel)]="form.active" />
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
+        <button type="submit" class="btn btn-submit">{{ isEditMode ? 'Save Changes' : 'Add' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

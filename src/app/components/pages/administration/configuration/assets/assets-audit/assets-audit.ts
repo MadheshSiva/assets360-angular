@@ -16,6 +16,16 @@ export interface AuditConfigEntry {
   createdBy: string;
 }
 
+interface AuditConfigForm {
+  assetId: string;
+  assetName: string;
+  auditCode: string;
+  auditName: string;
+  auditStartDate: string;
+  auditEndDate: string;
+  active: string;
+}
+
 type AuditTab = 'configuration';
 
 @Component({
@@ -66,27 +76,37 @@ export class AssetAuditConfig {
     { assetId: 'AST-0015', assetName: 'Server Rack Unit 2', auditCode: 'WB180625', auditName: 'WB180625', auditStartDate: '2025-06-18', auditEndDate: '2025-07-15', active: false, createdDate: '2025-06-18', createdBy: 'Admin' }
   ];
 
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: AuditConfigEntry | null = null;
+  form: AuditConfigForm = this.emptyForm();
+
   private today(): string {
     return new Date().toISOString().slice(0, 10);
   }
 
-  // Adds a new row directly to the table — each editable cell is already a
-  // live textbox/date picker/checkbox, so there's no separate add form.
+  private emptyForm(): AuditConfigForm {
+    return {
+      assetId: '',
+      assetName: '',
+      auditCode: '',
+      auditName: '',
+      auditStartDate: '',
+      auditEndDate: '',
+      active: 'Yes'
+    };
+  }
+
+  private parseActive(value: string): boolean {
+    const normalized = value.trim().toLowerCase();
+    return normalized === 'yes' || normalized === 'true';
+  }
+
   onAdd(): void {
-    this.entries = [
-      ...this.entries,
-      {
-        assetId: '',
-        assetName: '',
-        auditCode: '',
-        auditName: '',
-        auditStartDate: '',
-        auditEndDate: '',
-        active: true,
-        createdDate: this.today(),
-        createdBy: 'Admin'
-      }
-    ];
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
   }
 
   onUpload(): void {
@@ -127,10 +147,58 @@ export class AssetAuditConfig {
   }
 
   editRow(entry: AuditConfigEntry): void {
-    // Rows here are already inline-editable; no separate edit flow to mirror.
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      auditCode: entry.auditCode,
+      auditName: entry.auditName,
+      auditStartDate: entry.auditStartDate,
+      auditEndDate: entry.auditEndDate,
+      active: entry.active ? 'Yes' : 'No'
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: AuditConfigEntry): void {
     this.entries = this.entries.filter((e) => e !== entry);
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    const active = this.parseActive(this.form.active);
+
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, {
+        assetId: this.form.assetId,
+        assetName: this.form.assetName,
+        auditCode: this.form.auditCode,
+        auditName: this.form.auditName,
+        auditStartDate: this.form.auditStartDate,
+        auditEndDate: this.form.auditEndDate,
+        active
+      });
+    } else {
+      this.entries = [
+        ...this.entries,
+        {
+          assetId: this.form.assetId,
+          assetName: this.form.assetName,
+          auditCode: this.form.auditCode,
+          auditName: this.form.auditName,
+          auditStartDate: this.form.auditStartDate,
+          auditEndDate: this.form.auditEndDate,
+          active,
+          createdDate: this.today(),
+          createdBy: 'Admin'
+        }
+      ];
+    }
+    this.closeFormModal();
   }
 }

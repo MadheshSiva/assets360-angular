@@ -14,6 +14,16 @@ export interface AssetMovementEntry {
   nextApprovalWorkflow: string;
 }
 
+export interface AssetMovementForm {
+  assetId: string;
+  assetName: string;
+  referenceNumber: string;
+  status: string;
+  movementDate: string;
+  lastApprovalWorkflow: string;
+  nextApprovalWorkflow: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-asset-movement',
@@ -55,21 +65,42 @@ export class AssetMovement {
     { assetId: 'AST-0014', assetName: 'Scissor Lift Genie GS-1930', referenceNumber: 'MOV-09092024-113124', status: 'Created', movementDate: '', lastApprovalWorkflow: '', nextApprovalWorkflow: 'Asset Controller' }
   ];
 
-  // Adds a new row directly to the table — each editable cell is already a
-  // live dropdown/textbox/date picker, so there's no separate add form.
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: AssetMovementEntry | null = null;
+  form: AssetMovementForm = this.emptyForm();
+
+  private emptyForm(): AssetMovementForm {
+    return {
+      assetId: '',
+      assetName: '',
+      referenceNumber: '',
+      status: '',
+      movementDate: '',
+      lastApprovalWorkflow: '',
+      nextApprovalWorkflow: ''
+    };
+  }
+
   onAdd(): void {
-    this.entries = [
-      ...this.entries,
-      {
-        assetId: '',
-        assetName: '',
-        referenceNumber: '',
-        status: this.statusOptions[0],
-        movementDate: '',
-        lastApprovalWorkflow: '',
-        nextApprovalWorkflow: ''
-      }
-    ];
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -105,7 +136,18 @@ export class AssetMovement {
   }
 
   editRow(entry: AssetMovementEntry): void {
-    // TODO: open edit flow for a single row (rows here are already inline-editable; no separate edit flow to mirror)
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      referenceNumber: entry.referenceNumber,
+      status: entry.status,
+      movementDate: entry.movementDate,
+      lastApprovalWorkflow: entry.lastApprovalWorkflow,
+      nextApprovalWorkflow: entry.nextApprovalWorkflow
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: AssetMovementEntry): void {

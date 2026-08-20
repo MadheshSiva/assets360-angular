@@ -14,6 +14,15 @@ export interface ComplianceCertificationEntry {
   inspectionLogs: string;
 }
 
+export interface ComplianceCertificationForm {
+  assetId: string;
+  assetName: string;
+  certificationType: string;
+  issuedDate: string;
+  expiryDate: string;
+  inspectionLogs: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-asset-compliance-certification',
@@ -32,15 +41,6 @@ export class AssetComplianceCertification {
   ];
 
   showImportModal = false;
-
-  // Master: certification type
-  certificationTypeOptions: string[] = [
-    'ISO 55000 Asset Management',
-    'Pressure Vessel Safety Certificate',
-    'Electrical Safety Certificate',
-    'Fire Safety Certificate',
-    'Environmental Compliance'
-  ];
 
   entries: ComplianceCertificationEntry[] = [
     {
@@ -61,20 +61,27 @@ export class AssetComplianceCertification {
     }
   ];
 
-  // Adds a new row directly to the table — each editable cell is already a
-  // live dropdown/date picker, so there's no separate add form.
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: ComplianceCertificationEntry | null = null;
+  form: ComplianceCertificationForm = this.emptyForm();
+
+  private emptyForm(): ComplianceCertificationForm {
+    return {
+      assetId: '',
+      assetName: '',
+      certificationType: '',
+      issuedDate: '',
+      expiryDate: '',
+      inspectionLogs: ''
+    };
+  }
+
   onAdd(): void {
-    this.entries = [
-      ...this.entries,
-      {
-        assetId: '',
-        assetName: '',
-        certificationType: this.certificationTypeOptions[0],
-        issuedDate: '',
-        expiryDate: '',
-        inspectionLogs: 'No inspections logged yet'
-      }
-    ];
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
   }
 
   onUpload(): void {
@@ -108,11 +115,32 @@ export class AssetComplianceCertification {
     // TODO: delete selected entries
   }
 
-  // Rows in this table are already inline-editable (each cell is a live
-  // dropdown/date picker bound directly to the entry), so there is no
-  // separate edit mode to enter. This exists for parity with the row
-  // actions contract; it intentionally has nothing else to do.
   editRow(entry: ComplianceCertificationEntry): void {
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      certificationType: entry.certificationType,
+      issuedDate: entry.issuedDate,
+      expiryDate: entry.expiryDate,
+      inspectionLogs: entry.inspectionLogs
+    };
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   deleteRow(entry: ComplianceCertificationEntry): void {

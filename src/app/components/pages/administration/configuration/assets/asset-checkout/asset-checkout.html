@@ -64,50 +64,19 @@
       </thead>
       <tbody>
         <tr *ngFor="let entry of entries">
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. AST-0001" [(ngModel)]="entry.assetId" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Honeywell CT60 Mobile Computer" [(ngModel)]="entry.assetName" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. 00188417" [(ngModel)]="entry.assetCode" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Honeywell CT60 Mobile Computer" [(ngModel)]="entry.assetDescription" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Central Bank of Oman" [(ngModel)]="entry.company" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Sharjah" [(ngModel)]="entry.site" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Gate Tower" [(ngModel)]="entry.building" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. First Floor" [(ngModel)]="entry.floor" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Main Conference Room" [(ngModel)]="entry.room" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Projects & Solutions" [(ngModel)]="entry.departmentName" />
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Faseeh Akthar" [(ngModel)]="entry.custodianName" />
-          </td>
-          <td>
-            <div class="select-wrap">
-              <select class="cell-select" [(ngModel)]="entry.mainCategory">
-                <option value="">-</option>
-                <option *ngFor="let option of mainCategoryOptions" [value]="option">{{ option }}</option>
-              </select>
-            </div>
-          </td>
-          <td>
-            <input type="text" class="cell-input" placeholder="e.g. Mobile Computer" [(ngModel)]="entry.subCategory" />
-          </td>
+          <td>{{ entry.assetId }}</td>
+          <td>{{ entry.assetName }}</td>
+          <td>{{ entry.assetCode }}</td>
+          <td>{{ entry.assetDescription }}</td>
+          <td>{{ entry.company }}</td>
+          <td>{{ entry.site }}</td>
+          <td>{{ entry.building }}</td>
+          <td>{{ entry.floor }}</td>
+          <td>{{ entry.room }}</td>
+          <td>{{ entry.departmentName }}</td>
+          <td>{{ entry.custodianName }}</td>
+          <td>{{ entry.mainCategory || '-' }}</td>
+          <td>{{ entry.subCategory }}</td>
           <td class="actions-col">
             <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
           </td>
@@ -129,3 +98,59 @@
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>
+
+<!-- Create / Edit Modal -->
+<div class="modal-overlay" *ngIf="showFormModal" (click)="closeFormModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <div class="modal-title-wrap">
+        <span class="modal-icon">
+          <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <rect x="4" y="2" width="16" height="20" rx="1.5" stroke="currentColor" stroke-width="1.6"/>
+            <rect x="7" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="5.5" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="7" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="11" y="10" width="2.2" height="2.2" fill="currentColor"/>
+            <rect x="15" y="10" width="2.2" height="2.2" fill="currentColor"/>
+          </svg>
+        </span>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Asset Check-Out' : 'Add Asset Check-Out' }}</h2>
+      </div>
+      <button class="modal-close" (click)="closeFormModal()" title="Close">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <form class="modal-form" (ngSubmit)="submitForm()" #entryForm="ngForm">
+      <div class="form-grid">
+        <div class="form-field"><label>ASSET ID</label><input type="text" name="assetId" [(ngModel)]="form.assetId" /></div>
+        <div class="form-field"><label>ASSET NAME</label><input type="text" name="assetName" [(ngModel)]="form.assetName" /></div>
+        <div class="form-field"><label>ASSET CODE</label><input type="text" name="assetCode" [(ngModel)]="form.assetCode" /></div>
+        <div class="form-field"><label>ASSET DESCRIPTION</label><input type="text" name="assetDescription" [(ngModel)]="form.assetDescription" /></div>
+        <div class="form-field"><label>COMPANY</label><input type="text" name="company" [(ngModel)]="form.company" /></div>
+        <div class="form-field"><label>SITE</label><input type="text" name="site" [(ngModel)]="form.site" /></div>
+        <div class="form-field"><label>BUILDING</label><input type="text" name="building" [(ngModel)]="form.building" /></div>
+        <div class="form-field"><label>FLOOR</label><input type="text" name="floor" [(ngModel)]="form.floor" /></div>
+        <div class="form-field"><label>ROOM</label><input type="text" name="room" [(ngModel)]="form.room" /></div>
+        <div class="form-field"><label>DEPARTMENT NAME</label><input type="text" name="departmentName" [(ngModel)]="form.departmentName" /></div>
+        <div class="form-field"><label>CUSTODIAN NAME</label><input type="text" name="custodianName" [(ngModel)]="form.custodianName" /></div>
+        <div class="form-field">
+          <label>MAIN CATEGORY</label>
+          <div class="select-wrap">
+            <select name="mainCategory" [(ngModel)]="form.mainCategory">
+              <option value="">-</option>
+              <option *ngFor="let option of mainCategoryOptions" [value]="option">{{ option }}</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-field"><label>SUB CATEGORY</label><input type="text" name="subCategory" [(ngModel)]="form.subCategory" /></div>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
+        <button type="submit" class="btn btn-submit">{{ isEditMode ? 'Save Changes' : 'Add' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

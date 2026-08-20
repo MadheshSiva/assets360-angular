@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 
@@ -12,10 +13,19 @@ export interface WarrantyContractEntry {
   vendorContractDocuments: string;
 }
 
+type WarrantyContractEntryForm = {
+  assetId: string;
+  assetName: string;
+  warrantyPeriod: string;
+  amc: string;
+  slaDetails: string;
+  vendorContractDocuments: string;
+};
+
 @Component({
   standalone: true,
   selector: 'app-asset-warranty-contract',
-  imports: [CommonModule, ImportFileModal, RowActions],
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './warranty-contract.html',
   styleUrls: ['./warranty-contract.css']
 })
@@ -30,6 +40,11 @@ export class AssetWarrantyContract {
   ];
 
   showImportModal = false;
+
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: WarrantyContractEntry | null = null;
+  form: WarrantyContractEntryForm = this.emptyForm();
 
   entries: WarrantyContractEntry[] = [
     {
@@ -50,8 +65,36 @@ export class AssetWarrantyContract {
     }
   ];
 
+  private emptyForm(): WarrantyContractEntryForm {
+    return {
+      assetId: '',
+      assetName: '',
+      warrantyPeriod: '',
+      amc: '',
+      slaDetails: '',
+      vendorContractDocuments: ''
+    };
+  }
+
   onAdd(): void {
-    // TODO: open add warranty & contract entry flow
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   onUpload(): void {
@@ -86,7 +129,17 @@ export class AssetWarrantyContract {
   }
 
   editRow(entry: WarrantyContractEntry): void {
-    // TODO: open edit flow for a single row (no existing per-row edit flow to mirror on this page)
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      warrantyPeriod: entry.warrantyPeriod,
+      amc: entry.amc,
+      slaDetails: entry.slaDetails,
+      vendorContractDocuments: entry.vendorContractDocuments
+    };
+    this.showFormModal = true;
   }
 
   deleteRow(entry: WarrantyContractEntry): void {

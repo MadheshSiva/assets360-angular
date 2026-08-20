@@ -15,6 +15,16 @@ export interface AlertIncidentEntry {
   resolutionStatus: string;
 }
 
+export interface AlertIncidentForm {
+  assetId: string;
+  assetName: string;
+  alertType: string;
+  incidentReports: string;
+  damageReports: string;
+  theftLossRecords: string;
+  resolutionStatus: string;
+}
+
 @Component({
   standalone: true,
   selector: 'app-asset-alert-incident',
@@ -68,21 +78,28 @@ export class AssetAlertIncident {
     }
   ];
 
-  // Adds a new row directly to the table — each cell is already a live
-  // dropdown/textbox, so there's no separate add form to fill in first.
+  showFormModal = false;
+  isEditMode = false;
+  private editingEntry: AlertIncidentEntry | null = null;
+  form: AlertIncidentForm = this.emptyForm();
+
+  private emptyForm(): AlertIncidentForm {
+    return {
+      assetId: '',
+      assetName: '',
+      alertType: '',
+      incidentReports: '',
+      damageReports: '',
+      theftLossRecords: '',
+      resolutionStatus: ''
+    };
+  }
+
   onAdd(): void {
-    this.entries = [
-      ...this.entries,
-      {
-        assetId: '',
-        assetName: '',
-        alertType: this.alertTypeOptions[0],
-        incidentReports: '',
-        damageReports: '',
-        theftLossRecords: '',
-        resolutionStatus: this.resolutionStatusOptions[0]
-      }
-    ];
+    this.isEditMode = false;
+    this.editingEntry = null;
+    this.form = this.emptyForm();
+    this.showFormModal = true;
   }
 
   onUpload(): void {
@@ -118,7 +135,32 @@ export class AssetAlertIncident {
   }
 
   editRow(entry: AlertIncidentEntry): void {
-    // TODO: open edit form for this alert / incident entry (fields are already inline-editable)
+    this.isEditMode = true;
+    this.editingEntry = entry;
+    this.form = {
+      assetId: entry.assetId,
+      assetName: entry.assetName,
+      alertType: entry.alertType,
+      incidentReports: entry.incidentReports,
+      damageReports: entry.damageReports,
+      theftLossRecords: entry.theftLossRecords,
+      resolutionStatus: entry.resolutionStatus
+    };
+    this.showFormModal = true;
+  }
+
+  closeFormModal(): void {
+    this.showFormModal = false;
+    this.editingEntry = null;
+  }
+
+  submitForm(): void {
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, this.form);
+    } else {
+      this.entries = [...this.entries, { ...this.form }];
+    }
+    this.closeFormModal();
   }
 
   deleteRow(entry: AlertIncidentEntry): void {
