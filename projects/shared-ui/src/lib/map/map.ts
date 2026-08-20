@@ -27,6 +27,9 @@ export interface MapPin {
   lng: number;
   color?: string;
   label?: string;
+  kind?: 'count' | 'device' | 'camera';
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  payload?: any;
 }
 
 @Component({
@@ -41,6 +44,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() pins: MapPin[] = [];
 
   @Output() locationClick = new EventEmitter<MapLocation>();
+  @Output() pinClick = new EventEmitter<MapPin>();
 
   @ViewChild('mapEl', { static: false }) mapEl?: ElementRef<HTMLDivElement>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -48,9 +52,13 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private marker?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private markersLayer?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private L?: any;
 
   private readonly isBrowser: boolean;
+  /** Guards against overlapping initializeMap() calls while the async Leaflet load is in flight. */
+  private mapInitStarted = false;
 
   constructor(@Inject(PLATFORM_ID) platformId: object) {
     this.isBrowser = isPlatformBrowser(platformId);
@@ -66,6 +74,13 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     if (changes['locations'] && !changes['locations'].firstChange && this.map) {
       this.updateInitialLocation();
     }
+    if (changes['pins'] && !changes['pins'].firstChange) {
+      if (this.map) {
+        this.renderPins();
+      } else if (this.isBrowser && this.mapEl && this.pins.length > 0 && !this.mapInitStarted) {
+        this.initializeMap();
+      }
+    }
   }
 
   ngOnDestroy(): void {
@@ -74,7 +89,9 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   private async initializeMap(): Promise<void> {
+    if (this.mapInitStarted || this.map) return;
     if (!this.mapEl || (this.locations.length === 0 && this.pins.length === 0)) return;
+    this.mapInitStarted = true;
     this.L = await loadLeaflet();
     const L = this.L;
 
@@ -88,18 +105,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
         attribution: '© OpenStreetMap contributors',
       }).addTo(this.map);
 
-      this.pins.forEach((pin) => {
-        const pinIcon = L.divIcon({
-          className: 'colored-pin-icon',
-          html: this.buildPinSvg(pin.color || '#2563eb'),
-          iconSize: [28, 34],
-          iconAnchor: [14, 34],
-        });
-        L.marker([pin.lat, pin.lng], { icon: pinIcon }).addTo(this.map);
-      });
-
-      const bounds = L.latLngBounds(this.pins.map((pin) => [pin.lat, pin.lng]));
-      this.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+      this.renderPins();
 
       setTimeout(() => this.map?.invalidateSize(), 100);
       setTimeout(() => this.map?.invalidateSize(), 400);
@@ -132,6 +138,32 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
 
     setTimeout(() => this.map?.invalidateSize(), 100);
     setTimeout(() => this.map?.invalidateSize(), 400);
+  }
+
+  private renderPins(): void {
+    if (!this.map || !this.L) return;
+    const L = this.L;
+
+    this.markersLayer?.clearLayers();
+    this.markersLayer ??= L.layerGroup().addTo(this.map);
+
+    this.pins.forEach((pin) => {
+      const pinIcon = L.divIcon({
+        className: 'colored-pin-icon',
+        html: this.buildPinSvg(pin.color || '#2563eb'),
+        iconSize: [28, 34],
+        iconAnchor: [14, 34],
+      });
+      const marker = L.marker([pin.lat, pin.lng], { icon: pinIcon }).addTo(this.markersLayer);
+      if (pin.kind) {
+        marker.on('click', () => this.pinClick.emit(pin));
+      }
+    });
+
+    if (this.pins.length > 0) {
+      const bounds = L.latLngBounds(this.pins.map((pin) => [pin.lat, pin.lng]));
+      this.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
+    }
   }
 
   private buildPinSvg(color: string): string {

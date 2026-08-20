@@ -588,3 +588,167 @@
   color: #7030a0;
 }
 
+/* ============ Area / Floor filter bar additions ============ */
+.filter-level-label {
+  flex: 0 0 auto;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: #7030a0;
+  background: #f0e6fa;
+  padding: 4px 12px;
+  border-radius: 999px;
+}
+
+.period-tabs {
+  display: flex;
+  align-items: center;
+  background: #eef1f6;
+  border-radius: 999px;
+  padding: 3px;
+  gap: 2px;
+}
+
+.item-multiselect {
+  flex: 1 1 280px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.item-option {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: #f8f9fc;
+  border: 1px solid #eef0f4;
+  border-radius: 999px;
+  padding: 5px 12px;
+  font-size: 12.5px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.area-type-badge {
+  flex: 0 0 auto;
+  margin-left: 8px;
+  padding: 2px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: #7030a0;
+  background: #f0e6fa;
+  white-space: nowrap;
+}
+
+.cascade-row.is-active .area-type-badge {
+  color: #fff;
+  background: #a367d1;
+}
+
+/* ============ Pin click popup ============ */
+.pin-popup {
+  width: 480px;
+  max-width: 92vw;
+  max-height: 85vh;
+  background: #fff;
+  border-radius: 14px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 12px 32px rgba(15, 23, 42, 0.25);
+}
+
+.pin-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #e9dcfb;
+  padding: 16px 22px;
+}
+
+.pin-popup-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #7030a0;
+}
+
+.modal-close-btn {
+  border: none;
+  background: transparent;
+  font-size: 20px;
+  line-height: 1;
+  color: #7030a0;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+
+.modal-close-btn:hover {
+  background: rgba(112, 48, 160, 0.12);
+}
+
+.pin-popup-body {
+  padding: 18px 22px 22px;
+  overflow-y: auto;
+}
+
+.pin-popup-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.pin-popup-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+  padding: 6px 10px;
+  border-bottom: 1px solid #edf2f7;
+}
+
+.pin-popup-table td {
+  padding: 8px 10px;
+  border-bottom: 1px solid #f1f5f9;
+  color: #0f172a;
+}
+
+.pin-popup-fields {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 8px 16px;
+  margin: 0;
+}
+
+.pin-popup-fields dt {
+  font-size: 12px;
+  font-weight: 700;
+  color: #64748b;
+}
+
+.pin-popup-fields dd {
+  margin: 0;
+  font-size: 13px;
+  color: #0f172a;
+  font-weight: 600;
+}
+
+.camera-stub-preview {
+  background: #0f172a;
+  color: #94a3b8;
+  border-radius: 10px;
+  height: 140px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 13px;
+  margin-bottom: 16px;
+}
+

@@ -1,16 +1,25 @@
 <section class="locating-page">
   <div class="locating-layout">
-    <!-- Left Panel: Location cascade -->
+    <!-- Left Panel: real Project -> Area -> (Zone/Building -> Floor -> Zone) hierarchy, read-only -->
     <aside class="filter-panel" *ngIf="!isPanelCollapsed">
       <h2 class="panel-title">Locating</h2>
 
       <ul class="cascade-list">
-        <li *ngFor="let name of visibleChain; let i = index; trackBy: trackByName" class="cascade-row"
-          [class.is-header]="i === 0" [class.is-active]="isActive(name)" [class.is-clickable]="isExpandable(name)"
-          [attr.data-depth]="i" (click)="toggle(name)">
-          <span class="row-label">{{ name }}</span>
-          <span class="row-chevron" aria-hidden="true">
-            <ng-container *ngIf="isActive(name); else chevDown">&rsaquo;</ng-container>
+        <li
+          *ngFor="let row of visibleRows; trackBy: trackByRow"
+          class="cascade-row"
+          [class.is-header]="row.depth === 0"
+          [class.is-active]="isActive(row.node.id)"
+          [class.is-clickable]="true"
+          [attr.data-depth]="row.depth"
+          (click)="toggle(row.node)"
+        >
+          <span class="row-label">{{ row.node.name }}</span>
+          <span class="area-type-badge" *ngIf="areaTypeOf(row.node) as areaType" [title]="areaTypeLabels[areaType]">
+            {{ areaTypeShortLabels[areaType] }}
+          </span>
+          <span class="row-chevron" aria-hidden="true" *ngIf="isExpandable(row.node) || expanded.has(row.node.id)">
+            <ng-container *ngIf="expanded.has(row.node.id); else chevDown">&rsaquo;</ng-container>
             <ng-template #chevDown>v</ng-template>
           </span>
         </li>
@@ -19,26 +28,52 @@
 
     <!-- Right Panel: Map + Top Filters -->
     <div class="map-panel">
-      <header class="map-filters">
+      <header class="map-filters" *ngIf="currentFilters as filters">
+        <div class="filter-level-label">{{ activeLevel === 'area' ? 'Area filters' : 'Floor filters' }}</div>
+
         <div class="filter-group">
-          <label>Select Device :</label>
-          <select [(ngModel)]="selectedDevice" class="filter-select">
-            <option *ngFor="let d of devices" [value]="d.value">{{ d.label }}</option>
-          </select>
+          <label>Time :</label>
+          <div class="period-tabs">
+            <button type="button" class="period-tab" [class.is-active]="filters.period === 'day'"
+              (click)="selectPeriod(filters, 'day')">Day</button>
+            <button type="button" class="period-tab" [class.is-active]="filters.period === 'week'"
+              (click)="selectPeriod(filters, 'week')">Week</button>
+            <button type="button" class="period-tab" [class.is-active]="filters.period === 'month'"
+              (click)="selectPeriod(filters, 'month')">Month</button>
+          </div>
         </div>
+
         <div class="filter-group">
           <label>Select Parameter :</label>
-          <select [(ngModel)]="selectedParameter" class="filter-select">
+          <select [(ngModel)]="filters.parameter" (ngModelChange)="onParameterChange(filters)" class="filter-select">
             <option value="" disabled>-- Select Parameter --</option>
             <option *ngFor="let p of parameters" [value]="p.value">{{ p.label }}</option>
+          </select>
+        </div>
+
+        <div class="filter-group" *ngIf="hasCategoryItems(filters)">
+          <label>Select {{ filters.parameter === 'employee' ? 'Employees' : filters.parameter === 'asset' ? 'Assets' : 'Devices' }} :</label>
+          <div class="item-multiselect">
+            <label class="item-option" *ngFor="let item of itemsForParameter(filters.parameter)">
+              <input type="checkbox" [checked]="isItemSelected(filters, item.id)"
+                (change)="toggleItemSelection(filters, item.id)" />
+              <span>{{ item.name }}</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="filter-group" *ngIf="isDeviceCategory(filters) && filters.selectedItemIds.length > 0">
+          <label>Device Attribute :</label>
+          <select [(ngModel)]="filters.deviceAttribute" (ngModelChange)="onDeviceAttributeChange()" class="filter-select">
+            <option value="">-- None --</option>
+            <option *ngFor="let a of deviceAttributes" [value]="a.value">{{ a.label }}</option>
           </select>
         </div>
       </header>
 
       <!-- Map + its own FAB, anchored to the map's right edge -->
       <div class="map-wrapper">
-        <app-map *ngIf="!mapOverlayImage" [locations]="mapLocations"></app-map>
-        <img *ngIf="mapOverlayImage" [src]="mapOverlayImage" class="map-image-overlay" alt="Location map" />
+        <app-map [pins]="mapPins" (pinClick)="onPinClick($event)"></app-map>
 
         <button type="button" class="panel-fab" [class.is-collapsed]="isPanelCollapsed" (click)="togglePanel()"
           [attr.aria-label]="isPanelCollapsed ? 'Hide statistics' : 'Show statistics'">
@@ -54,11 +89,11 @@
 
         <div class="stats-period-tabs">
           <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'day'"
-            (click)="selectPeriod('day')">Day</button>
+            (click)="selectStatsPeriod('day')">Day</button>
           <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'week'"
-            (click)="selectPeriod('week')">Week</button>
+            (click)="selectStatsPeriod('week')">Week</button>
           <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'month'"
-            (click)="selectPeriod('month')">Month</button>
+            (click)="selectStatsPeriod('month')">Month</button>
         </div>
 
         <button type="button" class="stats-settings-btn" (click)="openStatsModal()"
@@ -103,6 +138,53 @@
         <div class="stats-modal-footer">
           <button type="button" class="btn-close" (click)="closeStatsModal()">Close</button>
           <button type="button" class="btn-save" (click)="saveStatsSelection()">Save</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pin click popups: count table / device detail / camera stub -->
+    <div class="modal-overlay" *ngIf="activePopup as popup" (click)="closePopup()">
+      <div class="pin-popup" (click)="$event.stopPropagation()">
+        <header class="pin-popup-header">
+          <h3>
+            <ng-container [ngSwitch]="popup.kind">
+              <span *ngSwitchCase="'count'">{{ popup.data.zoneName }}</span>
+              <span *ngSwitchCase="'device'">{{ popup.data.name }}</span>
+              <span *ngSwitchCase="'camera'">{{ popup.data.name }}</span>
+            </ng-container>
+          </h3>
+          <button type="button" class="modal-close-btn" aria-label="Close" (click)="closePopup()">&times;</button>
+        </header>
+
+        <div class="pin-popup-body" [ngSwitch]="popup.kind">
+          <table *ngSwitchCase="'count'" class="pin-popup-table">
+            <thead>
+              <tr><th>Name</th><th>Location</th><th>Status</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of popup.data.items">
+                <td>{{ item.name }}</td>
+                <td>{{ item.location }}</td>
+                <td><span class="status-label" [class]="'status-label-' + item.status">{{ item.status }}</span></td>
+              </tr>
+            </tbody>
+          </table>
+
+          <dl *ngSwitchCase="'device'" class="pin-popup-fields">
+            <dt>Device ID</dt><dd>{{ popup.data.id }}</dd>
+            <dt>Battery</dt><dd>{{ popup.data.battery }}%</dd>
+            <dt>RSSI</dt><dd>{{ popup.data.rssi }} dBm</dd>
+            <dt>Firmware</dt><dd>{{ popup.data.firmware }}</dd>
+            <dt>Last Heartbeat</dt><dd>{{ popup.data.lastHeartbeat }}</dd>
+          </dl>
+
+          <div *ngSwitchCase="'camera'" class="camera-stub">
+            <div class="camera-stub-preview">Live feed unavailable in demo</div>
+            <dl class="pin-popup-fields">
+              <dt>Camera</dt><dd>{{ popup.data.name }}</dd>
+              <dt>Zone</dt><dd>{{ popup.data.zoneName }}</dd>
+            </dl>
+          </div>
         </div>
       </div>
     </div>

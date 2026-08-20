@@ -1,19 +1,53 @@
-import {
-  Component,
-  ViewChild,
-} from '@angular/core';
+import { Component, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { MapComponent, MapLocation } from 'shared-ui';
+import {
+  AREA_TYPE_LABELS,
+  AREA_TYPE_SHORT_LABELS,
+  Coords,
+  HierarchyNode,
+  MapComponent,
+  MapPin,
+  SiteHierarchyService,
+  childrenOf,
+} from 'shared-ui';
 
 export type TrackMode = 'people' | 'assets';
+type Period = 'day' | 'week' | 'month';
+type PopupKind = 'count' | 'device' | 'camera';
 
-export interface LocationNode {
-  name: string;
-  /** Lat/Lng + zoom the map should fly to when this row becomes active. */
-  coords: { lat: number; lng: number; zoom: number };
-  children?: LocationNode[];
+interface Row {
+  node: HierarchyNode;
+  depth: number;
 }
+
+interface MockItem {
+  id: string;
+  name: string;
+  coords: Coords;
+}
+
+interface DeviceItem extends MockItem {
+  battery: number;
+  rssi: number;
+  firmware: string;
+  lastHeartbeat: string;
+}
+
+interface LevelFilters {
+  period: Period;
+  parameter: string;
+  selectedItemIds: string[];
+  deviceAttribute: string;
+}
+
+interface Popup {
+  kind: PopupKind;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  data: any;
+}
+
+const CATEGORY_PARAMETERS = new Set(['employee', 'asset', 'device']);
 
 @Component({
   standalone: true,
@@ -24,241 +58,349 @@ export interface LocationNode {
 })
 export class Locating {
   mode: TrackMode = 'people';
-
-  // The full chain we render in the cascade.
-  // Coords roughly approximate UAE → Oman → Muscat area → street → building,
-  // with progressively deeper zoom levels so each click visibly zooms in.
   isPanelCollapsed = false;
+
+  constructor(private readonly hierarchy: SiteHierarchyService) {
+    // Re-derive pins whenever the underlying (shared, signal-based) zone data changes.
+    effect(() => {
+      this.hierarchy.allZones();
+      this.refreshPins();
+    });
+  }
 
   togglePanel(): void {
     this.isPanelCollapsed = !this.isPanelCollapsed;
   }
-  locationTree: LocationNode[] = [
-    {
-      name: 'UAE',
-      coords: { lat: 24.4539, lng: 54.3773, zoom: 6 },
-      children: [
-        {
-          name: 'Oman',
-          coords: { lat: 23.585, lng: 58.405, zoom: 7 },
-          children: [
-            {
-              name: 'Street One',
-              coords: { lat: 23.612, lng: 58.539, zoom: 13 },
-              children: [
-                {
-                  name: 'Second Colony',
-                  coords: { lat: 23.6145, lng: 58.541, zoom: 15 },
-                  children: [
-                    {
-                      name: 'Third Right',
-                      coords: { lat: 23.6155, lng: 58.542, zoom: 17 },
-                      children: [
-                        {
-                          name: 'Azy floor',
-                          coords: { lat: 23.6158, lng: 58.5423, zoom: 19 },
-                        },
-                      ],
-                    },
-                  ],
-                },
-              ],
-            },
-          ],
-        },
-      ],
-    },
-  ];
 
-  expanded: Set<string> = new Set<string>();
+  // ===== Read-only cascade (mirrors the Area/Zone/Building hierarchy configured in Projects) =====
+
+  expanded = new Set<string>();
+  activeNodeId: string | null = null;
 
   @ViewChild(MapComponent, { static: false }) mapComponent?: MapComponent;
 
-  get modeLabel(): string {
-    return this.mode === 'people' ? 'Track People' : 'Track Assets';
+  readonly areaTypeLabels = AREA_TYPE_LABELS;
+  readonly areaTypeShortLabels = AREA_TYPE_SHORT_LABELS;
+
+  get visibleRows(): Row[] {
+    const rows: Row[] = [];
+    const walk = (node: HierarchyNode, depth: number) => {
+      rows.push({ node, depth });
+      if (this.expanded.has(node.id)) {
+        childrenOf(node).forEach((child) => walk(child, depth + 1));
+      }
+    };
+    this.hierarchy.projects().forEach((project) => walk(project, 0));
+    return rows;
   }
 
-  get visibleChain(): string[] {
-    const chain: string[] = [this.modeLabel];
-    if (!this.expanded.has(this.modeLabel)) return chain;
+  trackByRow = (_: number, row: Row) => row.node.id;
 
-    let node: LocationNode | undefined = this.locationTree[0];
-    while (node && node.children && node.children.length > 0) {
-      const next: LocationNode = node.children[0];
-      if (!this.expanded.has(node.name)) break;
-      chain.push(next.name);
-      node = next;
+  isActive(id: string): boolean {
+    return this.activeNodeId === id;
+  }
+
+  isExpandable(node: HierarchyNode): boolean {
+    return childrenOf(node).length > 0 && !this.expanded.has(node.id);
+  }
+
+  areaTypeOf(node: HierarchyNode) {
+    return node.kind === 'area' ? node.type : null;
+  }
+
+  toggle(node: HierarchyNode): void {
+    this.activeNodeId = node.id;
+    this.mapComponent?.flyTo(node.coords);
+    this.refreshPins();
+
+    if (this.expanded.has(node.id)) {
+      const next = new Set(this.expanded);
+      next.delete(node.id);
+      const collectDescendants = (n: HierarchyNode) => {
+        childrenOf(n).forEach((child) => {
+          next.delete(child.id);
+          collectDescendants(child);
+        });
+      };
+      collectDescendants(node);
+      this.expanded = next;
+      return;
     }
-    return chain;
+
+    if (childrenOf(node).length === 0) return;
+    this.expanded = new Set(this.expanded).add(node.id);
   }
 
-  /** Coords of the deepest expanded row, falling back to the root. */
-  get activeCoords(): { lat: number; lng: number; zoom: number } {
-    const names = this.visibleChain.slice(1); // drop the mode label
-    let node: LocationNode | undefined = this.locationTree[0];
-    let coords: { lat: number; lng: number; zoom: number } | undefined = node?.coords;
-    for (const name of names) {
-      if (!node || !node.children) break;
-      const next: LocationNode | undefined = node.children.find((c) => c.name === name);
-      if (!next) break;
-      node = next;
-      coords = next.coords;
-    }
-    return coords as { lat: number; lng: number; zoom: number };
+  get activeNode(): HierarchyNode | undefined {
+    return this.activeNodeId ? this.hierarchy.findNode(this.activeNodeId) : undefined;
   }
 
-  isActive(name: string): boolean {
-    if (name === this.modeLabel) return false;
-    const chain = this.visibleChain;
-    return chain[chain.length - 1] === name;
+  /** Which per-level filter bar to show: the spec calls for filters at Area level and Floor level only. */
+  get activeLevel(): 'area' | 'floor' | null {
+    const kind = this.activeNode?.kind;
+    return kind === 'area' ? 'area' : kind === 'floor' ? 'floor' : null;
   }
 
-  isExpandable(name: string): boolean {
-    if (name === this.modeLabel) return !this.expanded.has(this.modeLabel);
-    if (this.expanded.has(name)) return false;
-    return this.findNode(name)?.children?.length ? true : false;
-  }
-
-  /** Coords for the map component as MapLocation[] */
-  get mapLocations(): MapLocation[] {
-    return this.locationTree;
-  }
-
-  /** When the deepest active row is "Third Right" or "Azy floor", show a static image instead of the live map. */
-  get mapOverlayImage(): string | null {
-    const activeName = this.visibleChain[this.visibleChain.length - 1];
-    if (activeName === 'Third Right') return '/mapp.png';
-    if (activeName === 'Azy floor') return '/mappp.png';
+  get currentFilters(): LevelFilters | null {
+    if (this.activeLevel === 'area') return this.areaFilters;
+    if (this.activeLevel === 'floor') return this.floorFilters;
     return null;
   }
 
-  /**
-   * Click handler: expand the row, then fly the map to that node's coords.
-   */
-  toggle(name: string): void {
-    if (name === this.modeLabel) {
-      const next = new Set(this.expanded);
-      if (next.has(this.modeLabel)) {
-        next.delete(this.modeLabel);
-        this.locationTree.forEach((node) => {
-          const collectDescendants = (n: LocationNode) => {
-            next.delete(n.name);
-            (n.children ?? []).forEach((child) => collectDescendants(child));
-          };
-          collectDescendants(node);
-        });
-      } else {
-        next.add(this.modeLabel);
-        if (this.locationTree[0]) {
-          next.add(this.locationTree[0].name);
-        }
-      }
-      this.expanded = next;
-      return;
-    }
+  // ===== Area-level & floor-level filters (independent state per level) =====
 
-    const isCurrentlyExpanded = this.expanded.has(name);
-
-    if (isCurrentlyExpanded) {
-      const next = new Set(this.expanded);
-      next.delete(name);
-
-      const node = this.findNode(name);
-      if (node?.children?.length) {
-        const collectDescendants = (n: LocationNode) => {
-          (n.children ?? []).forEach((child) => {
-            next.delete(child.name);
-            collectDescendants(child);
-          });
-        };
-        collectDescendants(node);
-      }
-
-      this.expanded = next;
-      return;
-    }
-
-    if (!this.isExpandable(name)) return;
-    this.expanded = new Set(this.expanded).add(name);
-
-    const node = this.findNode(name);
-    if (this.mapComponent && node) {
-      this.mapComponent.flyTo(node.coords);
-    }
+  private defaultFilters(): LevelFilters {
+    return { period: 'month', parameter: '', selectedItemIds: [], deviceAttribute: '' };
   }
 
-  private findNode(name: string): LocationNode | undefined {
-    const stack: LocationNode[] = [this.locationTree[0]];
-    while (stack.length) {
-      const n: LocationNode = stack.pop()!;
-      if (n.name === name) return n;
-      if (n.children) stack.push(...n.children);
-    }
-    return undefined;
-  }
+  areaFilters: LevelFilters = this.defaultFilters();
+  floorFilters: LevelFilters = this.defaultFilters();
 
-  trackByName = (_: number, name: string) => name;
-
-  // ===== Right-side filter state =====
-  selectedDevice: string = 'fixed';
-  devices = [
-    { label: 'Fixed', value: 'fixed' },
-    { label: 'Mobile', value: 'mobile' },
-    { label: 'Wearable', value: 'wearable' },
-    { label: 'Bluetooth Beacon', value: 'beacon' },
-  ];
-
-  selectedParameter: string = '';
   parameters = [
+    { label: 'Employee', value: 'employee' },
+    { label: 'Asset', value: 'asset' },
+    { label: 'Device', value: 'device' },
     { label: 'Heart Rate', value: 'heart_rate' },
     { label: 'Body Temperature', value: 'body_temperature' },
     { label: 'Location', value: 'location' },
     { label: 'Movement Status', value: 'movement' },
     { label: 'Battery Level', value: 'battery' },
   ];
-selectedPeriod: 'day' | 'week' | 'month' = 'month';
-isStatsModalOpen = false;
 
-stats = {
-  topZone: 'Zone A',
-  peakTime: '14:00',
-  peakDay: 'Monday',
-};
+  deviceAttributes = [
+    { label: 'Battery', value: 'battery' },
+    { label: 'RSSI', value: 'rssi' },
+    { label: 'Firmware Version', value: 'firmware' },
+    { label: 'Last Heartbeat', value: 'heartbeat' },
+  ];
 
-// Full list mirrors the reference popup. Only keys present in `stats`
-// actually render a card right now — the rest are placeholders for later.
-statOptions: { key: string; label: string; checked: boolean }[] = [
-  { key: 'topZone', label: 'Top Zone', checked: true },
-  { key: 'peakTime', label: 'Peak Time', checked: true },
-  { key: 'peakDay', label: 'Peak Day', checked: true },
-  
-];
+  selectPeriod(filters: LevelFilters, period: Period): void {
+    filters.period = period;
+  }
 
-selectPeriod(period: 'day' | 'week' | 'month'): void {
-  this.selectedPeriod = period;
-}
+  onParameterChange(filters: LevelFilters): void {
+    filters.selectedItemIds = [];
+    filters.deviceAttribute = '';
+    this.refreshPins();
+  }
 
-openStatsModal(): void {
-  this.isStatsModalOpen = true;
-}
+  hasCategoryItems(filters: LevelFilters | null): boolean {
+    return !!filters && CATEGORY_PARAMETERS.has(filters.parameter);
+  }
 
-closeStatsModal(): void {
-  this.isStatsModalOpen = false;
-}
+  isDeviceCategory(filters: LevelFilters | null): boolean {
+    return filters?.parameter === 'device';
+  }
 
-toggleStatOption(key: string): void {
-  const opt = this.statOptions.find((o) => o.key === key);
-  if (opt) opt.checked = !opt.checked;
-}
+  itemsForParameter(parameter: string): MockItem[] {
+    switch (parameter) {
+      case 'employee':
+        return this.employeeItems;
+      case 'asset':
+        return this.assetItems;
+      case 'device':
+        return this.deviceItems;
+      default:
+        return [];
+    }
+  }
 
-saveStatsSelection(): void {
-  this.isStatsModalOpen = false;
-}
+  toggleItemSelection(filters: LevelFilters, id: string): void {
+    const idx = filters.selectedItemIds.indexOf(id);
+    if (idx >= 0) filters.selectedItemIds.splice(idx, 1);
+    else filters.selectedItemIds.push(id);
+    this.refreshPins();
+  }
 
-isStatVisible(key: string): boolean {
-  return this.statOptions.find((o) => o.key === key)?.checked ?? false;
-}
-  // ===== Tracked people summary (static) =====
+  isItemSelected(filters: LevelFilters, id: string): boolean {
+    return filters.selectedItemIds.includes(id);
+  }
+
+  onDeviceAttributeChange(): void {
+    this.refreshPins();
+  }
+
+  // ===== Mock items (Employee / Asset / Device categories) =====
+
+  employeeItems: MockItem[] = [
+    { id: 'emp-1', name: 'John Doe', coords: { lat: 23.6138, lng: 58.5406, zoom: 19 } },
+    { id: 'emp-2', name: 'Jane Smith', coords: { lat: 23.6149, lng: 58.5418, zoom: 19 } },
+    { id: 'emp-3', name: 'Ali Hassan', coords: { lat: 23.6128, lng: 58.5395, zoom: 19 } },
+  ];
+
+  assetItems: MockItem[] = [
+    { id: 'asset-1', name: 'Forklift #12', coords: { lat: 23.6135, lng: 58.5399, zoom: 19 } },
+    { id: 'asset-2', name: 'Pallet Jack #04', coords: { lat: 23.6151, lng: 58.542, zoom: 19 } },
+  ];
+
+  deviceItems: DeviceItem[] = [
+    {
+      id: 'dev-1',
+      name: 'Wearable Tag 101',
+      coords: { lat: 23.6143, lng: 58.541, zoom: 19 },
+      battery: 82,
+      rssi: -61,
+      firmware: '2.3.1',
+      lastHeartbeat: '2 min ago',
+    },
+    {
+      id: 'dev-2',
+      name: 'Fixed Beacon B2',
+      coords: { lat: 23.6146, lng: 58.5419, zoom: 19 },
+      battery: 45,
+      rssi: -74,
+      firmware: '2.2.0',
+      lastHeartbeat: '5 min ago',
+    },
+  ];
+
+  cameraPins: MapPin[] = [
+    {
+      lat: 23.6136,
+      lng: 58.5412,
+      color: '#1e293b',
+      label: 'Lobby Camera',
+      kind: 'camera',
+      payload: { id: 'cam-1', name: 'Lobby Camera', zoneName: 'Reception' },
+    },
+    {
+      lat: 23.6126,
+      lng: 58.5397,
+      color: '#1e293b',
+      label: 'Parking Camera',
+      kind: 'camera',
+      payload: { id: 'cam-2', name: 'Parking Camera', zoneName: 'Parking Zone' },
+    },
+  ];
+
+  private deviceAttributeValue(device: DeviceItem, attribute: string): string {
+    switch (attribute) {
+      case 'battery':
+        return `${device.battery}%`;
+      case 'rssi':
+        return `${device.rssi} dBm`;
+      case 'firmware':
+        return device.firmware;
+      case 'heartbeat':
+        return device.lastHeartbeat;
+      default:
+        return '';
+    }
+  }
+
+  /** Zones from the real configured hierarchy, each doubling as a "count" marker on the map. */
+  private zonePins(): MapPin[] {
+    return this.hierarchy.allZones().map((zone, i) => ({
+      lat: zone.coords.lat,
+      lng: zone.coords.lng,
+      color: zone.color,
+      label: zone.name,
+      kind: 'count' as const,
+      payload: { zoneName: zone.name, items: this.mockTrackedItems(zone.name, i) },
+    }));
+  }
+
+  private mockTrackedItems(zoneName: string, seed: number) {
+    const statuses: Array<'online' | 'idle' | 'offline'> = ['online', 'idle', 'offline'];
+    return Array.from({ length: 2 + (seed % 2) }, (_, i) => ({
+      name: `Asset ${seed * 3 + i + 1}`,
+      location: zoneName,
+      status: statuses[(seed + i) % statuses.length],
+    }));
+  }
+
+  private selectedItemPins(filters: LevelFilters | null): MapPin[] {
+    if (!filters || !this.hasCategoryItems(filters)) return [];
+
+    if (filters.parameter === 'device') {
+      return this.deviceItems
+        .filter((d) => filters.selectedItemIds.includes(d.id))
+        .map((d) => ({
+          lat: d.coords.lat,
+          lng: d.coords.lng,
+          color: '#2563eb',
+          label: filters.deviceAttribute
+            ? `${d.name} (${this.deviceAttributeValue(d, filters.deviceAttribute)})`
+            : d.name,
+          kind: 'device' as const,
+          payload: {
+            id: d.id,
+            name: d.name,
+            battery: d.battery,
+            rssi: d.rssi,
+            firmware: d.firmware,
+            lastHeartbeat: d.lastHeartbeat,
+          },
+        }));
+    }
+
+    const items = this.itemsForParameter(filters.parameter);
+    return items
+      .filter((item) => filters.selectedItemIds.includes(item.id))
+      .map((item) => ({ lat: item.coords.lat, lng: item.coords.lng, color: '#5b3df5', label: item.name }));
+  }
+
+  mapPins: MapPin[] = [];
+
+  private refreshPins(): void {
+    this.mapPins = [...this.zonePins(), ...this.selectedItemPins(this.currentFilters), ...this.cameraPins];
+  }
+
+  // ===== Click-to-popup =====
+
+  activePopup: Popup | null = null;
+
+  onPinClick(pin: MapPin): void {
+    if (!pin.kind) return;
+    this.activePopup = { kind: pin.kind, data: pin.payload };
+  }
+
+  closePopup(): void {
+    this.activePopup = null;
+  }
+
+  // ===== Existing Statistics panel (unrelated to the spec changes above; left as-is) =====
+
+  selectedPeriod: 'day' | 'week' | 'month' = 'month';
+  isStatsModalOpen = false;
+
+  stats = {
+    topZone: 'Zone A',
+    peakTime: '14:00',
+    peakDay: 'Monday',
+  };
+
+  statOptions: { key: string; label: string; checked: boolean }[] = [
+    { key: 'topZone', label: 'Top Zone', checked: true },
+    { key: 'peakTime', label: 'Peak Time', checked: true },
+    { key: 'peakDay', label: 'Peak Day', checked: true },
+  ];
+
+  selectStatsPeriod(period: 'day' | 'week' | 'month'): void {
+    this.selectedPeriod = period;
+  }
+
+  openStatsModal(): void {
+    this.isStatsModalOpen = true;
+  }
+
+  closeStatsModal(): void {
+    this.isStatsModalOpen = false;
+  }
+
+  toggleStatOption(key: string): void {
+    const opt = this.statOptions.find((o) => o.key === key);
+    if (opt) opt.checked = !opt.checked;
+  }
+
+  saveStatsSelection(): void {
+    this.isStatsModalOpen = false;
+  }
+
+  isStatVisible(key: string): boolean {
+    return this.statOptions.find((o) => o.key === key)?.checked ?? false;
+  }
+
   trackedPeople = [
     { name: 'Assets1', location: 'Azy floor - Room 101', status: 'online' as const },
     { name: 'Assets2', location: 'Azy floor - Room 102', status: 'online' as const },

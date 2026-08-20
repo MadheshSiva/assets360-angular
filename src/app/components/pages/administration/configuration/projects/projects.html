@@ -9,15 +9,14 @@
 
       <ul class="cascade-list">
         <li
-          *ngFor="let name of visibleChain; let i = index; trackBy: trackByName"
-          class="cascade-row"
-          [class.is-header]="i === 0"
-          [class.is-active]="isActive(name)"
-          [class.is-clickable]="isExpandable(name)"
-          [attr.data-depth]="i"
-          (click)="toggle(name)"
+          *ngFor="let row of visibleRows; trackBy: trackByRow"
+          class="cascade-row is-clickable"
+          [class.is-header]="row.depth === 0"
+          [class.is-active]="isActive(row.node.id)"
+          [attr.data-depth]="row.depth"
+          (click)="toggle(row.node)"
         >
-          <ng-container *ngIf="editingName === name; else displayLabel">
+          <ng-container *ngIf="editingId === row.node.id; else displayLabel">
             <input
               type="text"
               class="row-edit-input"
@@ -30,23 +29,69 @@
             />
           </ng-container>
           <ng-template #displayLabel>
-            <span class="row-label">{{ name }}</span>
+            <span class="row-label">{{ row.node.name }}</span>
+            <span class="area-type-badge" *ngIf="areaTypeOf(row.node) as areaType" [title]="areaTypeLabels[areaType]">
+              {{ areaTypeShortLabels[areaType] }}
+            </span>
           </ng-template>
 
-          <span class="row-actions" *ngIf="i > 0">
+          <span class="row-actions">
             <button
+              *ngIf="row.node.kind === 'project'"
               type="button"
               class="row-action-btn"
-              title="Add child location"
-              (click)="$event.stopPropagation(); addChild(name)"
+              title="Add Area"
+              (click)="openAddArea(row.node, $event)"
             >
-              <img src="addd.png" alt="Add" />
+              <img src="addd.png" alt="Add Area" />
             </button>
+
+            <ng-container *ngIf="row.node.kind === 'area'">
+              <button
+                *ngIf="canAddZone(row.node)"
+                type="button"
+                class="row-action-btn"
+                title="Add Zone"
+                (click)="openAddZone(row.node, $event)"
+              >
+                <img src="addd.png" alt="Add Zone" />
+              </button>
+              <button
+                *ngIf="canAddBuilding(row.node)"
+                type="button"
+                class="row-action-btn"
+                title="Add Building"
+                (click)="openAddBuilding(row.node, $event)"
+              >
+                <img src="addd.png" alt="Add Building" />
+              </button>
+            </ng-container>
+
+            <button
+              *ngIf="row.node.kind === 'building'"
+              type="button"
+              class="row-action-btn"
+              title="Add Floor"
+              (click)="openAddFloor(row.node, $event)"
+            >
+              <img src="addd.png" alt="Add Floor" />
+            </button>
+
+            <button
+              *ngIf="row.node.kind === 'floor'"
+              type="button"
+              class="row-action-btn"
+              title="Add Zone"
+              (click)="openAddZone(row.node, $event)"
+            >
+              <img src="addd.png" alt="Add Zone" />
+            </button>
+
             <button
               type="button"
               class="row-action-btn"
               title="Rename"
-              (click)="startEdit(name, $event)"
+              (click)="startEdit(row.node, $event)"
             >
               <img src="edit.png" alt="Edit" />
             </button>
@@ -54,12 +99,12 @@
               type="button"
               class="row-action-btn"
               title="Delete"
-              (click)="deleteNode(name, $event)"
+              (click)="deleteNode(row.node, $event)"
             >
               <img src="del.png" alt="Delete" />
             </button>
-            <span class="row-chevron" aria-hidden="true">
-              <ng-container *ngIf="isActive(name); else chevDown">&rsaquo;</ng-container>
+            <span class="row-chevron" aria-hidden="true" *ngIf="isExpandable(row.node) || expanded.has(row.node.id)">
+              <ng-container *ngIf="expanded.has(row.node.id); else chevDown">&rsaquo;</ng-container>
               <ng-template #chevDown>v</ng-template>
             </span>
           </span>
@@ -68,10 +113,11 @@
     </aside>
 
     <div class="map-panel">
-      <app-map [locations]="mapLocations"></app-map>
+      <app-map [pins]="mapPins()"></app-map>
     </div>
   </div>
 
+  <!-- Add Project -->
   <div class="modal-overlay" *ngIf="isAddProjectOpen" (click)="closeAddProject()">
     <div class="modal-card" (click)="$event.stopPropagation()">
       <header class="modal-header">
@@ -89,7 +135,7 @@
           id="project-name"
           type="text"
           class="field-input"
-          placeholder="e.g. Website Redesign"
+          placeholder="e.g. Muscat Campus"
           [(ngModel)]="addProjectForm.name"
         />
 
@@ -144,6 +190,61 @@
       <footer class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeAddProject()">Cancel</button>
         <button type="button" class="btn btn-primary" (click)="submitAddProject()">Create Project</button>
+      </footer>
+    </div>
+  </div>
+
+  <!-- Add Area / Building / Floor / Zone (shared) -->
+  <div class="modal-overlay" *ngIf="childModal" (click)="closeChildModal()">
+    <div class="modal-card modal-card-sm" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2 class="modal-title">{{ childModalTitle }}</h2>
+        <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeChildModal()">
+          &times;
+        </button>
+      </header>
+
+      <div class="modal-body">
+        <label class="field-label" for="child-name">
+          Name <span class="required-mark">*</span>
+        </label>
+        <input
+          id="child-name"
+          type="text"
+          class="field-input"
+          [(ngModel)]="childFormName"
+          (keydown.enter)="submitChildModal()"
+          autofocus
+        />
+
+        <ng-container *ngIf="childModal?.kind === 'area'">
+          <label class="field-label" for="child-area-type">Area Type</label>
+          <select id="child-area-type" class="field-input" [(ngModel)]="childFormAreaType">
+            <option value="indoor">Indoor</option>
+            <option value="outdoor">Outdoor</option>
+            <option value="indoor_outdoor">Indoor + Outdoor</option>
+          </select>
+          <p class="field-hint" *ngIf="childFormAreaType === 'indoor'">
+            Zones for this area are added within its buildings' floors.
+          </p>
+          <p class="field-hint" *ngIf="childFormAreaType !== 'indoor'">
+            Zones can be added directly on this area.
+          </p>
+        </ng-container>
+
+        <ng-container *ngIf="childModal?.kind === 'zone'">
+          <label class="field-label" for="child-zone-color">Color</label>
+          <select id="child-zone-color" class="field-input" [(ngModel)]="childFormZoneColor">
+            <option *ngFor="let c of zoneColors" [value]="c.value">{{ c.label }}</option>
+          </select>
+        </ng-container>
+
+        <p class="modal-error" *ngIf="childFormError">{{ childFormError }}</p>
+      </div>
+
+      <footer class="modal-footer">
+        <button type="button" class="btn btn-secondary" (click)="closeChildModal()">Cancel</button>
+        <button type="button" class="btn btn-primary" (click)="submitChildModal()">Create</button>
       </footer>
     </div>
   </div>
