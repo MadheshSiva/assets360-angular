@@ -1,5 +1,6 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MapComponent, MapPin } from 'shared-ui';
 import { WidgetDragHandle } from '../shared/widget-drag-handle/widget-drag-handle';
@@ -139,7 +140,10 @@ export class MainDashboard implements OnInit {
   statPopupTitle = '';
   statPopupRows: Array<Record<string, string | number>> = [];
 
-  constructor(private cd: ChangeDetectorRef) {}
+  constructor(
+    private cd: ChangeDetectorRef,
+    private router: Router,
+  ) {}
   async ngOnInit(): Promise<void> {
     const response = await fetch('/assets/data/dashboard-data.json');
 
@@ -254,5 +258,20 @@ export class MainDashboard implements OnInit {
     const first = this.statPopupRows[0];
     if (!first) return [];
     return Object.keys(first);
+  }
+
+  /** Rows carrying a "Zone" column can be located on the live map; other stat breakdowns
+   *  (e.g. donut legends, alert types) don't correspond to a real map zone. */
+  rowZoneName(row: Record<string, string | number>): string | null {
+    const value = row['Zone'];
+    return typeof value === 'string' ? value : null;
+  }
+
+  hasLocatableRows(): boolean {
+    return this.statPopupRows.some((row) => this.rowZoneName(row) !== null);
+  }
+
+  locate(zoneName: string): void {
+    this.router.navigate(['/locating'], { queryParams: { zone: zoneName } });
   }
 }

@@ -73,7 +73,13 @@
 
       <!-- Map + its own FAB, anchored to the map's right edge -->
       <div class="map-wrapper">
-        <app-map [pins]="mapPins" (pinClick)="onPinClick($event)"></app-map>
+        <app-map *ngIf="!showFloorPlan" [pins]="mapPins" (pinClick)="onPinClick($event)"></app-map>
+
+        <app-floor-plan
+          *ngIf="showFloorPlan"
+          [floorId]="activeFloor?.id ?? null"
+          [zones]="floorPlanZones"
+        ></app-floor-plan>
 
         <button type="button" class="panel-fab" [class.is-collapsed]="isPanelCollapsed" (click)="togglePanel()"
           [attr.aria-label]="isPanelCollapsed ? 'Hide statistics' : 'Show statistics'">
@@ -179,7 +185,14 @@
           </dl>
 
           <div *ngSwitchCase="'camera'" class="camera-stub">
-            <div class="camera-stub-preview">Live feed unavailable in demo</div>
+            <div class="camera-live-feed">
+              <div class="camera-live-feed-scan"></div>
+              <div class="camera-live-badge"><span class="camera-live-dot"></span>LIVE</div>
+              <div class="camera-live-overlay">
+                <span class="camera-live-name">{{ popup.data.name }}</span>
+                <span class="camera-live-clock">{{ cameraClockTime }}</span>
+              </div>
+            </div>
             <dl class="pin-popup-fields">
               <dt>Camera</dt><dd>{{ popup.data.name }}</dd>
               <dt>Zone</dt><dd>{{ popup.data.zoneName }}</dd>

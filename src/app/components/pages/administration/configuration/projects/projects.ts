@@ -9,6 +9,8 @@ import {
   Building,
   childrenOf,
   Floor,
+  FloorPlanComponent,
+  FloorPlanZoneInput,
   HierarchyNode,
   MapComponent,
   MapPin,
@@ -52,7 +54,7 @@ const ZONE_COLORS = [
 @Component({
   standalone: true,
   selector: 'app-projects',
-  imports: [CommonModule, FormsModule, MapComponent],
+  imports: [CommonModule, FormsModule, MapComponent, FloorPlanComponent],
   templateUrl: './projects.html',
   styleUrls: ['./projects.css'],
 })
@@ -80,6 +82,59 @@ export class Projects {
       label: zone.name,
     })),
   );
+
+  /** The floor plan image is shown instead of the geo map when a floor,
+   *  or a zone that belongs to a floor, is the active node. */
+  get activeFloor(): Floor | null {
+    const node = this.findNode(this.activeNodeId);
+    if (!node) return null;
+    if (node.kind === 'floor') return node;
+    if (node.kind === 'zone') return this.findParentFloor(node.id) ?? null;
+    return null;
+  }
+
+  get showFloorPlan(): boolean {
+    return this.activeFloor !== null;
+  }
+
+  get floorPlanZones(): FloorPlanZoneInput[] {
+    return (this.activeFloor?.zones ?? []).map((zone) => ({
+      id: zone.id,
+      name: zone.name,
+      color: zone.color,
+      lat: zone.coords.lat,
+      lng: zone.coords.lng,
+    }));
+  }
+
+  private findNode(id: string | null): HierarchyNode | undefined {
+    if (!id) return undefined;
+    let found: HierarchyNode | undefined;
+    const walk = (node: HierarchyNode) => {
+      if (found) return;
+      if (node.id === id) {
+        found = node;
+        return;
+      }
+      childrenOf(node).forEach(walk);
+    };
+    this.projects().forEach(walk);
+    return found;
+  }
+
+  private findParentFloor(zoneId: string): Floor | undefined {
+    let result: Floor | undefined;
+    const walk = (node: HierarchyNode) => {
+      if (result) return;
+      if (node.kind === 'floor' && node.zones.some((zone) => zone.id === zoneId)) {
+        result = node;
+        return;
+      }
+      childrenOf(node).forEach(walk);
+    };
+    this.projects().forEach(walk);
+    return result;
+  }
 
   get visibleRows(): Row[] {
     const rows: Row[] = [];

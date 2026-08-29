@@ -1,0 +1,187 @@
+<div class="floor-plan">
+  <div class="floor-plan-toolbar">
+    <button
+      type="button"
+      class="tool-btn"
+      [class.is-active]="isDrawing"
+      title="Draw zone (click to place points, double-click to finish)"
+      (click)="toggleDraw()"
+    >
+      <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+      </svg>
+    </button>
+
+    <label class="tool-btn color-tool-btn" title="Zone color">
+      <input
+        type="color"
+        [value]="selectedZone?.color ?? drawColor"
+        (input)="setColor($any($event.target).value)"
+      />
+    </label>
+
+    <button
+      type="button"
+      class="tool-btn"
+      title="Delete selected zone"
+      [disabled]="!selectedZoneId"
+      (click)="deleteSelectedZone()"
+    >
+      <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 6h18"></path>
+        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+      </svg>
+    </button>
+
+    <button type="button" class="tool-btn" title="Zoom in" [disabled]="zoomLevel >= maxZoom" (click)="zoomIn()">+</button>
+    <button type="button" class="tool-btn" title="Zoom out" [disabled]="zoomLevel <= minZoom" (click)="zoomOut()">&minus;</button>
+
+    <div class="tool-btn-wrap">
+      <button
+        type="button"
+        class="tool-btn"
+        [title]="selectedZoneId ? 'Selected zone opacity' : 'Floor plan image opacity'"
+        (click)="toggleOpacitySlider()"
+      >
+        <svg class="tool-opacity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>
+        </svg>
+      </button>
+      <div class="tool-popover opacity-popover" *ngIf="showOpacitySlider">
+        <input
+          type="range"
+          class="opacity-slider"
+          min="0.1"
+          max="1"
+          step="0.05"
+          [value]="selectedZone?.opacity ?? imageOpacity"
+          (input)="setOpacity($any($event.target).valueAsNumber)"
+        />
+      </div>
+    </div>
+  </div>
+
+  <div
+    #floorPlanCanvas
+    class="floor-plan-canvas"
+    [class.is-drawing]="isDrawing"
+    [class.is-pannable]="zoomLevel > minZoom && !isDrawing"
+    [class.is-panning]="isPanning"
+    (mousedown)="startPan($event)"
+    (click)="onFloorPlanClick($event)"
+    (dblclick)="onFloorPlanDblClick($event)"
+  >
+    <div
+      class="floor-plan-zoom-layer"
+      [class.no-transition]="isPanning"
+      [style.transform]="'translate(' + panX + 'px, ' + panY + 'px) scale(' + zoomLevel + ')'"
+    >
+      <img [src]="image" alt="Floor plan" class="floor-plan-image" [style.opacity]="imageOpacity" />
+
+      <svg class="floor-plan-svg" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <polygon
+          *ngFor="let zone of drawnZones"
+          [attr.points]="polygonPoints(zone)"
+          [attr.fill]="zone.color"
+          [attr.fill-opacity]="zone.opacity"
+          [attr.stroke]="zone.color"
+          stroke-width="0.5"
+          vector-effect="non-scaling-stroke"
+          [class.is-selected]="zone.id === selectedZoneId"
+          (click)="selectZone(zone, $event)"
+        ></polygon>
+
+        <polygon
+          *ngIf="drawingPoints.length > 1"
+          [attr.points]="drawingPreviewPoints"
+          [attr.fill]="drawColor"
+          fill-opacity="0.25"
+          [attr.stroke]="drawColor"
+          stroke-width="0.5"
+          stroke-dasharray="1.5"
+          vector-effect="non-scaling-stroke"
+        ></polygon>
+
+        <circle
+          *ngFor="let p of drawingPoints"
+          [attr.cx]="p.x"
+          [attr.cy]="p.y"
+          r="0.8"
+          [attr.fill]="drawColor"
+        ></circle>
+      </svg>
+
+      <div
+        class="floor-plan-pin"
+        *ngFor="let pin of floorPlanPins"
+        [style.left.%]="pin.left"
+        [style.top.%]="pin.top"
+        [title]="pin.label"
+      >
+        <span class="floor-plan-pin-dot" [style.background]="pin.color"></span>
+        <span class="floor-plan-pin-label">{{ pin.label }}</span>
+      </div>
+
+      <div
+        class="asset-marker"
+        *ngFor="let zone of drawnZones"
+        [style.left.%]="centroidX(zone)"
+        [style.top.%]="centroidY(zone)"
+      >
+        <button
+          type="button"
+          class="asset-marker-icon"
+          [style.background]="zone.color"
+          title="View / add assets in this zone"
+          (click)="openAssetPanel(zone, $event)"
+          (mousedown)="$event.stopPropagation()"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
+            <path d="M3.27 6.96 12 12.01l8.73-5.05"></path>
+            <path d="M12 22.08V12"></path>
+          </svg>
+        </button>
+        <span class="asset-marker-count" *ngIf="zone.assets.length">{{ zone.assets.length }}</span>
+
+        <div
+          class="asset-panel"
+          *ngIf="assetPanelZoneId === zone.id"
+          (click)="$event.stopPropagation()"
+          (mousedown)="$event.stopPropagation()"
+          (dblclick)="$event.stopPropagation()"
+        >
+          <div class="asset-panel-header">
+            <span>Assets in this zone</span>
+            <button type="button" class="asset-panel-close" (click)="closeAssetPanel()">&times;</button>
+          </div>
+
+          <ul class="asset-panel-list" *ngIf="zone.assets.length; else noAssets">
+            <li *ngFor="let asset of zone.assets; let i = index">
+              <span>{{ asset }}</span>
+              <button type="button" (click)="removeAsset(zone, i)">&times;</button>
+            </li>
+          </ul>
+          <ng-template #noAssets>
+            <p class="asset-panel-empty">No assets yet.</p>
+          </ng-template>
+
+          <div class="asset-panel-add">
+            <input
+              type="text"
+              placeholder="Asset name"
+              [(ngModel)]="newAssetName"
+              (keydown.enter)="addAsset()"
+            />
+            <button type="button" (click)="addAsset()">Add</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <p class="floor-plan-hint" *ngIf="isDrawing">
+    Click on the plan to place each corner, then double-click to finish the shape.
+  </p>
+</div>

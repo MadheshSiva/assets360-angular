@@ -728,3 +728,20 @@ body, .dashboard-wrapper {
 .stat-popup-table tbody tr:hover {
   background: #f8fafc;
 }
+
+.locate-btn {
+  font: inherit;
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #7030a0;
+  background: #f4f0fc;
+  border: 1px solid #dcd0ff;
+  border-radius: 999px;
+  padding: 4px 12px;
+  cursor: pointer;
+  white-space: nowrap;
+}
+
+.locate-btn:hover {
+  background: #e9dcfb;
+}

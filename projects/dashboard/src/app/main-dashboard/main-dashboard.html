@@ -414,11 +414,22 @@
         <thead>
           <tr>
             <th *ngFor="let key of getPopupTableKeys()">{{ key }}</th>
+            <th *ngIf="hasLocatableRows()"></th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let row of statPopupRows">
             <td *ngFor="let key of getPopupTableKeys()">{{ row[key] }}</td>
+            <td *ngIf="hasLocatableRows()">
+              <button
+                type="button"
+                class="locate-btn"
+                *ngIf="rowZoneName(row) as zoneName"
+                (click)="locate(zoneName)"
+              >
+                Locate
+              </button>
+            </td>
           </tr>
         </tbody>
       </table>

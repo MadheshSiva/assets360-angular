@@ -740,15 +740,85 @@
   font-weight: 600;
 }
 
-.camera-stub-preview {
-  background: #0f172a;
-  color: #94a3b8;
+.camera-live-feed {
+  position: relative;
+  height: 160px;
   border-radius: 10px;
-  height: 140px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  background: radial-gradient(ellipse at center, #1e293b 0%, #0f172a 70%, #050810 100%);
+}
+
+.camera-live-feed-scan {
+  position: absolute;
+  inset: -50% -20%;
+  background: linear-gradient(115deg, transparent 40%, rgba(148, 163, 184, 0.14) 50%, transparent 60%);
+  animation: camera-scan 3.5s linear infinite;
+}
+
+@keyframes camera-scan {
+  0% {
+    transform: translateX(-30%);
+  }
+  100% {
+    transform: translateX(30%);
+  }
+}
+
+.camera-live-badge {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 9px 3px 7px;
+  border-radius: 999px;
+  background: rgba(220, 38, 38, 0.92);
+  color: #fff;
+  font-size: 10px;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+}
+
+.camera-live-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #fff;
+  animation: camera-live-pulse 1.4s ease-in-out infinite;
+}
+
+@keyframes camera-live-pulse {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.25;
+  }
+}
+
+.camera-live-overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   align-items: center;
-  justify-content: center;
-  font-size: 13px;
-  margin-bottom: 16px;
+  justify-content: space-between;
+  padding: 6px 10px;
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.65), transparent);
+  color: #e2e8f0;
+  font-size: 11px;
+  font-family: 'Courier New', monospace;
+}
+
+.camera-live-name {
+  font-weight: 700;
+}
+
+.camera-live-clock {
+  letter-spacing: 0.02em;
 }
 

@@ -113,7 +113,13 @@
     </aside>
 
     <div class="map-panel">
-      <app-map [pins]="mapPins()"></app-map>
+      <app-map *ngIf="!showFloorPlan" [pins]="mapPins()"></app-map>
+
+      <app-floor-plan
+        *ngIf="showFloorPlan"
+        [floorId]="activeFloor?.id ?? null"
+        [zones]="floorPlanZones"
+      ></app-floor-plan>
     </div>
   </div>
 

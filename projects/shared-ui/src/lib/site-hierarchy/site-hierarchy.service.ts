@@ -84,10 +84,7 @@ export class SiteHierarchyService {
       id: 'floor-1',
       name: 'Ground Floor',
       coords: { lat: 23.6141, lng: 58.5411, zoom: 18 },
-      zones: [
-        zone('zone-1', 'Reception', '#5b3df5', { lat: 23.6141, lng: 58.5408, zoom: 19 }),
-        zone('zone-2', 'Server Room', '#c22a3e', { lat: 23.6144, lng: 58.5413, zoom: 19 }),
-      ],
+      zones: [],
     };
     const floor2: Floor = {
       kind: 'floor',
@@ -111,7 +108,15 @@ export class SiteHierarchyService {
       name: 'Main Campus',
       type: 'indoor_outdoor',
       coords: areaCoords,
-      zones: [zone('zone-4', 'Parking Zone', '#a8650a', { lat: 23.6132, lng: 58.5402, zoom: 16 })],
+      zones: [
+        zone('zone-4', 'Parking Zone', '#a8650a', { lat: 23.6132, lng: 58.5402, zoom: 16 }),
+        // Matches the geofence names surfaced in the Dashboard's "Idle Assets" popup,
+        // so its "Locate" action has a real pin to fly to on the map.
+        zone('zone-5', 'Warehouse Zone', '#0ea5e9', { lat: 23.6125, lng: 58.539, zoom: 16 }),
+        zone('zone-6', 'Construction Site', '#f59e0b', { lat: 23.612, lng: 58.542, zoom: 16 }),
+        zone('zone-7', 'Logistics Park', '#10b981', { lat: 23.6155, lng: 58.5395, zoom: 16 }),
+        zone('zone-8', 'Port Area', '#ec4899', { lat: 23.616, lng: 58.543, zoom: 16 }),
+      ],
       buildings: [building],
     };
 

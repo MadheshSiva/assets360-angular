@@ -1,10 +1,15 @@
-import { Component, ViewChild, effect } from '@angular/core';
+import { AfterViewInit, Component, OnDestroy, ViewChild, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute } from '@angular/router';
+import { Subscription } from 'rxjs';
 import {
   AREA_TYPE_LABELS,
   AREA_TYPE_SHORT_LABELS,
   Coords,
+  Floor,
+  FloorPlanComponent,
+  FloorPlanZoneInput,
   HierarchyNode,
   MapComponent,
   MapPin,
@@ -52,20 +57,41 @@ const CATEGORY_PARAMETERS = new Set(['employee', 'asset', 'device']);
 @Component({
   standalone: true,
   selector: 'app-locating',
-  imports: [CommonModule, FormsModule, MapComponent],
+  imports: [CommonModule, FormsModule, MapComponent, FloorPlanComponent],
   templateUrl: './locating.html',
   styleUrls: ['./locating.css'],
 })
-export class Locating {
+export class Locating implements AfterViewInit, OnDestroy {
   mode: TrackMode = 'people';
   isPanelCollapsed = false;
 
-  constructor(private readonly hierarchy: SiteHierarchyService) {
+  private queryParamsSub?: Subscription;
+
+  constructor(
+    private readonly hierarchy: SiteHierarchyService,
+    private readonly route: ActivatedRoute,
+  ) {
     // Re-derive pins whenever the underlying (shared, signal-based) zone data changes.
     effect(() => {
       this.hierarchy.allZones();
       this.refreshPins();
     });
+  }
+
+  ngAfterViewInit(): void {
+    // Deep link from elsewhere in the app (e.g. Dashboard's "Locate" action): fly to and
+    // highlight a zone by name. Subscribed here (not the constructor) so mapComponent is ready.
+    this.queryParamsSub = this.route.queryParams.subscribe((params) => {
+      const zoneName = params['zone'];
+      if (zoneName) this.locateZoneByName(zoneName);
+    });
+  }
+
+  private locateZoneByName(zoneName: string): void {
+    const pin = this.zonePins().find((p) => p.label === zoneName);
+    if (!pin) return;
+    this.mapComponent?.flyTo({ lat: pin.lat, lng: pin.lng, zoom: 19 });
+    this.onPinClick(pin);
   }
 
   togglePanel(): void {
@@ -139,6 +165,44 @@ export class Locating {
   get activeLevel(): 'area' | 'floor' | null {
     const kind = this.activeNode?.kind;
     return kind === 'area' ? 'area' : kind === 'floor' ? 'floor' : null;
+  }
+
+  /** The floor plan image is shown instead of the geo map when a floor,
+   *  or a zone that belongs to a floor, is the active node (mirrors Projects). */
+  get activeFloor(): Floor | null {
+    const node = this.activeNode;
+    if (!node) return null;
+    if (node.kind === 'floor') return node;
+    if (node.kind === 'zone') return this.findParentFloor(node.id) ?? null;
+    return null;
+  }
+
+  get showFloorPlan(): boolean {
+    return this.activeFloor !== null;
+  }
+
+  get floorPlanZones(): FloorPlanZoneInput[] {
+    return (this.activeFloor?.zones ?? []).map((zone) => ({
+      id: zone.id,
+      name: zone.name,
+      color: zone.color,
+      lat: zone.coords.lat,
+      lng: zone.coords.lng,
+    }));
+  }
+
+  private findParentFloor(zoneId: string): Floor | undefined {
+    let result: Floor | undefined;
+    const walk = (node: HierarchyNode) => {
+      if (result) return;
+      if (node.kind === 'floor' && node.zones.some((zone) => zone.id === zoneId)) {
+        result = node;
+        return;
+      }
+      childrenOf(node).forEach(walk);
+    };
+    this.hierarchy.projects().forEach(walk);
+    return result;
   }
 
   get currentFilters(): LevelFilters | null {
@@ -349,14 +413,39 @@ export class Locating {
   // ===== Click-to-popup =====
 
   activePopup: Popup | null = null;
+  cameraClockTime = '';
+  private cameraClockInterval?: ReturnType<typeof setInterval>;
 
   onPinClick(pin: MapPin): void {
     if (!pin.kind) return;
     this.activePopup = { kind: pin.kind, data: pin.payload };
+    if (pin.kind === 'camera') this.startCameraClock();
+    else this.stopCameraClock();
   }
 
   closePopup(): void {
     this.activePopup = null;
+    this.stopCameraClock();
+  }
+
+  private startCameraClock(): void {
+    this.stopCameraClock();
+    this.cameraClockTime = new Date().toLocaleTimeString();
+    this.cameraClockInterval = setInterval(() => {
+      this.cameraClockTime = new Date().toLocaleTimeString();
+    }, 1000);
+  }
+
+  private stopCameraClock(): void {
+    if (this.cameraClockInterval) {
+      clearInterval(this.cameraClockInterval);
+      this.cameraClockInterval = undefined;
+    }
+  }
+
+  ngOnDestroy(): void {
+    this.stopCameraClock();
+    this.queryParamsSub?.unsubscribe();
   }
 
   // ===== Existing Statistics panel (unrelated to the spec changes above; left as-is) =====
