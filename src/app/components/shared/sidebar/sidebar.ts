@@ -135,10 +135,36 @@ export class Sidebar {
               ]
             },
             {
+              label: 'Inspection',
+              path: '/administration/configuration/inspection',
+              icon: '',
+              children: [
+                { label: 'Inspection Type', path: '/administration/configuration/inspection/inspection-type', icon: '' },
+                { label: 'Task Category', path: '/administration/configuration/inspection/task-category', icon: '' },
+                { label: 'Inspection Task', path: '/administration/configuration/inspection/inspection-task', icon: '' },
+                { label: 'Checklist', path: '/administration/configuration/inspection/checklist-template/list', icon: '' },
+                { label: 'Failure Reason', path: '/administration/configuration/inspection/failure-reason', icon: '' },
+                { label: 'Defect', path: '/administration/configuration/inspection/defect', icon: '' },
+                { label: 'Severity', path: '/administration/configuration/inspection/severity', icon: '' },
+                { label: 'Priority', path: '/administration/configuration/inspection/priority', icon: '' },
+                { label: 'Signature and Stamp', path: '/administration/configuration/inspection/signature-stamp', icon: '' },
+                { label: 'Notification Template', path: '/administration/configuration/inspection/notification-template', icon: '' },
+                { label: 'Report Template', path: '/administration/configuration/inspection/report-template', icon: '' },
+                { label: 'Numbering Sequence', path: '/administration/configuration/inspection/numbering-sequence', icon: '' },
+                { label: 'Holiday and Working Calendar', path: '/administration/configuration/inspection/holiday-calendar', icon: '' }
+              ]
+            },
+            {
               label: 'Master Management',
               path: '/administration/configuration/master-management',
               icon: '',
               children: [
+                { label: 'Organization', path: '/administration/configuration/master-management/organization', icon: '' },
+                { label: 'Business Unit', path: '/administration/configuration/master-management/business-unit', icon: '' },
+                { label: 'Department', path: '/administration/configuration/master-management/department', icon: '' },
+                { label: 'Site', path: '/administration/configuration/master-management/site', icon: '' },
+                { label: 'Manufacturer', path: '/administration/configuration/master-management/manufacturer', icon: '' },
+                { label: 'Supplier', path: '/administration/configuration/master-management/supplier', icon: '' },
                 { label: 'Master Maintenance', path: '/administration/configuration/master-management/master-maintenance', icon: '' },
                 { label: 'Category / Sub-category', path: '/administration/configuration/master-management/category-subcategory', icon: '' },
                 { label: 'Asset Type', path: '/administration/configuration/master-management/asset-type', icon: '' },
@@ -174,32 +200,6 @@ export class Sidebar {
                 { label: 'Module Access Master', path: '/administration/configuration/master-management/module-access-master', icon: '' }
               ]
             },
-            {
-              label: 'Inspection',
-              path: '/administration/configuration/inspection',
-              icon: '',
-              children: [
-                { label: 'Organization', path: '/administration/configuration/inspection/organization', icon: '' },
-                { label: 'Business Unit', path: '/administration/configuration/inspection/business-unit', icon: '' },
-                { label: 'Department', path: '/administration/configuration/inspection/department', icon: '' },
-                { label: 'Site', path: '/administration/configuration/inspection/site', icon: '' },
-                { label: 'Manufacturer', path: '/administration/configuration/inspection/manufacturer', icon: '' },
-                { label: 'Supplier', path: '/administration/configuration/inspection/supplier', icon: '' },
-                { label: 'Inspection Type', path: '/administration/configuration/inspection/inspection-type', icon: '' },
-                { label: 'Task Category', path: '/administration/configuration/inspection/task-category', icon: '' },
-                { label: 'Inspection Task', path: '/administration/configuration/inspection/inspection-task', icon: '' },
-                { label: 'Checklist', path: '/administration/configuration/inspection/checklist-template/list', icon: '' },
-                { label: 'Failure Reason', path: '/administration/configuration/inspection/failure-reason', icon: '' },
-                { label: 'Defect', path: '/administration/configuration/inspection/defect', icon: '' },
-                { label: 'Severity', path: '/administration/configuration/inspection/severity', icon: '' },
-                { label: 'Priority', path: '/administration/configuration/inspection/priority', icon: '' },
-                { label: 'Signature and Stamp', path: '/administration/configuration/inspection/signature-stamp', icon: '' },
-                { label: 'Notification Template', path: '/administration/configuration/inspection/notification-template', icon: '' },
-                { label: 'Report Template', path: '/administration/configuration/inspection/report-template', icon: '' },
-                { label: 'Numbering Sequence', path: '/administration/configuration/inspection/numbering-sequence', icon: '' },
-                { label: 'Holiday and Working Calendar', path: '/administration/configuration/inspection/holiday-calendar', icon: '' }
-              ]
-            }
           ]
         },
         { label: 'License', path: '/administration/license', icon: '' },

@@ -24,6 +24,8 @@ export interface MapLocation {
 }
 
 export interface MapPin {
+  /** Stable identity across pin-array refreshes. Required for smooth movement animation and path trails. */
+  id?: string;
   lat: number;
   lng: number;
   color?: string;
@@ -33,11 +35,23 @@ export interface MapPin {
   payload?: any;
 }
 
+export type ZoneType = 'safety' | 'high_value' | 'restricted' | 'parking' | 'evacuation' | 'custom';
+
+export const ZONE_TYPE_OPTIONS: { value: ZoneType; label: string; color: string }[] = [
+  { value: 'safety', label: 'Safety', color: '#158b4b' },
+  { value: 'high_value', label: 'High-Value', color: '#a8650a' },
+  { value: 'restricted', label: 'Restricted', color: '#c22a3e' },
+  { value: 'parking', label: 'Parking', color: '#2563eb' },
+  { value: 'evacuation', label: 'Evacuation', color: '#ea580c' },
+  { value: 'custom', label: 'Custom', color: '#5b3df5' },
+];
+
 export interface GeoZone {
   id: string;
   latlngs: { lat: number; lng: number }[];
   color: string;
   opacity: number;
+  zoneType?: ZoneType;
 }
 
 export interface ZoneSensor {
@@ -66,6 +80,14 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Input() locations: MapLocation[] = [];
   @Input() pins: MapPin[] = [];
 
+  /** Opt-in analytics/visualization layers (Phase 2). All default off so existing callers are unaffected. */
+  @Input() clusterEnabled = false;
+  @Input() showTrails = false;
+  @Input() showHeatmap = false;
+  @Input() showDeviceHealth = false;
+  /** Read-only mode (Phase 2 role gating): hides zone drawing/editing from Viewer-level roles. */
+  @Input() controlsDisabled = false;
+
   @Output() locationClick = new EventEmitter<MapLocation>();
   @Output() pinClick = new EventEmitter<MapPin>();
   @Output() zoneDrawn = new EventEmitter<GeoZone>();
@@ -74,12 +96,15 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   @Output() sensorRemoved = new EventEmitter<string>();
 
   readonly zoneColors = GEO_ZONE_COLORS;
+  readonly zoneTypeOptions = ZONE_TYPE_OPTIONS;
 
   isDrawing = false;
   drawColor = GEO_ZONE_COLORS[0].value;
+  drawZoneType: ZoneType = 'custom';
   drawOpacity = 0.4;
   selectedZoneId: string | null = null;
   showColorPicker = false;
+  showZoneTypePicker = false;
   showOpacitySlider = false;
   isPlacingSensor = false;
 
@@ -98,6 +123,20 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   private sensorLayer?: any;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   private sensorMarkerById = new Map<string, any>();
+
+  // ===== Phase 2: clustering / trails / heatmap / device health state =====
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private markerById = new Map<string, any>();
+  private trailHistory = new Map<string, { lat: number; lng: number }[]>();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private trailLayer?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private heatLayer?: any;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  private healthLayer?: any;
+  /** Sorted, pipe-joined pin ids from the last structural render; null if any pin lacks an id. */
+  private lastPinIds: string | null = null;
+  private readonly onViewChange = (): void => this.reclusterInPlace();
 
   @ViewChild('mapEl', { static: false }) mapEl?: ElementRef<HTMLDivElement>;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -134,9 +173,18 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
         this.initializeMap();
       }
     }
+
+    const visualOptionKeys = ['clusterEnabled', 'showTrails', 'showHeatmap', 'showDeviceHealth'];
+    const visualOptionsChanged = visualOptionKeys.some((key) => changes[key] && !changes[key].firstChange);
+    if (visualOptionsChanged && this.map) {
+      // Force the next renderPins() through the full structural path so the new option takes effect.
+      this.lastPinIds = null;
+      this.renderPins();
+    }
   }
 
   ngOnDestroy(): void {
+    this.map?.off('zoomend', this.onViewChange);
     this.map?.remove();
     this.map = undefined;
   }
@@ -157,6 +205,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
         maxZoom: 19,
         attribution: '© OpenStreetMap contributors',
       }).addTo(this.map);
+      this.map.on('zoomend', this.onViewChange);
 
       this.renderPins();
 
@@ -193,30 +242,218 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     setTimeout(() => this.map?.invalidateSize(), 400);
   }
 
+  // ===== Pin rendering: structural (recreate + fit bounds) vs. in-place (smooth animation) =====
+
   private renderPins(): void {
     if (!this.map || !this.L) return;
+
+    const ids = this.pins.every((p) => p.id) ? this.pins.map((p) => p.id).sort().join('|') : null;
+    const canAnimateInPlace = ids !== null && ids === this.lastPinIds && this.markersLayer && !this.clusterEnabled;
+
+    if (canAnimateInPlace) {
+      this.animatePinsToNewPositions();
+      this.recordTrails();
+      if (this.showTrails) this.renderTrails();
+      if (this.showDeviceHealth) this.renderDeviceHealth();
+      if (this.showHeatmap) this.renderHeatmap();
+      return;
+    }
+
+    this.lastPinIds = ids;
+    this.structuralRenderPins();
+  }
+
+  private structuralRenderPins(): void {
     const L = this.L;
 
+    this.markerById.clear();
     this.markersLayer?.clearLayers();
     this.markersLayer ??= L.layerGroup().addTo(this.map);
-
-    this.pins.forEach((pin) => {
-      const pinIcon = L.divIcon({
-        className: 'colored-pin-icon',
-        html: this.buildPinSvg(pin.color || '#2563eb'),
-        iconSize: [28, 34],
-        iconAnchor: [14, 34],
-      });
-      const marker = L.marker([pin.lat, pin.lng], { icon: pinIcon }).addTo(this.markersLayer);
-      if (pin.kind) {
-        marker.on('click', () => this.pinClick.emit(pin));
-      }
-    });
 
     if (this.pins.length > 0) {
       const bounds = L.latLngBounds(this.pins.map((pin) => [pin.lat, pin.lng]));
       this.map.fitBounds(bounds, { padding: [30, 30], maxZoom: 15 });
     }
+
+    const groups = this.clusterEnabled ? this.clusterPins(this.pins) : this.pins.map((p) => [p]);
+    groups.forEach((group) => (group.length > 1 ? this.renderClusterMarker(group) : this.renderSingleMarker(group[0])));
+
+    this.recordTrails();
+    if (this.showTrails) this.renderTrails();
+    else this.trailLayer?.clearLayers();
+
+    if (this.showHeatmap) this.renderHeatmap();
+    else this.clearHeatmap();
+
+    if (this.showDeviceHealth) this.renderDeviceHealth();
+    else this.healthLayer?.clearLayers();
+  }
+
+  /** Re-groups existing pins into clusters after a zoom/pan, without touching bounds, trails, or history. */
+  private reclusterInPlace(): void {
+    if (!this.clusterEnabled || !this.map || !this.L) return;
+    const L = this.L;
+    this.markerById.clear();
+    this.markersLayer?.clearLayers();
+    this.markersLayer ??= L.layerGroup().addTo(this.map);
+    const groups = this.clusterPins(this.pins);
+    groups.forEach((group) => (group.length > 1 ? this.renderClusterMarker(group) : this.renderSingleMarker(group[0])));
+  }
+
+  private renderSingleMarker(pin: MapPin): void {
+    const L = this.L;
+    const pinIcon = L.divIcon({
+      className: 'colored-pin-icon',
+      html: this.buildPinSvg(pin.color || '#2563eb'),
+      iconSize: [28, 34],
+      iconAnchor: [14, 34],
+    });
+    const marker = L.marker([pin.lat, pin.lng], { icon: pinIcon }).addTo(this.markersLayer);
+    if (pin.kind) {
+      marker.on('click', () => this.pinClick.emit(pin));
+    }
+    if (pin.id) this.markerById.set(pin.id, marker);
+  }
+
+  /** Groups pins within a fixed pixel radius of each other at the current zoom (simple, dependency-free clustering). */
+  private clusterPins(pins: MapPin[]): MapPin[][] {
+    if (!this.map || pins.length === 0) return pins.map((p) => [p]);
+    const radiusPx = 46;
+    const points = pins.map((p) => this.map.latLngToContainerPoint([p.lat, p.lng]));
+    const used = new Array(pins.length).fill(false);
+    const groups: MapPin[][] = [];
+
+    for (let i = 0; i < pins.length; i++) {
+      if (used[i]) continue;
+      const group = [pins[i]];
+      used[i] = true;
+      for (let j = i + 1; j < pins.length; j++) {
+        if (used[j]) continue;
+        if (points[i].distanceTo(points[j]) <= radiusPx) {
+          group.push(pins[j]);
+          used[j] = true;
+        }
+      }
+      groups.push(group);
+    }
+    return groups;
+  }
+
+  private renderClusterMarker(group: MapPin[]): void {
+    const L = this.L;
+    const lat = group.reduce((sum, p) => sum + p.lat, 0) / group.length;
+    const lng = group.reduce((sum, p) => sum + p.lng, 0) / group.length;
+    const icon = L.divIcon({
+      className: 'cluster-marker-icon',
+      html: `<div class="cluster-marker-badge">${group.length}</div>`,
+      iconSize: [34, 34],
+      iconAnchor: [17, 17],
+    });
+    const marker = L.marker([lat, lng], { icon }).addTo(this.markersLayer);
+    marker.on('click', () => {
+      const currentZoom = this.map.getZoom() ?? 13;
+      this.map.flyTo([lat, lng], Math.min(currentZoom + 3, 18), { duration: 0.6 });
+    });
+  }
+
+  /** Tweens each existing marker to its new coordinates instead of a hard jump. */
+  private animatePinsToNewPositions(): void {
+    const durationMs = 500;
+    this.pins.forEach((pin) => {
+      if (!pin.id) return;
+      const marker = this.markerById.get(pin.id);
+      if (!marker) return;
+      const from = marker.getLatLng();
+      if (from.lat === pin.lat && from.lng === pin.lng) return;
+
+      const start = performance.now();
+      const step = (now: number) => {
+        const t = Math.min(1, (now - start) / durationMs);
+        marker.setLatLng([from.lat + (pin.lat - from.lat) * t, from.lng + (pin.lng - from.lng) * t]);
+        if (t < 1) requestAnimationFrame(step);
+      };
+      requestAnimationFrame(step);
+    });
+  }
+
+  // ===== Phase 2: path trails =====
+
+  private recordTrails(): void {
+    this.pins.forEach((pin) => {
+      if (!pin.id) return;
+      const history = this.trailHistory.get(pin.id) ?? [];
+      const last = history[history.length - 1];
+      if (!last || last.lat !== pin.lat || last.lng !== pin.lng) {
+        history.push({ lat: pin.lat, lng: pin.lng });
+        if (history.length > 8) history.shift();
+        this.trailHistory.set(pin.id, history);
+      }
+    });
+  }
+
+  private renderTrails(): void {
+    const L = this.L;
+    this.trailLayer?.clearLayers();
+    this.trailLayer ??= L.layerGroup().addTo(this.map);
+
+    this.trailHistory.forEach((points, id) => {
+      if (points.length < 2) return;
+      const pin = this.pins.find((p) => p.id === id);
+      const color = pin?.color || '#5b3df5';
+      for (let i = 1; i < points.length; i++) {
+        const opacity = 0.1 + (i / points.length) * 0.45;
+        L.polyline(
+          [
+            [points[i - 1].lat, points[i - 1].lng],
+            [points[i].lat, points[i].lng],
+          ],
+          { color, weight: 3, opacity },
+        ).addTo(this.trailLayer);
+      }
+    });
+  }
+
+  // ===== Phase 2: heatmap (dependency-free approximation via layered translucent circles) =====
+
+  private renderHeatmap(): void {
+    const L = this.L;
+    this.heatLayer?.remove();
+    this.heatLayer = L.layerGroup().addTo(this.map);
+    this.pins.forEach((pin) => {
+      L.circle([pin.lat, pin.lng], { radius: 40, stroke: false, fillColor: '#f97316', fillOpacity: 0.18 }).addTo(
+        this.heatLayer,
+      );
+      L.circle([pin.lat, pin.lng], { radius: 18, stroke: false, fillColor: '#dc2626', fillOpacity: 0.32 }).addTo(
+        this.heatLayer,
+      );
+    });
+  }
+
+  private clearHeatmap(): void {
+    this.heatLayer?.remove();
+    this.heatLayer = undefined;
+  }
+
+  // ===== Phase 2: device health layer (battery badge under device pins) =====
+
+  private renderDeviceHealth(): void {
+    const L = this.L;
+    this.healthLayer?.clearLayers();
+    this.healthLayer ??= L.layerGroup().addTo(this.map);
+
+    this.pins
+      .filter((pin) => pin.kind === 'device' && pin.payload?.battery !== undefined)
+      .forEach((pin) => {
+        const battery = pin.payload.battery as number;
+        const color = battery > 50 ? '#16a34a' : battery > 20 ? '#d97706' : '#dc2626';
+        const icon = L.divIcon({
+          className: 'device-health-badge-icon',
+          html: `<div class="device-health-badge" style="border-color:${color};color:${color}">${battery}%</div>`,
+          iconSize: [42, 16],
+          iconAnchor: [21, -16],
+        });
+        L.marker([pin.lat, pin.lng], { icon, interactive: false }).addTo(this.healthLayer);
+      });
   }
 
   private buildPinSvg(color: string): string {
@@ -257,10 +494,11 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   toggleDraw(): void {
-    if (!this.map || !this.L) return;
+    if (!this.map || !this.L || this.controlsDisabled) return;
     this.stopPlacingSensors();
     this.isDrawing = !this.isDrawing;
     this.showColorPicker = false;
+    this.showZoneTypePicker = false;
     this.showOpacitySlider = false;
     this.selectedZoneId = null;
     this.drawingLatLngs = [];
@@ -342,6 +580,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
       latlngs: this.drawingLatLngs.map((ll: any) => ({ lat: ll.lat, lng: ll.lng })),
       color: this.drawColor,
       opacity: this.drawOpacity,
+      zoneType: this.drawZoneType,
     };
     this.drawnZones = [...this.drawnZones, zone];
     this.renderZone(zone);
@@ -375,6 +614,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
       this.stopPlacingSensors();
       this.selectedZoneId = this.selectedZoneId === zone.id ? null : zone.id;
       this.showColorPicker = false;
+      this.showZoneTypePicker = false;
       this.showOpacitySlider = false;
     });
 
@@ -383,12 +623,20 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
 
   toggleColorPicker(): void {
     this.showColorPicker = !this.showColorPicker;
+    this.showZoneTypePicker = false;
+    this.showOpacitySlider = false;
+  }
+
+  toggleZoneTypePicker(): void {
+    this.showZoneTypePicker = !this.showZoneTypePicker;
+    this.showColorPicker = false;
     this.showOpacitySlider = false;
   }
 
   toggleOpacitySlider(): void {
     this.showOpacitySlider = !this.showOpacitySlider;
     this.showColorPicker = false;
+    this.showZoneTypePicker = false;
   }
 
   setColor(color: string): void {
@@ -401,6 +649,16 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     this.showColorPicker = false;
   }
 
+  /** Picking a zone type (Safety/Restricted/Parking/…) also applies its preset color. */
+  setZoneType(type: ZoneType): void {
+    this.drawZoneType = type;
+    const preset = this.zoneTypeOptions.find((o) => o.value === type);
+    if (preset) this.setColor(preset.color);
+    const zone = this.selectedZone;
+    if (zone) zone.zoneType = type;
+    this.showZoneTypePicker = false;
+  }
+
   setOpacity(value: number): void {
     this.drawOpacity = value;
     const zone = this.selectedZone;
@@ -411,7 +669,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   deleteSelectedZone(): void {
-    if (!this.selectedZoneId) return;
+    if (!this.selectedZoneId || this.controlsDisabled) return;
     this.zoneLayerById.get(this.selectedZoneId)?.remove();
     this.zoneLayerById.delete(this.selectedZoneId);
     this.drawnZones = this.drawnZones.filter((zone) => zone.id !== this.selectedZoneId);
@@ -429,7 +687,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   // ===== Place sensors inside a drawn zone =====
 
   toggleAddSensor(): void {
-    if (!this.map || !this.selectedZoneId) return;
+    if (!this.map || !this.selectedZoneId || this.controlsDisabled) return;
     if (this.isPlacingSensor) {
       this.stopPlacingSensors();
       return;
@@ -437,6 +695,7 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     this.isDrawing = false;
     this.stopDrawListening();
     this.showColorPicker = false;
+    this.showZoneTypePicker = false;
     this.showOpacitySlider = false;
     this.isPlacingSensor = true;
     this.map.on('click', this.handleSensorClick);

@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
-import { InspectionOrganizationItem, InspectionOrganizationRow } from './organization.model';
-import { InspectionOrganizationService } from './organization.service';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { MasterManagementSiteItem, MasterManagementSiteRow } from './site.model';
+import { MasterManagementSiteService } from './site.service';
 
-interface InspectionOrganizationColumn {
+interface MasterManagementSiteColumn {
   key: string;
   label: string;
   visible: boolean;
@@ -15,53 +16,51 @@ interface InspectionOrganizationColumn {
 
 @Component({
   standalone: true,
-  selector: 'app-inspection-organization',
-  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
-  templateUrl: './organization.html',
-  styleUrls: ['./organization.css']
+  selector: 'app-master-management-site',
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions, MasterLinkIcons],
+  templateUrl: './site.html',
+  styleUrls: ['./site.css']
 })
-export class InspectionOrganization {
+export class MasterManagementSite {
   searchTerm = '';
 
-  columns: InspectionOrganizationColumn[] = [
-    { key: 'organizationCode', label: 'Organization Code', visible: true },
+  columns: MasterManagementSiteColumn[] = [
+    { key: 'siteCode', label: 'Site Code', visible: true },
     { key: 'assetId', label: 'Asset ID', visible: true },
     { key: 'assetName', label: 'Asset Name', visible: true },
-    { key: 'organizationName', label: 'Organization Name', visible: true },
-    { key: 'legalName', label: 'Legal Name', visible: true },
-    { key: 'logo', label: 'Logo', visible: true },
+    { key: 'siteName', label: 'Site Name', visible: true },
+    { key: 'organization', label: 'Organization', visible: true },
+    { key: 'businessUnit', label: 'Business Unit', visible: true },
+    { key: 'siteType', label: 'Site Type', visible: true },
     { key: 'address', label: 'Address', visible: true },
     { key: 'country', label: 'Country', visible: true },
     { key: 'state', label: 'State', visible: true },
     { key: 'city', label: 'City', visible: true },
-    { key: 'postalCode', label: 'Postal Code', visible: true },
-    { key: 'contactPerson', label: 'Contact Person', visible: true },
-    { key: 'email', label: 'Email', visible: true },
-    { key: 'phoneNumber', label: 'Phone Number', visible: true },
-    { key: 'timeZone', label: 'Time Zone', visible: true },
-    { key: 'dateFormat', label: 'Date Format', visible: true },
-    { key: 'currency', label: 'Currency', visible: true },
+    { key: 'gpsLatitude', label: 'GPS Latitude', visible: true },
+    { key: 'gpsLongitude', label: 'GPS Longitude', visible: true },
+    { key: 'siteManager', label: 'Site Manager', visible: true },
+    { key: 'contactDetails', label: 'Contact Details', visible: true },
+    { key: 'operatingHours', label: 'Operating Hours', visible: true },
     { key: 'status', label: 'Status', visible: true }
   ];
 
   readonly importColumns: ImportColumn[] = [
-    { key: 'organizationCode', label: 'Organization Code' },
+    { key: 'siteCode', label: 'Site Code' },
     { key: 'assetId', label: 'Asset ID' },
     { key: 'assetName', label: 'Asset Name' },
-    { key: 'organizationName', label: 'Organization Name' },
-    { key: 'legalName', label: 'Legal Name' },
-    { key: 'logo', label: 'Logo' },
+    { key: 'siteName', label: 'Site Name' },
+    { key: 'organization', label: 'Organization' },
+    { key: 'businessUnit', label: 'Business Unit' },
+    { key: 'siteType', label: 'Site Type' },
     { key: 'address', label: 'Address' },
     { key: 'country', label: 'Country' },
     { key: 'state', label: 'State' },
     { key: 'city', label: 'City' },
-    { key: 'postalCode', label: 'Postal Code' },
-    { key: 'contactPerson', label: 'Contact Person' },
-    { key: 'email', label: 'Email' },
-    { key: 'phoneNumber', label: 'Phone Number' },
-    { key: 'timeZone', label: 'Time Zone' },
-    { key: 'dateFormat', label: 'Date Format' },
-    { key: 'currency', label: 'Currency' },
+    { key: 'gpsLatitude', label: 'GPS Latitude' },
+    { key: 'gpsLongitude', label: 'GPS Longitude' },
+    { key: 'siteManager', label: 'Site Manager' },
+    { key: 'contactDetails', label: 'Contact Details' },
+    { key: 'operatingHours', label: 'Operating Hours' },
     { key: 'status', label: 'Status' }
   ];
 
@@ -69,19 +68,19 @@ export class InspectionOrganization {
 
   showColumnPicker = false;
 
-  records: InspectionOrganizationRow[] = [];
-  filteredRecords: InspectionOrganizationRow[] = [];
+  records: MasterManagementSiteRow[] = [];
+  filteredRecords: MasterManagementSiteRow[] = [];
 
   showFormModal = false;
   isEditMode = false;
-  private editingRecord: InspectionOrganizationRow | null = null;
+  private editingRecord: MasterManagementSiteRow | null = null;
 
-  form: InspectionOrganizationItem = this.emptyForm();
+  form: MasterManagementSiteItem = this.emptyForm();
 
   private returnUrl: string | null = null;
 
   constructor(
-    private service: InspectionOrganizationService,
+    private service: MasterManagementSiteService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -100,7 +99,7 @@ export class InspectionOrganization {
       this.onCreate();
     } else if (action === 'edit') {
       const value = params.get('linkValue') ?? '';
-      const match = this.records.find((r) => r.organizationName === value);
+      const match = this.records.find((r) => r.siteName === value);
       if (match) {
         this.isEditMode = true;
         this.editingRecord = match;
@@ -111,42 +110,36 @@ export class InspectionOrganization {
     }
   }
 
-  get timeZoneMaster() {
-    return this.service.timeZoneMaster;
+  get organizationMaster() {
+    return this.service.organizationMaster;
   }
 
-  get currencyMaster() {
-    return this.service.currencyMaster;
+  get businessUnitMaster() {
+    return this.service.businessUnitMaster;
   }
 
-  get dateFormatMaster() {
-    return this.service.dateFormatMaster;
+  get siteTypeMaster() {
+    return this.service.siteTypeMaster;
   }
 
-  onLogoSelected(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    this.form.logo = input.files && input.files[0] ? input.files[0].name : '';
-  }
-
-  private emptyForm(): InspectionOrganizationItem {
+  private emptyForm(): MasterManagementSiteItem {
     return {
-      organizationCode: '',
+      siteCode: '',
       assetId: '',
       assetName: '',
-      organizationName: '',
-      legalName: '',
-      logo: '',
+      siteName: '',
+      organization: '',
+      businessUnit: '',
+      siteType: '',
       address: '',
       country: '',
       state: '',
       city: '',
-      postalCode: '',
-      contactPerson: '',
-      email: '',
-      phoneNumber: '',
-      timeZone: '',
-      dateFormat: '',
-      currency: '',
+      gpsLatitude: '',
+      gpsLongitude: '',
+      siteManager: '',
+      contactDetails: '',
+      operatingHours: '',
       status: true
     };
   }
@@ -168,11 +161,11 @@ export class InspectionOrganization {
     this.showColumnPicker = false;
   }
 
-  toggleColumn(col: InspectionOrganizationColumn): void {
+  toggleColumn(col: MasterManagementSiteColumn): void {
     col.visible = !col.visible;
   }
 
-  get selectedRecords(): InspectionOrganizationRow[] {
+  get selectedRecords(): MasterManagementSiteRow[] {
     return this.filteredRecords.filter((r) => r.selected);
   }
 
@@ -185,12 +178,12 @@ export class InspectionOrganization {
     this.filteredRecords.forEach((r) => (r.selected = next));
   }
 
-  toggleSelectRecord(record: InspectionOrganizationRow): void {
+  toggleSelectRecord(record: MasterManagementSiteRow): void {
     record.selected = !record.selected;
   }
 
   onSearch(): void {
-    this.filteredRecords = this.service.search(this.searchTerm) as InspectionOrganizationRow[];
+    this.filteredRecords = this.service.search(this.searchTerm) as MasterManagementSiteRow[];
   }
 
   onRefresh(): void {
@@ -210,7 +203,7 @@ export class InspectionOrganization {
     this.editRow(this.selectedRecords[0]);
   }
 
-  editRow(record: InspectionOrganizationRow): void {
+  editRow(record: MasterManagementSiteRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -228,7 +221,7 @@ export class InspectionOrganization {
 
   submitForm(): void {
     if (this.isEditMode && this.editingRecord) {
-      this.service.updateRecord(this.editingRecord.organizationCode, { ...this.form });
+      this.service.updateRecord(this.editingRecord.siteCode, { ...this.form });
     } else {
       this.service.addRecord({ ...this.form });
     }
@@ -238,12 +231,12 @@ export class InspectionOrganization {
 
   onDelete(): void {
     if (this.selectedRecords.length === 0) return;
-    this.service.deleteRecords(this.selectedRecords.map((r) => r.organizationCode));
+    this.service.deleteRecords(this.selectedRecords.map((r) => r.siteCode));
     this.refresh();
   }
 
-  deleteRow(record: InspectionOrganizationRow): void {
-    this.service.deleteRecords([record.organizationCode]);
+  deleteRow(record: MasterManagementSiteRow): void {
+    this.service.deleteRecords([record.siteCode]);
     this.refresh();
   }
 
@@ -255,23 +248,22 @@ export class InspectionOrganization {
     rows.forEach((row) => {
       const activeRaw = (row['status'] ?? '').trim().toLowerCase();
       this.service.addRecord({
-        organizationCode: row['organizationCode'] ?? '',
+        siteCode: row['siteCode'] ?? '',
         assetId: row['assetId'] ?? '',
         assetName: row['assetName'] ?? '',
-        organizationName: row['organizationName'] ?? '',
-        legalName: row['legalName'] ?? '',
-        logo: row['logo'] ?? '',
+        siteName: row['siteName'] ?? '',
+        organization: row['organization'] ?? '',
+        businessUnit: row['businessUnit'] ?? '',
+        siteType: row['siteType'] ?? '',
         address: row['address'] ?? '',
         country: row['country'] ?? '',
         state: row['state'] ?? '',
         city: row['city'] ?? '',
-        postalCode: row['postalCode'] ?? '',
-        contactPerson: row['contactPerson'] ?? '',
-        email: row['email'] ?? '',
-        phoneNumber: row['phoneNumber'] ?? '',
-        timeZone: row['timeZone'] ?? '',
-        dateFormat: row['dateFormat'] ?? '',
-        currency: row['currency'] ?? '',
+        gpsLatitude: row['gpsLatitude'] ?? '',
+        gpsLongitude: row['gpsLongitude'] ?? '',
+        siteManager: row['siteManager'] ?? '',
+        contactDetails: row['contactDetails'] ?? '',
+        operatingHours: row['operatingHours'] ?? '',
         status: activeRaw === 'yes' || activeRaw === 'true'
       });
     });

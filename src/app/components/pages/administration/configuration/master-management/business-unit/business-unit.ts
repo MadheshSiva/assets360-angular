@@ -5,10 +5,10 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
 import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
-import { InspectionSiteItem, InspectionSiteRow } from './site.model';
-import { InspectionSiteService } from './site.service';
+import { MasterManagementBusinessUnitItem, MasterManagementBusinessUnitRow } from './business-unit.model';
+import { MasterManagementBusinessUnitService } from './business-unit.service';
 
-interface InspectionSiteColumn {
+interface MasterManagementBusinessUnitColumn {
   key: string;
   label: string;
   visible: boolean;
@@ -16,51 +16,37 @@ interface InspectionSiteColumn {
 
 @Component({
   standalone: true,
-  selector: 'app-inspection-site',
+  selector: 'app-master-management-business-unit',
   imports: [CommonModule, FormsModule, ImportFileModal, RowActions, MasterLinkIcons],
-  templateUrl: './site.html',
-  styleUrls: ['./site.css']
+  templateUrl: './business-unit.html',
+  styleUrls: ['./business-unit.css']
 })
-export class InspectionSite {
+export class MasterManagementBusinessUnit {
   searchTerm = '';
 
-  columns: InspectionSiteColumn[] = [
-    { key: 'siteCode', label: 'Site Code', visible: true },
+  columns: MasterManagementBusinessUnitColumn[] = [
+    { key: 'businessUnitCode', label: 'Business Unit Code', visible: true },
     { key: 'assetId', label: 'Asset ID', visible: true },
     { key: 'assetName', label: 'Asset Name', visible: true },
-    { key: 'siteName', label: 'Site Name', visible: true },
+    { key: 'businessUnitName', label: 'Business Unit Name', visible: true },
     { key: 'organization', label: 'Organization', visible: true },
-    { key: 'businessUnit', label: 'Business Unit', visible: true },
-    { key: 'siteType', label: 'Site Type', visible: true },
-    { key: 'address', label: 'Address', visible: true },
-    { key: 'country', label: 'Country', visible: true },
-    { key: 'state', label: 'State', visible: true },
-    { key: 'city', label: 'City', visible: true },
-    { key: 'gpsLatitude', label: 'GPS Latitude', visible: true },
-    { key: 'gpsLongitude', label: 'GPS Longitude', visible: true },
-    { key: 'siteManager', label: 'Site Manager', visible: true },
-    { key: 'contactDetails', label: 'Contact Details', visible: true },
-    { key: 'operatingHours', label: 'Operating Hours', visible: true },
+    { key: 'description', label: 'Description', visible: true },
+    { key: 'businessUnitHead', label: 'Business Unit Head', visible: true },
+    { key: 'email', label: 'Email', visible: true },
+    { key: 'phone', label: 'Phone', visible: true },
     { key: 'status', label: 'Status', visible: true }
   ];
 
   readonly importColumns: ImportColumn[] = [
-    { key: 'siteCode', label: 'Site Code' },
+    { key: 'businessUnitCode', label: 'Business Unit Code' },
     { key: 'assetId', label: 'Asset ID' },
     { key: 'assetName', label: 'Asset Name' },
-    { key: 'siteName', label: 'Site Name' },
+    { key: 'businessUnitName', label: 'Business Unit Name' },
     { key: 'organization', label: 'Organization' },
-    { key: 'businessUnit', label: 'Business Unit' },
-    { key: 'siteType', label: 'Site Type' },
-    { key: 'address', label: 'Address' },
-    { key: 'country', label: 'Country' },
-    { key: 'state', label: 'State' },
-    { key: 'city', label: 'City' },
-    { key: 'gpsLatitude', label: 'GPS Latitude' },
-    { key: 'gpsLongitude', label: 'GPS Longitude' },
-    { key: 'siteManager', label: 'Site Manager' },
-    { key: 'contactDetails', label: 'Contact Details' },
-    { key: 'operatingHours', label: 'Operating Hours' },
+    { key: 'description', label: 'Description' },
+    { key: 'businessUnitHead', label: 'Business Unit Head' },
+    { key: 'email', label: 'Email' },
+    { key: 'phone', label: 'Phone' },
     { key: 'status', label: 'Status' }
   ];
 
@@ -68,19 +54,19 @@ export class InspectionSite {
 
   showColumnPicker = false;
 
-  records: InspectionSiteRow[] = [];
-  filteredRecords: InspectionSiteRow[] = [];
+  records: MasterManagementBusinessUnitRow[] = [];
+  filteredRecords: MasterManagementBusinessUnitRow[] = [];
 
   showFormModal = false;
   isEditMode = false;
-  private editingRecord: InspectionSiteRow | null = null;
+  private editingRecord: MasterManagementBusinessUnitRow | null = null;
 
-  form: InspectionSiteItem = this.emptyForm();
+  form: MasterManagementBusinessUnitItem = this.emptyForm();
 
   private returnUrl: string | null = null;
 
   constructor(
-    private service: InspectionSiteService,
+    private service: MasterManagementBusinessUnitService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -99,7 +85,7 @@ export class InspectionSite {
       this.onCreate();
     } else if (action === 'edit') {
       const value = params.get('linkValue') ?? '';
-      const match = this.records.find((r) => r.siteName === value);
+      const match = this.records.find((r) => r.businessUnitName === value);
       if (match) {
         this.isEditMode = true;
         this.editingRecord = match;
@@ -114,32 +100,17 @@ export class InspectionSite {
     return this.service.organizationMaster;
   }
 
-  get businessUnitMaster() {
-    return this.service.businessUnitMaster;
-  }
-
-  get siteTypeMaster() {
-    return this.service.siteTypeMaster;
-  }
-
-  private emptyForm(): InspectionSiteItem {
+  private emptyForm(): MasterManagementBusinessUnitItem {
     return {
-      siteCode: '',
+      businessUnitCode: '',
       assetId: '',
       assetName: '',
-      siteName: '',
+      businessUnitName: '',
       organization: '',
-      businessUnit: '',
-      siteType: '',
-      address: '',
-      country: '',
-      state: '',
-      city: '',
-      gpsLatitude: '',
-      gpsLongitude: '',
-      siteManager: '',
-      contactDetails: '',
-      operatingHours: '',
+      description: '',
+      businessUnitHead: '',
+      email: '',
+      phone: '',
       status: true
     };
   }
@@ -161,11 +132,11 @@ export class InspectionSite {
     this.showColumnPicker = false;
   }
 
-  toggleColumn(col: InspectionSiteColumn): void {
+  toggleColumn(col: MasterManagementBusinessUnitColumn): void {
     col.visible = !col.visible;
   }
 
-  get selectedRecords(): InspectionSiteRow[] {
+  get selectedRecords(): MasterManagementBusinessUnitRow[] {
     return this.filteredRecords.filter((r) => r.selected);
   }
 
@@ -178,12 +149,12 @@ export class InspectionSite {
     this.filteredRecords.forEach((r) => (r.selected = next));
   }
 
-  toggleSelectRecord(record: InspectionSiteRow): void {
+  toggleSelectRecord(record: MasterManagementBusinessUnitRow): void {
     record.selected = !record.selected;
   }
 
   onSearch(): void {
-    this.filteredRecords = this.service.search(this.searchTerm) as InspectionSiteRow[];
+    this.filteredRecords = this.service.search(this.searchTerm) as MasterManagementBusinessUnitRow[];
   }
 
   onRefresh(): void {
@@ -203,7 +174,7 @@ export class InspectionSite {
     this.editRow(this.selectedRecords[0]);
   }
 
-  editRow(record: InspectionSiteRow): void {
+  editRow(record: MasterManagementBusinessUnitRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -221,7 +192,7 @@ export class InspectionSite {
 
   submitForm(): void {
     if (this.isEditMode && this.editingRecord) {
-      this.service.updateRecord(this.editingRecord.siteCode, { ...this.form });
+      this.service.updateRecord(this.editingRecord.businessUnitCode, { ...this.form });
     } else {
       this.service.addRecord({ ...this.form });
     }
@@ -231,12 +202,12 @@ export class InspectionSite {
 
   onDelete(): void {
     if (this.selectedRecords.length === 0) return;
-    this.service.deleteRecords(this.selectedRecords.map((r) => r.siteCode));
+    this.service.deleteRecords(this.selectedRecords.map((r) => r.businessUnitCode));
     this.refresh();
   }
 
-  deleteRow(record: InspectionSiteRow): void {
-    this.service.deleteRecords([record.siteCode]);
+  deleteRow(record: MasterManagementBusinessUnitRow): void {
+    this.service.deleteRecords([record.businessUnitCode]);
     this.refresh();
   }
 
@@ -248,22 +219,15 @@ export class InspectionSite {
     rows.forEach((row) => {
       const activeRaw = (row['status'] ?? '').trim().toLowerCase();
       this.service.addRecord({
-        siteCode: row['siteCode'] ?? '',
+        businessUnitCode: row['businessUnitCode'] ?? '',
         assetId: row['assetId'] ?? '',
         assetName: row['assetName'] ?? '',
-        siteName: row['siteName'] ?? '',
+        businessUnitName: row['businessUnitName'] ?? '',
         organization: row['organization'] ?? '',
-        businessUnit: row['businessUnit'] ?? '',
-        siteType: row['siteType'] ?? '',
-        address: row['address'] ?? '',
-        country: row['country'] ?? '',
-        state: row['state'] ?? '',
-        city: row['city'] ?? '',
-        gpsLatitude: row['gpsLatitude'] ?? '',
-        gpsLongitude: row['gpsLongitude'] ?? '',
-        siteManager: row['siteManager'] ?? '',
-        contactDetails: row['contactDetails'] ?? '',
-        operatingHours: row['operatingHours'] ?? '',
+        description: row['description'] ?? '',
+        businessUnitHead: row['businessUnitHead'] ?? '',
+        email: row['email'] ?? '',
+        phone: row['phone'] ?? '',
         status: activeRaw === 'yes' || activeRaw === 'true'
       });
     });

@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
-import { InspectionOrganizationItem } from './organization.model';
+import { MasterManagementOrganizationItem } from './organization.model';
 
 @Injectable({ providedIn: 'root' })
-export class InspectionOrganizationService {
+export class MasterManagementOrganizationService {
   readonly timeZoneMaster: string[] = [
     'GMT+00:00 (UTC)',
     'GMT+04:00 (Dubai)',
@@ -15,7 +15,7 @@ export class InspectionOrganizationService {
 
   readonly dateFormatMaster: string[] = ['DD/MM/YYYY', 'MM/DD/YYYY', 'YYYY-MM-DD'];
 
-  private readonly records: InspectionOrganizationItem[] = [
+  private readonly records: MasterManagementOrganizationItem[] = [
     {
       organizationCode: 'ORG-1001',
       assetId: 'AST-1001',
@@ -80,18 +80,18 @@ export class InspectionOrganizationService {
 
   private nextSequence = 1004;
 
-  getRecords(): InspectionOrganizationItem[] {
+  getRecords(): MasterManagementOrganizationItem[] {
     return this.records;
   }
 
-  addRecord(record: InspectionOrganizationItem): InspectionOrganizationItem {
+  addRecord(record: MasterManagementOrganizationItem): MasterManagementOrganizationItem {
     const organizationCode = record.organizationCode?.trim() || `ORG-${this.nextSequence++}`;
-    const created: InspectionOrganizationItem = { ...record, organizationCode };
+    const created: MasterManagementOrganizationItem = { ...record, organizationCode };
     this.records.push(created);
     return created;
   }
 
-  updateRecord(organizationCode: string, changes: InspectionOrganizationItem): void {
+  updateRecord(organizationCode: string, changes: MasterManagementOrganizationItem): void {
     const index = this.records.findIndex((r) => r.organizationCode === organizationCode);
     if (index !== -1) {
       this.records[index] = { ...this.records[index], ...changes };
@@ -107,7 +107,7 @@ export class InspectionOrganizationService {
     }
   }
 
-  search(term: string): InspectionOrganizationItem[] {
+  search(term: string): MasterManagementOrganizationItem[] {
     const value = term.trim().toLowerCase();
     if (!value) return this.records;
     return this.records.filter((r) =>

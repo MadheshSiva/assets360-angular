@@ -56,6 +56,19 @@
   border-color: #dcd0ff;
 }
 
+.tool-zonetype-select {
+  width: 60px;
+  padding: 4px 2px;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  background: #fff;
+  color: #334155;
+  font-size: 9.5px;
+  font-weight: 700;
+  text-align: center;
+  cursor: pointer;
+}
+
 .tool-btn.is-active {
   background: #7030a0;
   border-color: #7030a0;
@@ -189,7 +202,7 @@
   position: relative;
   flex: 1 1 auto;
   min-width: 0;
-  min-height: 480px;
+  min-height: 680px;
   background: #fff;
   border: 1px solid #d4d6da;
   border-radius: 10px;
@@ -282,18 +295,41 @@
   white-space: nowrap;
 }
 
-.asset-marker {
+.zone-asset-label {
   position: absolute;
   transform: translate(-50%, -50%);
+  padding: 2px 8px;
+  border: none;
+  border-radius: 999px;
+  background: rgba(15, 23, 42, 0.82);
+  color: #fff;
+  font: inherit;
+  font-size: 11px;
+  font-weight: 700;
+  white-space: nowrap;
+  pointer-events: none;
+  cursor: default;
   z-index: 4;
 }
 
-.asset-marker-icon {
+.zone-asset-label.is-clickable {
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+.zone-asset-label.is-clickable:hover {
+  background: #0f172a;
+}
+
+.zone-asset-pin {
+  position: absolute;
+  transform: translate(-50%, -50%);
+  z-index: 5;
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 30px;
-  height: 30px;
+  width: 24px;
+  height: 24px;
   padding: 0;
   border: 2px solid #fff;
   border-radius: 50%;
@@ -302,131 +338,23 @@
   cursor: pointer;
 }
 
-.asset-marker-icon svg {
-  width: 15px;
-  height: 15px;
+.zone-asset-pin svg {
+  width: 12px;
+  height: 12px;
   pointer-events: none;
 }
 
-.asset-marker-count {
-  position: absolute;
-  top: -4px;
-  right: -4px;
-  min-width: 16px;
-  height: 16px;
-  padding: 0 3px;
-  border-radius: 999px;
-  background: #0f172a;
-  color: #fff;
-  font-size: 10px;
-  font-weight: 700;
-  line-height: 16px;
-  text-align: center;
-  pointer-events: none;
+.zone-asset-pin.is-highlighted {
+  z-index: 6;
+  animation: zone-asset-pin-pulse 1.2s ease-in-out infinite;
 }
 
-.asset-panel {
-  position: absolute;
-  top: calc(100% + 10px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 210px;
-  background: #fff;
-  border: 1px solid #d4d6da;
-  border-radius: 10px;
-  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.2);
-  padding: 10px;
-  z-index: 10;
-  cursor: default;
-}
-
-.asset-panel-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  font-size: 12px;
-  font-weight: 700;
-  color: #334155;
-  margin-bottom: 8px;
-}
-
-.asset-panel-close {
-  border: none;
-  background: transparent;
-  cursor: pointer;
-  font-size: 15px;
-  color: #94a3b8;
-  line-height: 1;
-  padding: 0;
-}
-
-.asset-panel-list {
-  list-style: none;
-  margin: 0 0 8px;
-  padding: 0;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-  max-height: 120px;
-  overflow-y: auto;
-}
-
-.asset-panel-list li {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  font-size: 12.5px;
-  padding: 4px 8px;
-  background: #f8fafc;
-  border-radius: 6px;
-}
-
-.asset-panel-list li button {
-  border: none;
-  background: transparent;
-  color: #94a3b8;
-  cursor: pointer;
-  font-size: 13px;
-  line-height: 1;
-  padding: 0;
-}
-
-.asset-panel-empty {
-  margin: 0 0 8px;
-  font-size: 12px;
-  color: #94a3b8;
-}
-
-.asset-panel-add {
-  display: flex;
-  gap: 6px;
-}
-
-.asset-panel-add input {
-  flex: 1;
-  min-width: 0;
-  font: inherit;
-  font-size: 12.5px;
-  padding: 6px 8px;
-  border: 1px solid #e2e8f0;
-  border-radius: 6px;
-  outline: none;
-}
-
-.asset-panel-add input:focus {
-  border-color: #b794f4;
-}
-
-.asset-panel-add button {
-  flex: 0 0 auto;
-  font: inherit;
-  font-size: 12px;
-  font-weight: 700;
-  padding: 6px 12px;
-  border: none;
-  border-radius: 6px;
-  background: #7030a0;
-  color: #fff;
-  cursor: pointer;
+@keyframes zone-asset-pin-pulse {
+  0%,
+  100% {
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.4), 0 0 0 0 rgba(250, 204, 21, 0.9);
+  }
+  50% {
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.4), 0 0 0 10px rgba(250, 204, 21, 0);
+  }
 }

@@ -1,13 +1,13 @@
 import { Injectable } from '@angular/core';
-import { InspectionSiteItem } from './site.model';
+import { MasterManagementSiteItem } from './site.model';
 
 @Injectable({ providedIn: 'root' })
-export class InspectionSiteService {
+export class MasterManagementSiteService {
   readonly organizationMaster: string[] = ['PurpleIQ Global Holdings', 'Northbridge Manufacturing Inc.', 'Meridian Facilities Ltd.'];
   readonly businessUnitMaster: string[] = ['Facilities Operations', 'Manufacturing Plants', 'Retail & Warehousing'];
   readonly siteTypeMaster: string[] = ['Factory', 'Warehouse', 'Office', 'Retail Store', 'Data Center'];
 
-  private readonly records: InspectionSiteItem[] = [
+  private readonly records: MasterManagementSiteItem[] = [
     {
       siteCode: 'SITE-1001',
       assetId: 'AST-1001',
@@ -69,18 +69,18 @@ export class InspectionSiteService {
 
   private nextSequence = 1004;
 
-  getRecords(): InspectionSiteItem[] {
+  getRecords(): MasterManagementSiteItem[] {
     return this.records;
   }
 
-  addRecord(record: InspectionSiteItem): InspectionSiteItem {
+  addRecord(record: MasterManagementSiteItem): MasterManagementSiteItem {
     const siteCode = record.siteCode?.trim() || `SITE-${this.nextSequence++}`;
-    const created: InspectionSiteItem = { ...record, siteCode };
+    const created: MasterManagementSiteItem = { ...record, siteCode };
     this.records.push(created);
     return created;
   }
 
-  updateRecord(siteCode: string, changes: InspectionSiteItem): void {
+  updateRecord(siteCode: string, changes: MasterManagementSiteItem): void {
     const index = this.records.findIndex((r) => r.siteCode === siteCode);
     if (index !== -1) {
       this.records[index] = { ...this.records[index], ...changes };
@@ -96,7 +96,7 @@ export class InspectionSiteService {
     }
   }
 
-  search(term: string): InspectionSiteItem[] {
+  search(term: string): MasterManagementSiteItem[] {
     const value = term.trim().toLowerCase();
     if (!value) return this.records;
     return this.records.filter((r) =>

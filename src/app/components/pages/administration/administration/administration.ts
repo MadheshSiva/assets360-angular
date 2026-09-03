@@ -116,6 +116,12 @@ export class Administration {
   ];
 
   masterManagementOptions: BreadcrumbOption[] = [
+    { label: 'Organization', path: '/administration/configuration/master-management/organization' },
+    { label: 'Business Unit', path: '/administration/configuration/master-management/business-unit' },
+    { label: 'Department', path: '/administration/configuration/master-management/department' },
+    { label: 'Site', path: '/administration/configuration/master-management/site' },
+    { label: 'Manufacturer', path: '/administration/configuration/master-management/manufacturer' },
+    { label: 'Supplier', path: '/administration/configuration/master-management/supplier' },
     { label: 'Master Maintenance', path: '/administration/configuration/master-management/master-maintenance' },
     { label: 'Category / Sub-category', path: '/administration/configuration/master-management/category-subcategory' },
     { label: 'Asset Type', path: '/administration/configuration/master-management/asset-type' },
@@ -152,12 +158,6 @@ export class Administration {
   ];
 
   inspectionOptions: BreadcrumbOption[] = [
-    { label: 'Organization', path: '/administration/configuration/inspection/organization' },
-    { label: 'Business Unit', path: '/administration/configuration/inspection/business-unit' },
-    { label: 'Department', path: '/administration/configuration/inspection/department' },
-    { label: 'Site', path: '/administration/configuration/inspection/site' },
-    { label: 'Manufacturer', path: '/administration/configuration/inspection/manufacturer' },
-    { label: 'Supplier', path: '/administration/configuration/inspection/supplier' },
     { label: 'Inspection Type', path: '/administration/configuration/inspection/inspection-type' },
     { label: 'Task Category', path: '/administration/configuration/inspection/task-category' },
     { label: 'Inspection Task', path: '/administration/configuration/inspection/inspection-task' },
@@ -264,6 +264,12 @@ export class Administration {
 
   // Maps URL slug -> breadcrumb label for pages nested under Master Management
   private masterManagementSlugLabelMap: Record<string, string> = {
+    'organization': 'Organization',
+    'business-unit': 'Business Unit',
+    'department': 'Department',
+    'site': 'Site',
+    'manufacturer': 'Manufacturer',
+    'supplier': 'Supplier',
     'master-maintenance': 'Master Maintenance',
     'category-subcategory': 'Category / Sub-category',
     'asset-type': 'Asset Type',
@@ -301,12 +307,6 @@ export class Administration {
 
   // Maps URL slug -> breadcrumb label for pages nested under Inspection
   private inspectionSlugLabelMap: Record<string, string> = {
-    'organization': 'Organization',
-    'business-unit': 'Business Unit',
-    'department': 'Department',
-    'site': 'Site',
-    'manufacturer': 'Manufacturer',
-    'supplier': 'Supplier',
     'inspection-type': 'Inspection Type',
     'task-category': 'Task Category',
     'inspection-task': 'Inspection Task',

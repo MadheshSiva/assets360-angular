@@ -1,4 +1,4 @@
-export interface InspectionOrganizationItem {
+export interface MasterManagementOrganizationItem {
   organizationCode: string;
   assetId: string;
   assetName: string;
@@ -19,6 +19,6 @@ export interface InspectionOrganizationItem {
   status: boolean;
 }
 
-export interface InspectionOrganizationRow extends InspectionOrganizationItem {
+export interface MasterManagementOrganizationRow extends MasterManagementOrganizationItem {
   selected?: boolean;
 }

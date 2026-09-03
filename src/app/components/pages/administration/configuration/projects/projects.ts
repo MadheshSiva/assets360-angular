@@ -8,18 +8,23 @@ import {
   AreaType,
   Building,
   childrenOf,
+  Coords,
   Floor,
   FloorPlanComponent,
   FloorPlanZoneInput,
   HierarchyNode,
   MapComponent,
+  MapLocation,
   MapPin,
   Project,
   ProjectStatus,
   SiteHierarchyService,
+  State,
+  Zone,
   areaAllowsBuildings,
   areaAllowsDirectZones,
 } from 'shared-ui';
+import { COUNTRIES, TIME_ZONES } from './country-data';
 
 export interface AddProjectForm {
   name: string;
@@ -29,13 +34,13 @@ export interface AddProjectForm {
   status: ProjectStatus;
 }
 
-type ChildModalKind = 'area' | 'building' | 'floor' | 'zone';
+type ChildModalKind = 'area' | 'state' | 'building' | 'floor' | 'zone';
 
 interface ChildModalState {
   kind: ChildModalKind;
   parentId: string;
-  /** Only relevant when kind === 'zone': a zone can attach to either an area or a floor. */
-  zoneParentKind?: 'area' | 'floor';
+  /** Only relevant when kind === 'zone': a zone can attach to a state, a floor, or another zone (a sub-zone). */
+  zoneParentKind?: 'state' | 'floor' | 'zone';
 }
 
 interface Row {
@@ -66,6 +71,8 @@ export class Projects {
   readonly areaTypeShortLabels = AREA_TYPE_SHORT_LABELS;
   readonly zoneColors = ZONE_COLORS;
 
+  /** Everything starts collapsed — only the top-level project(s) show at first, and each
+   *  click reveals just that node's own children, one level at a time. */
   expanded = new Set<string>();
   activeNodeId: string | null = null;
 
@@ -83,6 +90,13 @@ export class Projects {
     })),
   );
 
+  /** Gives the map something to center on even before any zone exists to derive a pin from —
+   *  otherwise it never initializes (see MapComponent.ngAfterViewInit). */
+  readonly mapLocations = computed<MapLocation[]>(() => {
+    const project = this.projects()[0];
+    return project ? [{ name: project.name, coords: project.coords }] : [];
+  });
+
   /** The floor plan image is shown instead of the geo map when a floor,
    *  or a zone that belongs to a floor, is the active node. */
   get activeFloor(): Floor | null {
@@ -95,6 +109,16 @@ export class Projects {
 
   get showFloorPlan(): boolean {
     return this.activeFloor !== null;
+  }
+
+  /** When the active node is a zone with an uploaded map image, that image is shown in the
+   *  map panel instead of the geo map or the floor plan. A sub-zone with no image of its own
+   *  falls back to its parent zone's image, since it's just an area within that same zone. */
+  get activeZoneImage(): string | null {
+    const node = this.findNode(this.activeNodeId);
+    if (!node || node.kind !== 'zone') return null;
+    if (node.mapImage) return node.mapImage;
+    return this.findParentZone(node.id)?.mapImage ?? null;
   }
 
   get floorPlanZones(): FloorPlanZoneInput[] {
@@ -122,11 +146,32 @@ export class Projects {
     return found;
   }
 
+  /** Walks a zone's own sub-zones (recursively) to see if the target zone is anywhere underneath it. */
+  private zoneContains(zone: Zone, zoneId: string): boolean {
+    return zone.zones.some((sub) => sub.id === zoneId || this.zoneContains(sub, zoneId));
+  }
+
   private findParentFloor(zoneId: string): Floor | undefined {
     let result: Floor | undefined;
     const walk = (node: HierarchyNode) => {
       if (result) return;
-      if (node.kind === 'floor' && node.zones.some((zone) => zone.id === zoneId)) {
+      // Match a zone directly on this floor, or a sub-zone nested inside one of those zones.
+      if (node.kind === 'floor' && node.zones.some((zone) => zone.id === zoneId || this.zoneContains(zone, zoneId))) {
+        result = node;
+        return;
+      }
+      childrenOf(node).forEach(walk);
+    };
+    this.projects().forEach(walk);
+    return result;
+  }
+
+  /** The zone this one is nested under, if it's a sub-zone (nesting is one level deep only). */
+  private findParentZone(zoneId: string): Zone | undefined {
+    let result: Zone | undefined;
+    const walk = (node: HierarchyNode) => {
+      if (result) return;
+      if (node.kind === 'zone' && node.zones.some((z) => z.id === zoneId)) {
         result = node;
         return;
       }
@@ -159,15 +204,20 @@ export class Projects {
   }
 
   areaTypeOf(node: HierarchyNode): AreaType | null {
-    return node.kind === 'area' ? node.type : null;
+    return node.kind === 'state' ? node.type : null;
   }
 
   canAddZone(node: HierarchyNode): boolean {
-    return node.kind === 'area' ? areaAllowsDirectZones(node.type) : node.kind === 'floor';
+    return node.kind === 'state' ? areaAllowsDirectZones(node.type) : node.kind === 'floor';
   }
 
   canAddBuilding(node: HierarchyNode): boolean {
-    return node.kind === 'area' && areaAllowsBuildings(node.type);
+    return node.kind === 'state' && areaAllowsBuildings(node.type);
+  }
+
+  /** A zone can add sub-zones, but a sub-zone itself cannot — nesting stops at one level. */
+  canAddSubZone(node: HierarchyNode): boolean {
+    return node.kind === 'zone' && !this.findParentZone(node.id);
   }
 
   toggle(node: HierarchyNode): void {
@@ -283,27 +333,99 @@ export class Projects {
     this.mapComponent?.flyTo(project.coords);
   }
 
-  // ===== Add Area / Building / Floor / Zone modal (shared) =====
+  // ===== Add Area / State / Building / Floor / Zone modal (shared) =====
+
+  readonly countryOptions = COUNTRIES;
+  readonly timeZoneOptions = TIME_ZONES;
 
   childModal: ChildModalState | null = null;
   childFormName = '';
-  childFormAreaType: AreaType = 'indoor';
   childFormZoneColor = ZONE_COLORS[0].value;
+  childFormDescription = '';
+  childFormTimeZone = '';
+  childFormCountryCode = '';
+  childFormLatitude = '';
+  childFormLongitude = '';
+  childFormZoomLevel = '';
+  childFormStatus: 'active' | 'inactive' = 'active';
+  childFormStateType: AreaType | '' = '';
+  childFormMapImage: string | null = null;
+  childFormMapFileName: string | null = null;
+  childFormTopZone = '';
+  childFormPriority = '';
+  childFormExit = '';
+  childFormAssemblyPoint: 'active' | 'inactive' = 'active';
   childFormError: string | null = null;
 
   get childModalTitle(): string {
     switch (this.childModal?.kind) {
       case 'area':
+        return 'Add Country';
+      case 'state':
         return 'Add Area';
       case 'building':
         return 'Add Building';
       case 'floor':
         return 'Add Floor';
       case 'zone':
-        return 'Add Zone';
+        return this.childModal?.zoneParentKind === 'zone' ? 'Add Subzone' : 'Add Zone';
       default:
         return '';
     }
+  }
+
+  get childModalSubmitLabel(): string {
+    switch (this.childModal?.kind) {
+      case 'area':
+        return 'Add Country';
+      case 'state':
+        return 'Add State';
+      case 'building':
+        return 'Add City';
+      case 'floor':
+        return 'Add Street';
+      case 'zone':
+        return this.childModal?.zoneParentKind === 'zone' ? 'Add Subzone' : 'Add Building';
+      default:
+        return 'Create';
+    }
+  }
+
+  /** Countries (areas) already added under the project currently open in the "Add Country" modal. */
+  get countryListRows(): Area[] {
+    if (!this.childModal || this.childModal.kind !== 'area') return [];
+    const parent = this.findNode(this.childModal.parentId);
+    return parent && parent.kind === 'project' ? parent.areas : [];
+  }
+
+  /** States already added under the country currently open in the "Add Area" modal. */
+  get stateListRows(): State[] {
+    if (!this.childModal || this.childModal.kind !== 'state') return [];
+    const parent = this.findNode(this.childModal.parentId);
+    return parent && parent.kind === 'area' ? parent.states : [];
+  }
+
+  /** Buildings ("cities") already added under the area currently open in the "Add Building" modal. */
+  get buildingListRows(): Building[] {
+    if (!this.childModal || this.childModal.kind !== 'building') return [];
+    const parent = this.findNode(this.childModal.parentId);
+    return parent && parent.kind === 'state' ? parent.buildings : [];
+  }
+
+  /** Floors ("streets") already added under the building currently open in the "Add Floor" modal. */
+  get floorListRows(): Floor[] {
+    if (!this.childModal || this.childModal.kind !== 'floor') return [];
+    const parent = this.findNode(this.childModal.parentId);
+    return parent && parent.kind === 'building' ? parent.floors : [];
+  }
+
+  /** Zones already added under the state/floor/zone currently open in the "Add Zone" modal. */
+  get zoneListRows(): Zone[] {
+    if (!this.childModal || this.childModal.kind !== 'zone') return [];
+    const parent = this.findNode(this.childModal.parentId);
+    return parent && (parent.kind === 'state' || parent.kind === 'floor' || parent.kind === 'zone')
+      ? parent.zones
+      : [];
   }
 
   openAddArea(project: Project, event?: Event): void {
@@ -312,9 +434,15 @@ export class Projects {
     this.resetChildForm();
   }
 
-  openAddBuilding(area: Area, event?: Event): void {
+  openAddState(area: Area, event?: Event): void {
     event?.stopPropagation();
-    this.childModal = { kind: 'building', parentId: area.id };
+    this.childModal = { kind: 'state', parentId: area.id };
+    this.resetChildForm();
+  }
+
+  openAddBuilding(state: State, event?: Event): void {
+    event?.stopPropagation();
+    this.childModal = { kind: 'building', parentId: state.id };
     this.resetChildForm();
   }
 
@@ -324,7 +452,7 @@ export class Projects {
     this.resetChildForm();
   }
 
-  openAddZone(parent: Area | Floor, event?: Event): void {
+  openAddZone(parent: State | Floor | Zone, event?: Event): void {
     event?.stopPropagation();
     this.childModal = { kind: 'zone', parentId: parent.id, zoneParentKind: parent.kind };
     this.resetChildForm();
@@ -332,8 +460,21 @@ export class Projects {
 
   private resetChildForm(): void {
     this.childFormName = '';
-    this.childFormAreaType = 'indoor';
     this.childFormZoneColor = ZONE_COLORS[0].value;
+    this.childFormDescription = '';
+    this.childFormTimeZone = '';
+    this.childFormCountryCode = '';
+    this.childFormLatitude = '';
+    this.childFormLongitude = '';
+    this.childFormZoomLevel = '';
+    this.childFormStatus = 'active';
+    this.childFormStateType = '';
+    this.childFormMapImage = null;
+    this.childFormMapFileName = null;
+    this.childFormTopZone = '';
+    this.childFormPriority = '';
+    this.childFormExit = '';
+    this.childFormAssemblyPoint = 'active';
     this.childFormError = null;
   }
 
@@ -341,7 +482,195 @@ export class Projects {
     this.childModal = null;
   }
 
+  onMapFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+    if (!file) return;
+
+    this.childFormMapFileName = file.name;
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.childFormMapImage = typeof reader.result === 'string' ? reader.result : null;
+    };
+    reader.readAsDataURL(file);
+  }
+
+  onCountryNameChange(): void {
+    const match = this.countryOptions.find((c) => c.name === this.childFormName);
+    this.childFormCountryCode = match?.code ?? '';
+  }
+
+  toggleChildFormStatus(): void {
+    this.childFormStatus = this.childFormStatus === 'active' ? 'inactive' : 'active';
+  }
+
+  toggleChildFormAssemblyPoint(): void {
+    this.childFormAssemblyPoint = this.childFormAssemblyPoint === 'active' ? 'inactive' : 'active';
+  }
+
   submitChildModal(): void {
+    if (!this.childModal) return;
+
+    if (this.childModal.kind === 'area') {
+      this.submitAddCountry();
+      return;
+    }
+    if (this.childModal.kind === 'state') {
+      this.submitAddState();
+      return;
+    }
+    if (this.childModal.kind === 'building') {
+      this.submitAddBuilding();
+      return;
+    }
+    if (this.childModal.kind === 'floor') {
+      this.submitAddFloor();
+      return;
+    }
+
+    this.submitAddZone();
+  }
+
+  /** Adding a country keeps the modal open so several can be added in one session. */
+  private submitAddCountry(): void {
+    if (!this.childModal) return;
+    const name = this.childFormName.trim();
+    if (!name) {
+      this.childFormError = 'Country name is required.';
+      return;
+    }
+    const timeZone = this.childFormTimeZone.trim();
+    if (!timeZone) {
+      this.childFormError = 'Time zone is required.';
+      return;
+    }
+
+    const lat = parseFloat(this.childFormLatitude);
+    const lng = parseFloat(this.childFormLongitude);
+    const zoom = parseFloat(this.childFormZoomLevel);
+    const coords: Coords | undefined =
+      !isNaN(lat) && !isNaN(lng) ? { lat, lng, zoom: !isNaN(zoom) ? zoom : 12 } : undefined;
+
+    const created = this.hierarchy.addArea(this.childModal.parentId, {
+      name,
+      description: this.childFormDescription.trim(),
+      timeZone,
+      countryCode: this.childFormCountryCode,
+      status: this.childFormStatus,
+      coords,
+    });
+
+    if (!created) {
+      this.childFormError = 'Could not add this country.';
+      return;
+    }
+
+    this.expanded = new Set(this.expanded).add(this.childModal.parentId);
+    this.activeNodeId = created.id;
+    this.mapComponent?.flyTo(created.coords);
+    this.resetChildForm();
+  }
+
+  /** Adding a state keeps the modal open so several can be added in one session. */
+  private submitAddState(): void {
+    if (!this.childModal) return;
+    const name = this.childFormName.trim();
+    if (!name) {
+      this.childFormError = 'Area name is required.';
+      return;
+    }
+    if (!this.childFormStateType) {
+      this.childFormError = 'Outdoor map type is required.';
+      return;
+    }
+
+    const lat = parseFloat(this.childFormLatitude);
+    const lng = parseFloat(this.childFormLongitude);
+    const zoom = parseFloat(this.childFormZoomLevel);
+    const coords: Coords | undefined =
+      !isNaN(lat) && !isNaN(lng) ? { lat, lng, zoom: !isNaN(zoom) ? zoom : 12 } : undefined;
+
+    const created = this.hierarchy.addState(this.childModal.parentId, {
+      name,
+      type: this.childFormStateType,
+      description: this.childFormDescription.trim(),
+      status: this.childFormStatus,
+      coords,
+    });
+
+    if (!created) {
+      this.childFormError = 'Could not add this area.';
+      return;
+    }
+
+    this.expanded = new Set(this.expanded).add(this.childModal.parentId);
+    this.activeNodeId = created.id;
+    this.mapComponent?.flyTo(created.coords);
+    this.resetChildForm();
+  }
+
+  /** Adding a building ("city") keeps the modal open so several can be added in one session. */
+  private submitAddBuilding(): void {
+    if (!this.childModal) return;
+    const name = this.childFormName.trim();
+    if (!name) {
+      this.childFormError = 'Building name is required.';
+      return;
+    }
+
+    const lat = parseFloat(this.childFormLatitude);
+    const lng = parseFloat(this.childFormLongitude);
+    const zoom = parseFloat(this.childFormZoomLevel);
+    const coords: Coords | undefined =
+      !isNaN(lat) && !isNaN(lng) ? { lat, lng, zoom: !isNaN(zoom) ? zoom : 12 } : undefined;
+
+    const created = this.hierarchy.addBuilding(this.childModal.parentId, {
+      name,
+      description: this.childFormDescription.trim(),
+      status: this.childFormStatus,
+      coords,
+    });
+
+    if (!created) {
+      this.childFormError = 'Could not add this building.';
+      return;
+    }
+
+    this.expanded = new Set(this.expanded).add(this.childModal.parentId);
+    this.activeNodeId = created.id;
+    this.mapComponent?.flyTo(created.coords);
+    this.resetChildForm();
+  }
+
+  /** Adding a floor ("street") keeps the modal open so several can be added in one session. */
+  private submitAddFloor(): void {
+    if (!this.childModal) return;
+    const name = this.childFormName.trim();
+    if (!name) {
+      this.childFormError = 'Floor name is required.';
+      return;
+    }
+
+    const created = this.hierarchy.addFloor(this.childModal.parentId, {
+      name,
+      description: this.childFormDescription.trim(),
+      mapImage: this.childFormMapImage ?? undefined,
+      status: this.childFormStatus,
+    });
+
+    if (!created) {
+      this.childFormError = 'Could not add this floor.';
+      return;
+    }
+
+    this.expanded = new Set(this.expanded).add(this.childModal.parentId);
+    this.activeNodeId = created.id;
+    this.mapComponent?.flyTo(created.coords);
+    this.resetChildForm();
+  }
+
+  /** Adding a zone keeps the modal open so several can be added in one session. */
+  private submitAddZone(): void {
     if (!this.childModal) return;
     const name = this.childFormName.trim();
     if (!name) {
@@ -349,42 +678,43 @@ export class Projects {
       return;
     }
 
-    let created: HierarchyNode | undefined;
-    switch (this.childModal.kind) {
-      case 'area':
-        created = this.hierarchy.addArea(this.childModal.parentId, {
-          name,
-          type: this.childFormAreaType,
-        });
-        break;
-      case 'building':
-        created = this.hierarchy.addBuilding(this.childModal.parentId, { name });
-        break;
-      case 'floor':
-        created = this.hierarchy.addFloor(this.childModal.parentId, { name });
-        break;
-      case 'zone':
-        created =
-          this.childModal.zoneParentKind === 'area'
-            ? this.hierarchy.addZoneToArea(this.childModal.parentId, {
-                name,
-                color: this.childFormZoneColor,
-              })
-            : this.hierarchy.addZoneToFloor(this.childModal.parentId, {
-                name,
-                color: this.childFormZoneColor,
-              });
-        break;
+    const zoom = parseFloat(this.childFormZoomLevel);
+    const input = {
+      name,
+      color: this.childFormZoneColor,
+      description: this.childFormDescription.trim(),
+      mapImage: this.childFormMapImage ?? undefined,
+      topZone: this.childFormTopZone.trim(),
+      priority: this.childFormPriority.trim(),
+      exit: this.childFormExit.trim(),
+      assemblyPoint: this.childFormAssemblyPoint,
+      status: this.childFormStatus,
+      coords: !isNaN(zoom) ? { ...this.jitteredParentCoords(), zoom } : undefined,
+    };
+
+    let created: Zone | undefined;
+    if (this.childModal.zoneParentKind === 'state') {
+      created = this.hierarchy.addZoneToState(this.childModal.parentId, input);
+    } else if (this.childModal.zoneParentKind === 'zone') {
+      created = this.hierarchy.addSubZone(this.childModal.parentId, input);
+    } else {
+      created = this.hierarchy.addZoneToFloor(this.childModal.parentId, input);
     }
 
     if (!created) {
-      this.childFormError = 'Could not add this item.';
+      this.childFormError = 'Could not add this zone.';
       return;
     }
 
     this.expanded = new Set(this.expanded).add(this.childModal.parentId);
-    this.childModal = null;
     this.activeNodeId = created.id;
     this.mapComponent?.flyTo(created.coords);
+    this.resetChildForm();
+  }
+
+  /** The parent's own lat/lng, used as the base point when only a zoom level is given for a new zone. */
+  private jitteredParentCoords(): Coords {
+    const parent = this.childModal ? this.findNode(this.childModal.parentId) : undefined;
+    return parent?.coords ?? { lat: 25.2048, lng: 55.2708, zoom: 12 };
   }
 }

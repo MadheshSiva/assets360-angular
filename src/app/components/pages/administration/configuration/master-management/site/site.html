@@ -1,7 +1,7 @@
 <section class="wo-page">
   <div class="card">
     <div class="card-header">
-      <h1 class="page-title">Department</h1>
+      <h1 class="page-title">Site</h1>
 
       <div class="search-wrap">
         <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -77,13 +77,22 @@
             <th class="selection-col">
               <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
             </th>
-            <th *ngIf="isColumnVisible('departmentCode')">Department Code</th>
+            <th *ngIf="isColumnVisible('siteCode')">Site Code</th>
             <th *ngIf="isColumnVisible('assetId')">Asset ID</th>
             <th *ngIf="isColumnVisible('assetName')">Asset Name</th>
-            <th *ngIf="isColumnVisible('departmentName')">Department Name</th>
+            <th *ngIf="isColumnVisible('siteName')">Site Name</th>
+            <th *ngIf="isColumnVisible('organization')">Organization</th>
             <th *ngIf="isColumnVisible('businessUnit')">Business Unit</th>
-            <th *ngIf="isColumnVisible('departmentHead')">Department Head</th>
-            <th *ngIf="isColumnVisible('description')">Description</th>
+            <th *ngIf="isColumnVisible('siteType')">Site Type</th>
+            <th *ngIf="isColumnVisible('address')">Address</th>
+            <th *ngIf="isColumnVisible('country')">Country</th>
+            <th *ngIf="isColumnVisible('state')">State</th>
+            <th *ngIf="isColumnVisible('city')">City</th>
+            <th *ngIf="isColumnVisible('gpsLatitude')">GPS Latitude</th>
+            <th *ngIf="isColumnVisible('gpsLongitude')">GPS Longitude</th>
+            <th *ngIf="isColumnVisible('siteManager')">Site Manager</th>
+            <th *ngIf="isColumnVisible('contactDetails')">Contact Details</th>
+            <th *ngIf="isColumnVisible('operatingHours')">Operating Hours</th>
             <th *ngIf="isColumnVisible('status')">Status</th>
             <th class="actions-col">Actions</th>
           </tr>
@@ -93,13 +102,22 @@
             <td class="selection-col">
               <input type="checkbox" [checked]="r.selected" (change)="toggleSelectRecord(r)" />
             </td>
-            <td *ngIf="isColumnVisible('departmentCode')" class="mono">{{ r.departmentCode }}</td>
+            <td *ngIf="isColumnVisible('siteCode')" class="mono">{{ r.siteCode }}</td>
             <td *ngIf="isColumnVisible('assetId')" class="mono">{{ r.assetId }}</td>
             <td *ngIf="isColumnVisible('assetName')">{{ r.assetName }}</td>
-            <td *ngIf="isColumnVisible('departmentName')">{{ r.departmentName }}</td>
+            <td *ngIf="isColumnVisible('siteName')">{{ r.siteName }}</td>
+            <td *ngIf="isColumnVisible('organization')">{{ r.organization || '-' }}</td>
             <td *ngIf="isColumnVisible('businessUnit')">{{ r.businessUnit || '-' }}</td>
-            <td *ngIf="isColumnVisible('departmentHead')">{{ r.departmentHead || '-' }}</td>
-            <td *ngIf="isColumnVisible('description')">{{ r.description || '-' }}</td>
+            <td *ngIf="isColumnVisible('siteType')">{{ r.siteType || '-' }}</td>
+            <td *ngIf="isColumnVisible('address')">{{ r.address || '-' }}</td>
+            <td *ngIf="isColumnVisible('country')">{{ r.country || '-' }}</td>
+            <td *ngIf="isColumnVisible('state')">{{ r.state || '-' }}</td>
+            <td *ngIf="isColumnVisible('city')">{{ r.city || '-' }}</td>
+            <td *ngIf="isColumnVisible('gpsLatitude')" class="mono">{{ r.gpsLatitude || '-' }}</td>
+            <td *ngIf="isColumnVisible('gpsLongitude')" class="mono">{{ r.gpsLongitude || '-' }}</td>
+            <td *ngIf="isColumnVisible('siteManager')">{{ r.siteManager || '-' }}</td>
+            <td *ngIf="isColumnVisible('contactDetails')">{{ r.contactDetails || '-' }}</td>
+            <td *ngIf="isColumnVisible('operatingHours')">{{ r.operatingHours || '-' }}</td>
             <td *ngIf="isColumnVisible('status')">
               <span class="badge" [attr.data-flag]="r.status">{{ r.status ? 'Active' : 'Inactive' }}</span>
             </td>
@@ -132,7 +150,7 @@
             <rect x="15" y="10" width="2.2" height="2.2" fill="currentColor"/>
           </svg>
         </span>
-        <h2 class="modal-title">{{ isEditMode ? 'Edit Department' : 'Create Department' }}</h2>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Site' : 'Create Site' }}</h2>
       </div>
       <button class="modal-close" (click)="closeFormModal()" title="Close">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -144,8 +162,8 @@
     <form class="modal-form" (ngSubmit)="submitForm()" #recordForm="ngForm">
       <div class="form-grid">
         <div class="form-field">
-          <label>DEPARTMENT CODE</label>
-          <input type="text" name="departmentCode" placeholder="Auto-generated if left blank" [(ngModel)]="form.departmentCode" [readonly]="isEditMode" />
+          <label>SITE CODE</label>
+          <input type="text" name="siteCode" placeholder="Auto-generated if left blank" [(ngModel)]="form.siteCode" [readonly]="isEditMode" />
         </div>
 
         <div class="form-field">
@@ -159,8 +177,24 @@
         </div>
 
         <div class="form-field">
-          <label>DEPARTMENT NAME <span class="required">*</span></label>
-          <input type="text" name="departmentName" [(ngModel)]="form.departmentName" required />
+          <label>SITE NAME <span class="required">*</span></label>
+          <input type="text" name="siteName" [(ngModel)]="form.siteName" required />
+        </div>
+
+        <div class="form-field">
+          <label>ORGANIZATION</label>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <div class="select-wrap" style="flex: 1;">
+              <select name="organization" [(ngModel)]="form.organization">
+                <option value="" disabled selected>-- Select Organization --</option>
+                <option *ngFor="let o of organizationMaster" [value]="o">{{ o }}</option>
+              </select>
+            </div>
+            <app-master-link-icons
+              masterPath="/administration/configuration/master-management/organization"
+              [currentValue]="form.organization"
+            ></app-master-link-icons>
+          </div>
         </div>
 
         <div class="form-field">
@@ -173,20 +207,65 @@
               </select>
             </div>
             <app-master-link-icons
-              masterPath="/administration/configuration/inspection/business-unit"
+              masterPath="/administration/configuration/master-management/business-unit"
               [currentValue]="form.businessUnit"
             ></app-master-link-icons>
           </div>
         </div>
 
         <div class="form-field">
-          <label>DEPARTMENT HEAD</label>
-          <input type="text" name="departmentHead" [(ngModel)]="form.departmentHead" />
+          <label>SITE TYPE</label>
+          <div class="select-wrap">
+            <select name="siteType" [(ngModel)]="form.siteType">
+              <option value="" disabled selected>-- Select Site Type --</option>
+              <option *ngFor="let s of siteTypeMaster" [value]="s">{{ s }}</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-field">
-          <label>DESCRIPTION</label>
-          <input type="text" name="description" [(ngModel)]="form.description" />
+          <label>ADDRESS</label>
+          <input type="text" name="address" [(ngModel)]="form.address" />
+        </div>
+
+        <div class="form-field">
+          <label>COUNTRY</label>
+          <input type="text" name="country" [(ngModel)]="form.country" />
+        </div>
+
+        <div class="form-field">
+          <label>STATE</label>
+          <input type="text" name="state" [(ngModel)]="form.state" />
+        </div>
+
+        <div class="form-field">
+          <label>CITY</label>
+          <input type="text" name="city" [(ngModel)]="form.city" />
+        </div>
+
+        <div class="form-field">
+          <label>GPS LATITUDE</label>
+          <input type="text" name="gpsLatitude" [(ngModel)]="form.gpsLatitude" />
+        </div>
+
+        <div class="form-field">
+          <label>GPS LONGITUDE</label>
+          <input type="text" name="gpsLongitude" [(ngModel)]="form.gpsLongitude" />
+        </div>
+
+        <div class="form-field">
+          <label>SITE MANAGER</label>
+          <input type="text" name="siteManager" [(ngModel)]="form.siteManager" />
+        </div>
+
+        <div class="form-field">
+          <label>CONTACT DETAILS</label>
+          <input type="text" name="contactDetails" [(ngModel)]="form.contactDetails" />
+        </div>
+
+        <div class="form-field">
+          <label>OPERATING HOURS</label>
+          <input type="text" name="operatingHours" [(ngModel)]="form.operatingHours" />
         </div>
 
         <div class="form-field">
@@ -206,7 +285,7 @@
       <div class="modal-footer">
         <button type="button" class="btn btn-cancel" (click)="closeFormModal()">Cancel</button>
         <button type="submit" class="btn btn-submit" [disabled]="!recordForm.valid">
-          {{ isEditMode ? 'Save Changes' : 'Create Department' }}
+          {{ isEditMode ? 'Save Changes' : 'Create Site' }}
         </button>
       </div>
     </form>
@@ -216,7 +295,7 @@
 <app-import-file-modal
   *ngIf="showImportModal"
   [columns]="importColumns"
-  fileBaseName="department"
+  fileBaseName="site"
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>

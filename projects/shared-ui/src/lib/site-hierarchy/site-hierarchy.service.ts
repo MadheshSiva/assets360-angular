@@ -8,6 +8,7 @@ import {
   HierarchyNode,
   Project,
   ProjectStatus,
+  State,
   Zone,
   areaAllowsBuildings,
   areaAllowsDirectZones,
@@ -24,26 +25,52 @@ export interface AddProjectInput {
 
 export interface AddAreaInput {
   name: string;
+  description?: string;
+  timeZone?: string;
+  countryCode?: string;
+  status?: 'active' | 'inactive';
+  coords?: Coords;
+}
+
+export interface AddStateInput {
+  name: string;
   type: AreaType;
+  description?: string;
+  status?: 'active' | 'inactive';
+  coords?: Coords;
 }
 
 export interface AddZoneInput {
   name: string;
   color: string;
+  description?: string;
+  mapImage?: string;
+  topZone?: string;
+  priority?: string;
+  exit?: string;
+  assemblyPoint?: 'active' | 'inactive';
+  status?: 'active' | 'inactive';
+  coords?: Coords;
 }
 
 export interface AddBuildingInput {
   name: string;
+  description?: string;
+  status?: 'active' | 'inactive';
+  coords?: Coords;
 }
 
 export interface AddFloorInput {
   name: string;
+  description?: string;
+  mapImage?: string;
+  status?: 'active' | 'inactive';
 }
 
 /**
- * Single source of truth for the Project -> Area -> (Zone and/or Building -> Floor -> Zone)
- * hierarchy. Projects (Administration -> Configuration) is the only consumer allowed to call
- * the mutators below; Locating reads `projects` only.
+ * Single source of truth for the Project -> Area (Country) -> State ->
+ * (Zone and/or Building -> Floor -> Zone) hierarchy. Projects (Administration -> Configuration)
+ * is the only consumer allowed to call the mutators below; Locating reads `projects` only.
  */
 @Injectable({ providedIn: 'root' })
 export class SiteHierarchyService {
@@ -67,63 +94,64 @@ export class SiteHierarchyService {
   }
 
   private seedProject(): Project {
-    const projectCoords: Coords = { lat: 23.612, lng: 58.539, zoom: 13 };
-    const areaCoords: Coords = { lat: 23.6135, lng: 58.5405, zoom: 15 };
-    const buildingCoords: Coords = { lat: 23.614, lng: 58.541, zoom: 17 };
+    const projectCoords: Coords = { lat: 25.2048, lng: 55.2708, zoom: 6 };
+    const areaCoords: Coords = { lat: 25.2048, lng: 55.2708, zoom: 11 };
+    const floorCoords: Coords = { lat: 25.2048, lng: 55.2708, zoom: 17 };
 
-    const zone = (id: string, name: string, color: string, coords: Coords): Zone => ({
+    const zone = (id: string, name: string, color: string, coords: Coords, subZones: Zone[] = []): Zone => ({
       kind: 'zone',
       id,
       name,
       color,
       coords,
+      zones: subZones,
     });
 
-    const floor1: Floor = {
+    // Azy floor is a sub-zone nested inside Second Colony.
+    const azyFloorZone = zone('zone-2', 'Azy floor', '#dc2626', { lat: 25.2045, lng: 55.2705, zoom: 19 });
+    const secondColonyZone = zone('zone-1', 'Second Colony', '#158b4b', { lat: 25.2051, lng: 55.2711, zoom: 19 }, [
+      azyFloorZone,
+    ]);
+
+    const thirdRightFloor: Floor = {
       kind: 'floor',
       id: 'floor-1',
-      name: 'Ground Floor',
-      coords: { lat: 23.6141, lng: 58.5411, zoom: 18 },
-      zones: [],
-    };
-    const floor2: Floor = {
-      kind: 'floor',
-      id: 'floor-2',
-      name: 'Floor 1',
-      coords: { lat: 23.6142, lng: 58.5412, zoom: 18 },
-      zones: [zone('zone-3', 'Open Workspace', '#158b4b', { lat: 23.6147, lng: 58.5416, zoom: 19 })],
+      name: 'Third Right',
+      coords: floorCoords,
+      zones: [secondColonyZone],
     };
 
     const building: Building = {
       kind: 'building',
       id: 'building-1',
-      name: 'Tower 1',
-      coords: buildingCoords,
-      floors: [floor1, floor2],
+      name: 'Street One',
+      coords: areaCoords,
+      floors: [thirdRightFloor],
     };
 
+    const state: State = {
+      kind: 'state',
+      id: 'state-1',
+      name: 'Oman',
+      type: 'indoor',
+      coords: areaCoords,
+      zones: [],
+      buildings: [building],
+    };
+
+    // Country -> State -> Building -> Floor -> Zone.
     const area: Area = {
       kind: 'area',
       id: 'area-1',
-      name: 'Main Campus',
-      type: 'indoor_outdoor',
+      name: 'UAE',
       coords: areaCoords,
-      zones: [
-        zone('zone-4', 'Parking Zone', '#a8650a', { lat: 23.6132, lng: 58.5402, zoom: 16 }),
-        // Matches the geofence names surfaced in the Dashboard's "Idle Assets" popup,
-        // so its "Locate" action has a real pin to fly to on the map.
-        zone('zone-5', 'Warehouse Zone', '#0ea5e9', { lat: 23.6125, lng: 58.539, zoom: 16 }),
-        zone('zone-6', 'Construction Site', '#f59e0b', { lat: 23.612, lng: 58.542, zoom: 16 }),
-        zone('zone-7', 'Logistics Park', '#10b981', { lat: 23.6155, lng: 58.5395, zoom: 16 }),
-        zone('zone-8', 'Port Area', '#ec4899', { lat: 23.616, lng: 58.543, zoom: 16 }),
-      ],
-      buildings: [building],
+      states: [state],
     };
 
     return {
       kind: 'project',
       id: 'project-1',
-      name: 'Muscat Campus',
+      name: 'Track Assets',
       description: 'Primary demo project',
       status: 'active',
       coords: projectCoords,
@@ -197,44 +225,76 @@ export class SiteHierarchyService {
       kind: 'area',
       id: this.genId('area'),
       name: input.name,
-      type: input.type,
-      coords: this.jitteredCoords(project.coords),
-      zones: [],
-      buildings: [],
+      coords: input.coords ?? this.jitteredCoords(project.coords),
+      states: [],
+      description: input.description || undefined,
+      timeZone: input.timeZone || undefined,
+      countryCode: input.countryCode || undefined,
+      status: input.status ?? 'active',
     };
     project.areas = [...project.areas, area];
     this._projects.update((projects) => [...projects]);
     return area;
   }
 
-  addZoneToArea(areaId: string, input: AddZoneInput): Zone | undefined {
+  addState(areaId: string, input: AddStateInput): State | undefined {
     const area = this.findNode(areaId);
-    if (!area || area.kind !== 'area' || !areaAllowsDirectZones(area.type)) return undefined;
+    if (!area || area.kind !== 'area') return undefined;
+
+    const state: State = {
+      kind: 'state',
+      id: this.genId('state'),
+      name: input.name,
+      type: input.type,
+      coords: input.coords ?? this.jitteredCoords(area.coords),
+      zones: [],
+      buildings: [],
+      description: input.description || undefined,
+      status: input.status ?? 'active',
+    };
+    area.states = [...area.states, state];
+    this._projects.update((projects) => [...projects]);
+    return state;
+  }
+
+  addZoneToState(stateId: string, input: AddZoneInput): Zone | undefined {
+    const state = this.findNode(stateId);
+    if (!state || state.kind !== 'state' || !areaAllowsDirectZones(state.type)) return undefined;
 
     const zone: Zone = {
       kind: 'zone',
       id: this.genId('zone'),
       name: input.name,
       color: input.color,
-      coords: this.jitteredCoords(area.coords, 1),
+      coords: input.coords ?? this.jitteredCoords(state.coords, 1),
+      zones: [],
+      description: input.description || undefined,
+      mapImage: input.mapImage || undefined,
+      topZone: input.topZone || undefined,
+      priority: input.priority || undefined,
+      exit: input.exit || undefined,
+      assemblyPoint: input.assemblyPoint ?? 'active',
+      status: input.status ?? 'active',
     };
-    area.zones = [...area.zones, zone];
+    state.zones = [...state.zones, zone];
     this._projects.update((projects) => [...projects]);
     return zone;
   }
 
-  addBuilding(areaId: string, input: AddBuildingInput): Building | undefined {
-    const area = this.findNode(areaId);
-    if (!area || area.kind !== 'area' || !areaAllowsBuildings(area.type)) return undefined;
+  addBuilding(stateId: string, input: AddBuildingInput): Building | undefined {
+    const state = this.findNode(stateId);
+    if (!state || state.kind !== 'state' || !areaAllowsBuildings(state.type)) return undefined;
 
     const building: Building = {
       kind: 'building',
       id: this.genId('building'),
       name: input.name,
-      coords: this.jitteredCoords(area.coords),
+      coords: input.coords ?? this.jitteredCoords(state.coords),
       floors: [],
+      description: input.description || undefined,
+      status: input.status ?? 'active',
     };
-    area.buildings = [...area.buildings, building];
+    state.buildings = [...state.buildings, building];
     this._projects.update((projects) => [...projects]);
     return building;
   }
@@ -249,6 +309,9 @@ export class SiteHierarchyService {
       name: input.name,
       coords: this.jitteredCoords(building.coords),
       zones: [],
+      description: input.description || undefined,
+      mapImage: input.mapImage || undefined,
+      status: input.status ?? 'active',
     };
     building.floors = [...building.floors, floor];
     this._projects.update((projects) => [...projects]);
@@ -264,9 +327,41 @@ export class SiteHierarchyService {
       id: this.genId('zone'),
       name: input.name,
       color: input.color,
-      coords: this.jitteredCoords(floor.coords, 1),
+      coords: input.coords ?? this.jitteredCoords(floor.coords, 1),
+      zones: [],
+      description: input.description || undefined,
+      mapImage: input.mapImage || undefined,
+      topZone: input.topZone || undefined,
+      priority: input.priority || undefined,
+      exit: input.exit || undefined,
+      assemblyPoint: input.assemblyPoint ?? 'active',
+      status: input.status ?? 'active',
     };
     floor.zones = [...floor.zones, zone];
+    this._projects.update((projects) => [...projects]);
+    return zone;
+  }
+
+  addSubZone(parentZoneId: string, input: AddZoneInput): Zone | undefined {
+    const parentZone = this.findNode(parentZoneId);
+    if (!parentZone || parentZone.kind !== 'zone') return undefined;
+
+    const zone: Zone = {
+      kind: 'zone',
+      id: this.genId('zone'),
+      name: input.name,
+      color: input.color,
+      coords: input.coords ?? this.jitteredCoords(parentZone.coords, 1),
+      zones: [],
+      description: input.description || undefined,
+      mapImage: input.mapImage || undefined,
+      topZone: input.topZone || undefined,
+      priority: input.priority || undefined,
+      exit: input.exit || undefined,
+      assemblyPoint: input.assemblyPoint ?? 'active',
+      status: input.status ?? 'active',
+    };
+    parentZone.zones = [...parentZone.zones, zone];
     this._projects.update((projects) => [...projects]);
     return zone;
   }
@@ -296,6 +391,9 @@ export class SiteHierarchyService {
         parent.areas = parent.areas.filter((a) => a.id !== nodeId);
         break;
       case 'area':
+        parent.states = parent.states.filter((s) => s.id !== nodeId);
+        break;
+      case 'state':
         parent.zones = parent.zones.filter((z) => z.id !== nodeId);
         parent.buildings = parent.buildings.filter((b) => b.id !== nodeId);
         break;
@@ -303,6 +401,9 @@ export class SiteHierarchyService {
         parent.floors = parent.floors.filter((f) => f.id !== nodeId);
         break;
       case 'floor':
+        parent.zones = parent.zones.filter((z) => z.id !== nodeId);
+        break;
+      case 'zone':
         parent.zones = parent.zones.filter((z) => z.id !== nodeId);
         break;
     }

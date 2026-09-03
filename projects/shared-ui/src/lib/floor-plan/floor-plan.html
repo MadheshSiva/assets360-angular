@@ -1,36 +1,60 @@
 <div class="floor-plan">
   <div class="floor-plan-toolbar">
+    <ng-container *ngIf="!controlsDisabled">
+      <button
+        type="button"
+        class="tool-btn"
+        [class.is-active]="isDrawing"
+        title="Draw zone (click to place points, double-click to finish)"
+        (click)="toggleDraw()"
+      >
+        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
+        </svg>
+      </button>
+
+      <select
+        class="tool-zonetype-select"
+        title="Zone type"
+        [ngModel]="selectedZone?.zoneType ?? drawZoneType"
+        (ngModelChange)="setZoneType($any($event))"
+      >
+        <option *ngFor="let t of zoneTypeOptions" [value]="t.value">{{ t.label }}</option>
+      </select>
+
+      <label class="tool-btn color-tool-btn" title="Zone color">
+        <input
+          type="color"
+          [value]="selectedZone?.color ?? drawColor"
+          (input)="setColor($any($event.target).value)"
+        />
+      </label>
+
+      <button
+        type="button"
+        class="tool-btn"
+        title="Delete selected zone"
+        [disabled]="!selectedZoneId"
+        (click)="deleteSelectedZone()"
+      >
+        <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M3 6h18"></path>
+          <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+        </svg>
+      </button>
+    </ng-container>
+
     <button
       type="button"
       class="tool-btn"
-      [class.is-active]="isDrawing"
-      title="Draw zone (click to place points, double-click to finish)"
-      (click)="toggleDraw()"
+      title="Back to previous view"
+      *ngIf="hasPreviousView"
+      (click)="goToPreviousView()"
     >
       <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"></path>
-      </svg>
-    </button>
-
-    <label class="tool-btn color-tool-btn" title="Zone color">
-      <input
-        type="color"
-        [value]="selectedZone?.color ?? drawColor"
-        (input)="setColor($any($event.target).value)"
-      />
-    </label>
-
-    <button
-      type="button"
-      class="tool-btn"
-      title="Delete selected zone"
-      [disabled]="!selectedZoneId"
-      (click)="deleteSelectedZone()"
-    >
-      <svg class="tool-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M3 6h18"></path>
-        <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-        <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path>
+        <path d="M19 12H5"></path>
+        <path d="M12 19l-7-7 7-7"></path>
       </svg>
     </button>
 
@@ -89,7 +113,7 @@
           stroke-width="0.5"
           vector-effect="non-scaling-stroke"
           [class.is-selected]="zone.id === selectedZoneId"
-          (click)="selectZone(zone, $event)"
+          (click)="addAssetAt(zone, $event)"
         ></polygon>
 
         <polygon
@@ -104,11 +128,13 @@
         ></polygon>
 
         <circle
-          *ngFor="let p of drawingPoints"
+          *ngFor="let p of drawingPoints; let i = index"
           [attr.cx]="p.x"
           [attr.cy]="p.y"
-          r="0.8"
-          [attr.fill]="drawColor"
+          [attr.r]="i === 0 && drawingPoints.length > 2 ? 1.4 : 0.8"
+          [attr.fill]="i === 0 && drawingPoints.length > 2 ? '#fff' : drawColor"
+          [attr.stroke]="drawColor"
+          [attr.stroke-width]="i === 0 && drawingPoints.length > 2 ? 0.6 : 0"
         ></circle>
       </svg>
 
@@ -123,65 +149,43 @@
         <span class="floor-plan-pin-label">{{ pin.label }}</span>
       </div>
 
-      <div
-        class="asset-marker"
+      <button
+        type="button"
+        class="zone-asset-label"
         *ngFor="let zone of drawnZones"
+        [class.is-clickable]="zone.assets.length"
         [style.left.%]="centroidX(zone)"
         [style.top.%]="centroidY(zone)"
+        [title]="zone.assets.length ? 'View all assets in this zone' : ''"
+        (click)="onAssetsSummaryClick(zone, $event)"
+        (mousedown)="$event.stopPropagation()"
+      >{{ assetLabel }}: {{ zone.assets.length }}</button>
+
+      <button
+        type="button"
+        class="zone-asset-pin"
+        [class.is-highlighted]="entry.asset.id === highlightedAssetId"
+        *ngFor="let entry of zonePins"
+        [style.left.%]="entry.asset.x"
+        [style.top.%]="entry.asset.y"
+        [style.background]="entry.zone.color"
+        title="View asset details"
+        (click)="onAssetPinClick(entry.zone, entry.asset, $event)"
+        (mousedown)="$event.stopPropagation()"
       >
-        <button
-          type="button"
-          class="asset-marker-icon"
-          [style.background]="zone.color"
-          title="View / add assets in this zone"
-          (click)="openAssetPanel(zone, $event)"
-          (mousedown)="$event.stopPropagation()"
-        >
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16Z"></path>
-            <path d="M3.27 6.96 12 12.01l8.73-5.05"></path>
-            <path d="M12 22.08V12"></path>
-          </svg>
-        </button>
-        <span class="asset-marker-count" *ngIf="zone.assets.length">{{ zone.assets.length }}</span>
-
-        <div
-          class="asset-panel"
-          *ngIf="assetPanelZoneId === zone.id"
-          (click)="$event.stopPropagation()"
-          (mousedown)="$event.stopPropagation()"
-          (dblclick)="$event.stopPropagation()"
-        >
-          <div class="asset-panel-header">
-            <span>Assets in this zone</span>
-            <button type="button" class="asset-panel-close" (click)="closeAssetPanel()">&times;</button>
-          </div>
-
-          <ul class="asset-panel-list" *ngIf="zone.assets.length; else noAssets">
-            <li *ngFor="let asset of zone.assets; let i = index">
-              <span>{{ asset }}</span>
-              <button type="button" (click)="removeAsset(zone, i)">&times;</button>
-            </li>
-          </ul>
-          <ng-template #noAssets>
-            <p class="asset-panel-empty">No assets yet.</p>
-          </ng-template>
-
-          <div class="asset-panel-add">
-            <input
-              type="text"
-              placeholder="Asset name"
-              [(ngModel)]="newAssetName"
-              (keydown.enter)="addAsset()"
-            />
-            <button type="button" (click)="addAsset()">Add</button>
-          </div>
-        </div>
-      </div>
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M12.586 2.586A2 2 0 0 0 11.172 2H4a2 2 0 0 0-2 2v7.172a2 2 0 0 0 .586 1.414l8 8a2 2 0 0 0 2.828 0l7.172-7.172a2 2 0 0 0 0-2.828z"></path>
+          <circle cx="7.5" cy="7.5" r="1.4" fill="currentColor" stroke="none"></circle>
+        </svg>
+      </button>
     </div>
   </div>
 
   <p class="floor-plan-hint" *ngIf="isDrawing">
-    Click on the plan to place each corner, then double-click to finish the shape.
+    Click to place each corner — 3 points for a triangle, 4 for a square, or keep going for any shape.
+    Click the highlighted first point again (or double-click) to close it.
+  </p>
+  <p class="floor-plan-hint" *ngIf="!isDrawing && drawnZones.length">
+    Click inside a drawn zone to drop an asset icon there — one click, one icon. Click an icon to view its details.
   </p>
 </div>

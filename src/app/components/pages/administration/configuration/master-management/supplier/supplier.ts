@@ -4,10 +4,10 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
-import { InspectionSupplierItem, InspectionSupplierRow } from './supplier.model';
-import { InspectionSupplierService } from './supplier.service';
+import { MasterManagementSupplierItem, MasterManagementSupplierRow } from './supplier.model';
+import { MasterManagementSupplierService } from './supplier.service';
 
-interface InspectionSupplierColumn {
+interface MasterManagementSupplierColumn {
   key: string;
   label: string;
   visible: boolean;
@@ -15,15 +15,15 @@ interface InspectionSupplierColumn {
 
 @Component({
   standalone: true,
-  selector: 'app-inspection-supplier',
+  selector: 'app-master-management-supplier',
   imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
   templateUrl: './supplier.html',
   styleUrls: ['./supplier.css']
 })
-export class InspectionSupplier {
+export class MasterManagementSupplier {
   searchTerm = '';
 
-  columns: InspectionSupplierColumn[] = [
+  columns: MasterManagementSupplierColumn[] = [
     { key: 'supplierCode', label: 'Supplier Code', visible: true },
     { key: 'assetId', label: 'Asset ID', visible: true },
     { key: 'assetName', label: 'Asset Name', visible: true },
@@ -53,19 +53,19 @@ export class InspectionSupplier {
 
   showColumnPicker = false;
 
-  records: InspectionSupplierRow[] = [];
-  filteredRecords: InspectionSupplierRow[] = [];
+  records: MasterManagementSupplierRow[] = [];
+  filteredRecords: MasterManagementSupplierRow[] = [];
 
   showFormModal = false;
   isEditMode = false;
-  private editingRecord: InspectionSupplierRow | null = null;
+  private editingRecord: MasterManagementSupplierRow | null = null;
 
-  form: InspectionSupplierItem = this.emptyForm();
+  form: MasterManagementSupplierItem = this.emptyForm();
 
   private returnUrl: string | null = null;
 
   constructor(
-    private service: InspectionSupplierService,
+    private service: MasterManagementSupplierService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -95,7 +95,7 @@ export class InspectionSupplier {
     }
   }
 
-  private emptyForm(): InspectionSupplierItem {
+  private emptyForm(): MasterManagementSupplierItem {
     return {
       supplierCode: '',
       assetId: '',
@@ -127,11 +127,11 @@ export class InspectionSupplier {
     this.showColumnPicker = false;
   }
 
-  toggleColumn(col: InspectionSupplierColumn): void {
+  toggleColumn(col: MasterManagementSupplierColumn): void {
     col.visible = !col.visible;
   }
 
-  get selectedRecords(): InspectionSupplierRow[] {
+  get selectedRecords(): MasterManagementSupplierRow[] {
     return this.filteredRecords.filter((r) => r.selected);
   }
 
@@ -144,12 +144,12 @@ export class InspectionSupplier {
     this.filteredRecords.forEach((r) => (r.selected = next));
   }
 
-  toggleSelectRecord(record: InspectionSupplierRow): void {
+  toggleSelectRecord(record: MasterManagementSupplierRow): void {
     record.selected = !record.selected;
   }
 
   onSearch(): void {
-    this.filteredRecords = this.service.search(this.searchTerm) as InspectionSupplierRow[];
+    this.filteredRecords = this.service.search(this.searchTerm) as MasterManagementSupplierRow[];
   }
 
   onRefresh(): void {
@@ -169,7 +169,7 @@ export class InspectionSupplier {
     this.editRow(this.selectedRecords[0]);
   }
 
-  editRow(record: InspectionSupplierRow): void {
+  editRow(record: MasterManagementSupplierRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -201,7 +201,7 @@ export class InspectionSupplier {
     this.refresh();
   }
 
-  deleteRow(record: InspectionSupplierRow): void {
+  deleteRow(record: MasterManagementSupplierRow): void {
     this.service.deleteRecords([record.supplierCode]);
     this.refresh();
   }

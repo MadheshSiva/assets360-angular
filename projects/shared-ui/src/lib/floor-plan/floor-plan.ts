@@ -1,14 +1,17 @@
 import {
   Component,
   ElementRef,
+  EventEmitter,
   HostListener,
   Input,
   OnChanges,
+  Output,
   SimpleChanges,
   ViewChild,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { ZONE_TYPE_OPTIONS, ZoneType } from '../map/map';
 
 export interface FloorPlanZoneInput {
   id: string;
@@ -30,12 +33,18 @@ export interface DrawPoint {
   y: number;
 }
 
+/** One asset icon dropped inside a drawn zone, at the spot the user clicked. */
+export interface ZoneAsset extends DrawPoint {
+  id: string;
+}
+
 export interface DrawnZone {
   id: string;
   points: DrawPoint[];
   color: string;
   opacity: number;
-  assets: string[];
+  assets: ZoneAsset[];
+  zoneType?: ZoneType;
 }
 
 const DEFAULT_ZONE_COLOR = '#5b3df5';
@@ -58,6 +67,16 @@ export class FloorPlanComponent implements OnChanges {
    *  and changing this resets zoom/pan/draw state (mirrors switching floors). */
   @Input() floorId: string | null = null;
   @Input() zones: FloorPlanZoneInput[] = [];
+  /** Read-only mode (Phase 2 role gating): hides zone drawing/editing from Viewer-level roles. */
+  @Input() controlsDisabled = false;
+  /** Label shown on each drawn zone's asset count (e.g. "Unique Assets", "Movable Assets"),
+   *  driven by the host's asset-category filter so it stays in sync with the toolbar. */
+  @Input() assetLabel = 'Unique Assets';
+  /** Fired when a placed asset icon is clicked, so the host can show that asset's details. */
+  @Output() assetClick = new EventEmitter<{ zone: DrawnZone; asset: ZoneAsset }>();
+  /** Fired when the zone's "<Label>: N" count badge is clicked, so the host can list every
+   *  asset placed in that zone (name + type), not just one at a time. */
+  @Output() assetsSummaryClick = new EventEmitter<DrawnZone>();
 
   get floorPlanPins(): FloorPlanPin[] {
     if (this.zones.length === 0) return [];
@@ -161,12 +180,64 @@ export class FloorPlanComponent implements OnChanges {
     return this.clamp(value, 0, 100);
   }
 
+  /** The asset icon most recently zoomed to via `flyToAsset`, kept ringed/pulsing
+   *  indefinitely — until a different asset is located or the canvas is deselected —
+   *  so it stays unmistakable even when several icons started out clustered together. */
+  highlightedAssetId: string | null = null;
+
+  /** The zoom/pan state as it was right before the first `flyToAsset` call in the
+   *  current "detour" — lets "Back" return to wherever the user actually was
+   *  (mid-drawing, panned, etc.) instead of always resetting to the default view. */
+  private preFlyView: { zoomLevel: number; panX: number; panY: number } | null = null;
+
+  get hasPreviousView(): boolean {
+    return this.preFlyView !== null;
+  }
+
+  /** Zooms and pans so the given asset icon is centered in the canvas, then highlights
+   *  it — used when a "Location" action elsewhere (e.g. a table row) needs to reveal
+   *  which of several overlapping icons a given asset actually is. */
+  flyToAsset(zone: DrawnZone, asset: ZoneAsset, targetZoom: number = this.maxZoom): void {
+    if (!this.preFlyView) {
+      this.preFlyView = { zoomLevel: this.zoomLevel, panX: this.panX, panY: this.panY };
+    }
+
+    this.selectedZoneId = zone.id;
+    this.showOpacitySlider = false;
+    this.zoomLevel = this.clamp(targetZoom, this.minZoom, this.maxZoom);
+
+    this.floorPlanCanvasRef?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+    const rect = this.floorPlanCanvasRef?.nativeElement.getBoundingClientRect();
+    if (rect) {
+      const maxPanX = ((this.zoomLevel - 1) / 2) * rect.width;
+      const maxPanY = ((this.zoomLevel - 1) / 2) * rect.height;
+      this.panX = this.clamp((0.5 - asset.x / 100) * this.zoomLevel * rect.width, -maxPanX, maxPanX);
+      this.panY = this.clamp((0.5 - asset.y / 100) * this.zoomLevel * rect.height, -maxPanY, maxPanY);
+    }
+
+    this.highlightedAssetId = asset.id;
+  }
+
+  /** Restores the zoom/pan state captured just before the last `flyToAsset` detour. */
+  goToPreviousView(): void {
+    if (!this.preFlyView) return;
+    this.zoomLevel = this.preFlyView.zoomLevel;
+    this.panX = this.preFlyView.panX;
+    this.panY = this.preFlyView.panY;
+    this.preFlyView = null;
+    this.highlightedAssetId = null;
+    this.selectedZoneId = null;
+  }
+
   // ===== Draw zones on the image =====
 
   isDrawing = false;
   drawingPoints: DrawPoint[] = [];
   drawColor = DEFAULT_ZONE_COLOR;
+  drawZoneType: ZoneType = 'custom';
   drawOpacity = 0.55;
+  readonly zoneTypeOptions = ZONE_TYPE_OPTIONS;
 
   /** Opacity of the floor plan image itself — useful for seeing zones/pins more
    *  clearly against a faded background. Adjusted by the same opacity slider when
@@ -186,6 +257,11 @@ export class FloorPlanComponent implements OnChanges {
     return this.drawnZones.find((zone) => zone.id === this.selectedZoneId) ?? null;
   }
 
+  /** Every placed asset icon across all drawn zones, flattened for the template's *ngFor. */
+  get zonePins(): { zone: DrawnZone; asset: ZoneAsset }[] {
+    return this.drawnZones.flatMap((zone) => zone.assets.map((asset) => ({ zone, asset })));
+  }
+
   get drawingPreviewPoints(): string {
     return this.drawingPoints.map((p) => `${p.x},${p.y}`).join(' ');
   }
@@ -195,10 +271,29 @@ export class FloorPlanComponent implements OnChanges {
   }
 
   toggleDraw(): void {
+    if (this.controlsDisabled) return;
     this.isDrawing = !this.isDrawing;
     this.drawingPoints = [];
     this.selectedZoneId = null;
     this.showOpacitySlider = false;
+  }
+
+  /** Distance (in the 0-100 image-percent space) within which clicking counts as
+   *  hitting the first placed point again, closing the shape early. */
+  private readonly closePointRadius = 3;
+
+  /** Converts a click into the same 0-100 image-percent space used by drawn-zone
+   *  points, undoing the canvas's independent pan/zoom transform. Always measured
+   *  against the canvas element itself, not whichever child was actually clicked. */
+  private toImagePoint(event: MouseEvent): DrawPoint | null {
+    const rect = this.floorPlanCanvasRef?.nativeElement.getBoundingClientRect();
+    if (!rect) return null;
+    const fx = (event.clientX - rect.left) / rect.width;
+    const fy = (event.clientY - rect.top) / rect.height;
+    return {
+      x: this.clampPct((0.5 + (fx - 0.5 - this.panX / rect.width) / this.zoomLevel) * 100),
+      y: this.clampPct((0.5 + (fy - 0.5 - this.panY / rect.height) / this.zoomLevel) * 100),
+    };
   }
 
   onFloorPlanClick(event: MouseEvent): void {
@@ -206,19 +301,38 @@ export class FloorPlanComponent implements OnChanges {
       this.dragMoved = false;
       return;
     }
-    if (!this.isDrawing) return;
-    const rect = (event.currentTarget as HTMLElement).getBoundingClientRect();
-    const fx = (event.clientX - rect.left) / rect.width;
-    const fy = (event.clientY - rect.top) / rect.height;
-    // The image layer is panned/scaled independently of this (unscaled) container,
-    // so undo that transform to recover the point's position on the base image.
-    const x = this.clampPct((0.5 + (fx - 0.5 - this.panX / rect.width) / this.zoomLevel) * 100);
-    const y = this.clampPct((0.5 + (fy - 0.5 - this.panY / rect.height) / this.zoomLevel) * 100);
-    this.drawingPoints = [...this.drawingPoints, { x, y }];
+    if (!this.isDrawing) {
+      // Clicked empty canvas (not a zone, not one of its asset icons) — deselect.
+      this.selectedZoneId = null;
+      this.showOpacitySlider = false;
+      this.highlightedAssetId = null;
+      return;
+    }
+    const point = this.toImagePoint(event);
+    if (!point) return;
+
+    // Clicking back on the starting point closes the shape immediately, whatever
+    // its number of sides — 3 points finishes a triangle, 4 a square, and so on.
+    if (this.drawingPoints.length >= 3 && this.isNearFirstPoint(point)) {
+      this.finishDrawing();
+      return;
+    }
+
+    this.drawingPoints = [...this.drawingPoints, point];
   }
 
   onFloorPlanDblClick(event: MouseEvent): void {
     event.preventDefault();
+    this.finishDrawing();
+  }
+
+  private isNearFirstPoint(point: DrawPoint): boolean {
+    const first = this.drawingPoints[0];
+    return Math.hypot(point.x - first.x, point.y - first.y) <= this.closePointRadius;
+  }
+
+  /** Closes the in-progress shape (however many sides it ended up with) and selects it. */
+  private finishDrawing(): void {
     if (!this.isDrawing || this.drawingPoints.length < 3) return;
     if (!this.floorId) return;
 
@@ -228,13 +342,13 @@ export class FloorPlanComponent implements OnChanges {
       color: this.drawColor,
       opacity: this.drawOpacity,
       assets: [],
+      zoneType: this.drawZoneType,
     };
     this.drawnZonesByFloor.set(this.floorId, [...(this.drawnZonesByFloor.get(this.floorId) ?? []), zone]);
 
     this.drawingPoints = [];
     this.isDrawing = false;
     this.selectedZoneId = zone.id;
-    this.openAssetPanel(zone);
   }
 
   centroidX(zone: DrawnZone): number {
@@ -245,18 +359,42 @@ export class FloorPlanComponent implements OnChanges {
     return zone.points.reduce((sum, p) => sum + p.y, 0) / zone.points.length;
   }
 
-  selectZone(zone: DrawnZone, event?: Event): void {
-    event?.stopPropagation();
+  /** Clicking inside a finished shape both selects it (for the color/delete/opacity
+   *  tools) and drops a new asset icon at the exact spot clicked — click once for a
+   *  single asset, click again elsewhere inside the same shape to add another. */
+  addAssetAt(zone: DrawnZone, event: MouseEvent): void {
+    event.stopPropagation();
     if (this.isDrawing) return;
-    this.selectedZoneId = this.selectedZoneId === zone.id ? null : zone.id;
+    const point = this.toImagePoint(event);
+    if (!point) return;
+    this.selectedZoneId = zone.id;
     this.showOpacitySlider = false;
+    zone.assets = [...zone.assets, { id: crypto.randomUUID(), ...point }];
+  }
+
+  /** Click an existing asset icon to open its details (host listens on `assetClick`). */
+  onAssetPinClick(zone: DrawnZone, asset: ZoneAsset, event: MouseEvent): void {
+    event.stopPropagation();
+    this.assetClick.emit({ zone, asset });
+  }
+
+  /** Click the "<Label>: N" badge to see every asset placed in that zone. */
+  onAssetsSummaryClick(zone: DrawnZone, event: MouseEvent): void {
+    event.stopPropagation();
+    if (!zone.assets.length) return;
+    this.assetsSummaryClick.emit(zone);
+  }
+
+  /** Removes one placed asset icon — called by the host, e.g. from a "Remove from zone"
+   *  action in its own asset-details view, so it stays reachable without a second click target. */
+  removeAsset(zone: DrawnZone, assetId: string): void {
+    zone.assets = zone.assets.filter((a) => a.id !== assetId);
   }
 
   deleteSelectedZone(): void {
-    if (!this.floorId || !this.selectedZoneId) return;
+    if (!this.floorId || !this.selectedZoneId || this.controlsDisabled) return;
     const remaining = this.drawnZones.filter((zone) => zone.id !== this.selectedZoneId);
     this.drawnZonesByFloor.set(this.floorId, remaining);
-    if (this.assetPanelZoneId === this.selectedZoneId) this.closeAssetPanel();
     this.selectedZoneId = null;
   }
 
@@ -270,6 +408,15 @@ export class FloorPlanComponent implements OnChanges {
     if (zone) zone.color = color;
   }
 
+  /** Picking a zone type (Safety/Restricted/Parking/…) also applies its preset color. */
+  setZoneType(type: ZoneType): void {
+    this.drawZoneType = type;
+    const preset = this.zoneTypeOptions.find((o) => o.value === type);
+    if (preset) this.setColor(preset.color);
+    const zone = this.selectedZone;
+    if (zone) zone.zoneType = type;
+  }
+
   setOpacity(value: number): void {
     const zone = this.selectedZone;
     if (zone) {
@@ -278,38 +425,6 @@ export class FloorPlanComponent implements OnChanges {
     } else {
       this.imageOpacity = value;
     }
-  }
-
-  // ===== Assets inside a marked zone =====
-
-  assetPanelZoneId: string | null = null;
-  newAssetName = '';
-
-  get assetPanelZone(): DrawnZone | null {
-    return this.drawnZones.find((zone) => zone.id === this.assetPanelZoneId) ?? null;
-  }
-
-  openAssetPanel(zone: DrawnZone, event?: Event): void {
-    event?.stopPropagation();
-    this.assetPanelZoneId = this.assetPanelZoneId === zone.id ? null : zone.id;
-    this.newAssetName = '';
-  }
-
-  closeAssetPanel(): void {
-    this.assetPanelZoneId = null;
-    this.newAssetName = '';
-  }
-
-  addAsset(): void {
-    const zone = this.assetPanelZone;
-    const name = this.newAssetName.trim();
-    if (!zone || !name) return;
-    zone.assets = [...zone.assets, name];
-    this.newAssetName = '';
-  }
-
-  removeAsset(zone: DrawnZone, index: number): void {
-    zone.assets = zone.assets.filter((_, i) => i !== index);
   }
 
   private resetFloorPlanTools(): void {
@@ -321,8 +436,8 @@ export class FloorPlanComponent implements OnChanges {
     this.panX = 0;
     this.panY = 0;
     this.isPanning = false;
-    this.assetPanelZoneId = null;
-    this.newAssetName = '';
     this.imageOpacity = 1;
+    this.highlightedAssetId = null;
+    this.preFlyView = null;
   }
 }

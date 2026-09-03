@@ -13,6 +13,17 @@ export interface Zone {
   name: string;
   color: string;
   coords: Coords;
+  /** Nested sub-zones, addable from any zone via its own "+" action. */
+  zones: Zone[];
+  /** Set when this zone is added via the "Add Zone" form. */
+  description?: string;
+  /** Data URL of an uploaded map image. */
+  mapImage?: string;
+  topZone?: string;
+  priority?: string;
+  exit?: string;
+  assemblyPoint?: 'active' | 'inactive';
+  status?: 'active' | 'inactive';
 }
 
 export interface Floor {
@@ -21,6 +32,11 @@ export interface Floor {
   name: string;
   coords: Coords;
   zones: Zone[];
+  /** "Street" metadata, set when this floor is added via the "Add Floor" form. */
+  description?: string;
+  /** Data URL of an uploaded map image. */
+  mapImage?: string;
+  status?: 'active' | 'inactive';
 }
 
 export interface Building {
@@ -29,18 +45,37 @@ export interface Building {
   name: string;
   coords: Coords;
   floors: Floor[];
+  /** "City" metadata, set when this building is added via the "Add Building" form. */
+  description?: string;
+  status?: 'active' | 'inactive';
 }
 
-export interface Area {
-  kind: 'area';
+export interface State {
+  kind: 'state';
   id: string;
   name: string;
+  /** Drives the "Outdoor Map" field: whether this state holds zones, buildings, or both directly. */
   type: AreaType;
   coords: Coords;
   /** Only populated when type is 'outdoor' or 'indoor_outdoor'. */
   zones: Zone[];
   /** Only populated when type is 'indoor' or 'indoor_outdoor'. */
   buildings: Building[];
+  description?: string;
+  status?: 'active' | 'inactive';
+}
+
+export interface Area {
+  kind: 'area';
+  id: string;
+  name: string;
+  coords: Coords;
+  states: State[];
+  /** Country-level metadata, set when this area is added via the "Add Country" form. */
+  description?: string;
+  timeZone?: string;
+  countryCode?: string;
+  status?: 'active' | 'inactive';
 }
 
 export interface Project {
@@ -55,7 +90,7 @@ export interface Project {
   areas: Area[];
 }
 
-export type HierarchyNode = Project | Area | Building | Floor | Zone;
+export type HierarchyNode = Project | Area | State | Building | Floor | Zone;
 
 export const AREA_TYPE_LABELS: Record<AreaType, string> = {
   indoor: 'Indoor',
@@ -84,12 +119,14 @@ export function childrenOf(node: HierarchyNode): HierarchyNode[] {
     case 'project':
       return node.areas;
     case 'area':
+      return node.states;
+    case 'state':
       return [...node.zones, ...node.buildings];
     case 'building':
       return node.floors;
     case 'floor':
       return node.zones;
     case 'zone':
-      return [];
+      return node.zones;
   }
 }

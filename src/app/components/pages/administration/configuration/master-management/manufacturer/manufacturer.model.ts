@@ -1,4 +1,4 @@
-export interface InspectionManufacturerItem {
+export interface MasterManagementManufacturerItem {
   manufacturerCode: string;
   assetId: string;
   assetName: string;
@@ -11,6 +11,6 @@ export interface InspectionManufacturerItem {
   status: boolean;
 }
 
-export interface InspectionManufacturerRow extends InspectionManufacturerItem {
+export interface MasterManagementManufacturerRow extends MasterManagementManufacturerItem {
   selected?: boolean;
 }

@@ -1,4 +1,4 @@
-export interface InspectionBusinessUnitItem {
+export interface MasterManagementBusinessUnitItem {
   businessUnitCode: string;
   assetId: string;
   assetName: string;
@@ -11,6 +11,6 @@ export interface InspectionBusinessUnitItem {
   status: boolean;
 }
 
-export interface InspectionBusinessUnitRow extends InspectionBusinessUnitItem {
+export interface MasterManagementBusinessUnitRow extends MasterManagementBusinessUnitItem {
   selected?: boolean;
 }

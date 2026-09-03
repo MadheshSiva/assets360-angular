@@ -1,4 +1,4 @@
-export interface InspectionSiteItem {
+export interface MasterManagementSiteItem {
   siteCode: string;
   assetId: string;
   assetName: string;
@@ -18,6 +18,6 @@ export interface InspectionSiteItem {
   status: boolean;
 }
 
-export interface InspectionSiteRow extends InspectionSiteItem {
+export interface MasterManagementSiteRow extends MasterManagementSiteItem {
   selected?: boolean;
 }

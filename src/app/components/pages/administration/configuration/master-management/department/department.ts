@@ -4,10 +4,11 @@ import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
-import { InspectionManufacturerItem, InspectionManufacturerRow } from './manufacturer.model';
-import { InspectionManufacturerService } from './manufacturer.service';
+import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
+import { MasterManagementDepartmentItem, MasterManagementDepartmentRow } from './department.model';
+import { MasterManagementDepartmentService } from './department.service';
 
-interface InspectionManufacturerColumn {
+interface MasterManagementDepartmentColumn {
   key: string;
   label: string;
   visible: boolean;
@@ -15,37 +16,33 @@ interface InspectionManufacturerColumn {
 
 @Component({
   standalone: true,
-  selector: 'app-inspection-manufacturer',
-  imports: [CommonModule, FormsModule, ImportFileModal, RowActions],
-  templateUrl: './manufacturer.html',
-  styleUrls: ['./manufacturer.css']
+  selector: 'app-master-management-department',
+  imports: [CommonModule, FormsModule, ImportFileModal, RowActions, MasterLinkIcons],
+  templateUrl: './department.html',
+  styleUrls: ['./department.css']
 })
-export class InspectionManufacturer {
+export class MasterManagementDepartment {
   searchTerm = '';
 
-  columns: InspectionManufacturerColumn[] = [
-    { key: 'manufacturerCode', label: 'Manufacturer Code', visible: true },
+  columns: MasterManagementDepartmentColumn[] = [
+    { key: 'departmentCode', label: 'Department Code', visible: true },
     { key: 'assetId', label: 'Asset ID', visible: true },
     { key: 'assetName', label: 'Asset Name', visible: true },
-    { key: 'manufacturerName', label: 'Manufacturer Name', visible: true },
-    { key: 'contactPerson', label: 'Contact Person', visible: true },
-    { key: 'email', label: 'Email', visible: true },
-    { key: 'phone', label: 'Phone', visible: true },
-    { key: 'address', label: 'Address', visible: true },
-    { key: 'website', label: 'Website', visible: true },
+    { key: 'departmentName', label: 'Department Name', visible: true },
+    { key: 'businessUnit', label: 'Business Unit', visible: true },
+    { key: 'departmentHead', label: 'Department Head', visible: true },
+    { key: 'description', label: 'Description', visible: true },
     { key: 'status', label: 'Status', visible: true }
   ];
 
   readonly importColumns: ImportColumn[] = [
-    { key: 'manufacturerCode', label: 'Manufacturer Code' },
+    { key: 'departmentCode', label: 'Department Code' },
     { key: 'assetId', label: 'Asset ID' },
     { key: 'assetName', label: 'Asset Name' },
-    { key: 'manufacturerName', label: 'Manufacturer Name' },
-    { key: 'contactPerson', label: 'Contact Person' },
-    { key: 'email', label: 'Email' },
-    { key: 'phone', label: 'Phone' },
-    { key: 'address', label: 'Address' },
-    { key: 'website', label: 'Website' },
+    { key: 'departmentName', label: 'Department Name' },
+    { key: 'businessUnit', label: 'Business Unit' },
+    { key: 'departmentHead', label: 'Department Head' },
+    { key: 'description', label: 'Description' },
     { key: 'status', label: 'Status' }
   ];
 
@@ -53,19 +50,19 @@ export class InspectionManufacturer {
 
   showColumnPicker = false;
 
-  records: InspectionManufacturerRow[] = [];
-  filteredRecords: InspectionManufacturerRow[] = [];
+  records: MasterManagementDepartmentRow[] = [];
+  filteredRecords: MasterManagementDepartmentRow[] = [];
 
   showFormModal = false;
   isEditMode = false;
-  private editingRecord: InspectionManufacturerRow | null = null;
+  private editingRecord: MasterManagementDepartmentRow | null = null;
 
-  form: InspectionManufacturerItem = this.emptyForm();
+  form: MasterManagementDepartmentItem = this.emptyForm();
 
   private returnUrl: string | null = null;
 
   constructor(
-    private service: InspectionManufacturerService,
+    private service: MasterManagementDepartmentService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -84,7 +81,7 @@ export class InspectionManufacturer {
       this.onCreate();
     } else if (action === 'edit') {
       const value = params.get('linkValue') ?? '';
-      const match = this.records.find((r) => r.manufacturerName === value);
+      const match = this.records.find((r) => r.departmentName === value);
       if (match) {
         this.isEditMode = true;
         this.editingRecord = match;
@@ -95,17 +92,19 @@ export class InspectionManufacturer {
     }
   }
 
-  private emptyForm(): InspectionManufacturerItem {
+  get businessUnitMaster() {
+    return this.service.businessUnitMaster;
+  }
+
+  private emptyForm(): MasterManagementDepartmentItem {
     return {
-      manufacturerCode: '',
+      departmentCode: '',
       assetId: '',
       assetName: '',
-      manufacturerName: '',
-      contactPerson: '',
-      email: '',
-      phone: '',
-      address: '',
-      website: '',
+      departmentName: '',
+      businessUnit: '',
+      departmentHead: '',
+      description: '',
       status: true
     };
   }
@@ -127,11 +126,11 @@ export class InspectionManufacturer {
     this.showColumnPicker = false;
   }
 
-  toggleColumn(col: InspectionManufacturerColumn): void {
+  toggleColumn(col: MasterManagementDepartmentColumn): void {
     col.visible = !col.visible;
   }
 
-  get selectedRecords(): InspectionManufacturerRow[] {
+  get selectedRecords(): MasterManagementDepartmentRow[] {
     return this.filteredRecords.filter((r) => r.selected);
   }
 
@@ -144,12 +143,12 @@ export class InspectionManufacturer {
     this.filteredRecords.forEach((r) => (r.selected = next));
   }
 
-  toggleSelectRecord(record: InspectionManufacturerRow): void {
+  toggleSelectRecord(record: MasterManagementDepartmentRow): void {
     record.selected = !record.selected;
   }
 
   onSearch(): void {
-    this.filteredRecords = this.service.search(this.searchTerm) as InspectionManufacturerRow[];
+    this.filteredRecords = this.service.search(this.searchTerm) as MasterManagementDepartmentRow[];
   }
 
   onRefresh(): void {
@@ -169,7 +168,7 @@ export class InspectionManufacturer {
     this.editRow(this.selectedRecords[0]);
   }
 
-  editRow(record: InspectionManufacturerRow): void {
+  editRow(record: MasterManagementDepartmentRow): void {
     this.isEditMode = true;
     this.editingRecord = record;
     const { selected, ...rest } = record;
@@ -187,7 +186,7 @@ export class InspectionManufacturer {
 
   submitForm(): void {
     if (this.isEditMode && this.editingRecord) {
-      this.service.updateRecord(this.editingRecord.manufacturerCode, { ...this.form });
+      this.service.updateRecord(this.editingRecord.departmentCode, { ...this.form });
     } else {
       this.service.addRecord({ ...this.form });
     }
@@ -197,12 +196,12 @@ export class InspectionManufacturer {
 
   onDelete(): void {
     if (this.selectedRecords.length === 0) return;
-    this.service.deleteRecords(this.selectedRecords.map((r) => r.manufacturerCode));
+    this.service.deleteRecords(this.selectedRecords.map((r) => r.departmentCode));
     this.refresh();
   }
 
-  deleteRow(record: InspectionManufacturerRow): void {
-    this.service.deleteRecords([record.manufacturerCode]);
+  deleteRow(record: MasterManagementDepartmentRow): void {
+    this.service.deleteRecords([record.departmentCode]);
     this.refresh();
   }
 
@@ -214,15 +213,13 @@ export class InspectionManufacturer {
     rows.forEach((row) => {
       const activeRaw = (row['status'] ?? '').trim().toLowerCase();
       this.service.addRecord({
-        manufacturerCode: row['manufacturerCode'] ?? '',
+        departmentCode: row['departmentCode'] ?? '',
         assetId: row['assetId'] ?? '',
         assetName: row['assetName'] ?? '',
-        manufacturerName: row['manufacturerName'] ?? '',
-        contactPerson: row['contactPerson'] ?? '',
-        email: row['email'] ?? '',
-        phone: row['phone'] ?? '',
-        address: row['address'] ?? '',
-        website: row['website'] ?? '',
+        departmentName: row['departmentName'] ?? '',
+        businessUnit: row['businessUnit'] ?? '',
+        departmentHead: row['departmentHead'] ?? '',
+        description: row['description'] ?? '',
         status: activeRaw === 'yes' || activeRaw === 'true'
       });
     });

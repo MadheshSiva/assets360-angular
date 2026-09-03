@@ -20,6 +20,21 @@
   position: relative;
 }
 
+.map-wrapper > app-map,
+.map-wrapper > app-floor-plan {
+  display: block;
+  animation: map-panel-fade-in 0.25s ease;
+}
+
+@keyframes map-panel-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 .map-image-overlay {
   display: block;
   width: 100%;
@@ -75,7 +90,7 @@
   padding: 18px 18px 22px;
   box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
   flex: 0 0 auto;
-  width: 30%;
+  width: 22%;
 }
 
 .stats-list {
@@ -159,7 +174,20 @@
   border-radius: 999px;
   background: transparent;
   border: 1px solid transparent;
-  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease;
+  transition: background 0.2s ease, color 0.2s ease, border-color 0.2s ease, transform 0.12s ease,
+    box-shadow 0.2s ease;
+  animation: cascade-row-in 0.22s ease;
+}
+
+@keyframes cascade-row-in {
+  from {
+    opacity: 0;
+    transform: translateX(-6px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 
 .cascade-row.is-clickable {
@@ -168,6 +196,11 @@
 
 .cascade-row.is-clickable:hover {
   background: #f4f0fc;
+}
+
+.cascade-row.is-clickable:active {
+  transform: scale(0.97);
+  background: #ece3fa;
 }
 
 .cascade-row:not(.is-clickable) {
@@ -207,6 +240,7 @@
   font-size: 14px;
   font-weight: 700;
   line-height: 1;
+  transition: color 0.2s ease, transform 0.2s ease;
 }
 
 .cascade-row.is-active .row-chevron {
@@ -229,7 +263,7 @@
   flex-direction: column;
   gap: 16px;
   min-width: 0;
-  width: 70%;
+  width: 78%;
   margin-left: 10px;
 }
 
@@ -450,6 +484,18 @@
 .period-tab.is-active {
   background: #7030a0;
   color: #fff;
+}
+
+.stats-period-select {
+  padding: 4px 10px;
+  border-radius: 999px;
+  border: 1.5px solid #7030a0;
+  background: #fff;
+  color: #7030a0;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  flex: 0 0 auto;
 }
 
 .stats-settings-btn {
@@ -720,6 +766,38 @@
   color: #0f172a;
 }
 
+.pin-popup-table tr.is-clickable-row {
+  cursor: pointer;
+}
+
+.pin-popup-table tr.is-clickable-row:hover td {
+  background: #f8fafc;
+}
+
+.zone-asset-locate-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: none;
+  border-radius: 6px;
+  background: rgba(91, 61, 245, 0.1);
+  color: #5b3df5;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.zone-asset-locate-btn:hover {
+  background: #5b3df5;
+  color: #fff;
+}
+
+.zone-asset-locate-btn svg {
+  width: 16px;
+  height: 16px;
+}
+
 .pin-popup-fields {
   display: grid;
   grid-template-columns: auto 1fr;
@@ -820,5 +898,483 @@
 
 .camera-live-clock {
   letter-spacing: 0.02em;
+}
+
+/* ============================================================ */
+/* Phase 2 enhancements                                          */
+/* ============================================================ */
+
+/* Phase 2 toolbar rows sit above the map (reuse .map-filters' pill/row look);
+   the left sidebar shows only the Country/State/Floor/Zone hierarchy. */
+.phase2-toolbar {
+  row-gap: 10px;
+}
+
+.phase2-role-group,
+.phase2-search-group {
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.role-select {
+  height: 35px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #0f172a;
+  border: 1px solid #dbe3ef;
+  background: #fff;
+  border-radius: 25px;
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.search-input {
+  width: 220px;
+  height: 35px;
+  padding: 0 14px;
+  border: 1px solid #dbe3ef;
+  border-radius: 25px;
+  font-size: 13px;
+  outline: none;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease;
+}
+
+.search-input:focus {
+  border-color: #b794f4;
+  box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.15);
+}
+
+.advanced-filters-toggle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #dbe3ef;
+  background: #fff;
+  border-radius: 999px;
+  padding: 7px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #7030a0;
+  cursor: pointer;
+}
+
+.advanced-filters-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  align-items: flex-start;
+  background: #fff;
+  border: 1px solid #e6edf5;
+  border-radius: 10px;
+  padding: 14px 18px;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  animation: cascade-row-in 0.2s ease;
+}
+
+.advanced-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* .item-multiselect's flex-basis:280px is tuned for the horizontal map-filters row;
+   reset it here so it doesn't get read as a height when reused in this bar. */
+.advanced-filter-group .item-multiselect {
+  flex: 0 0 auto;
+}
+
+.advanced-filter-group label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+}
+
+.phase2-toolbar .filter-level-label ~ .filter-level-label {
+  margin-left: 8px;
+}
+
+.phase2-toolbar .filter-level-label small {
+  font-weight: 500;
+  color: #94a3b8;
+  text-transform: none;
+  letter-spacing: 0;
+}
+
+.toggle-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.toggle-chip {
+  border: 1px solid #dbe3ef;
+  background: #fff;
+  color: #334155;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, transform 0.12s ease;
+}
+
+.toggle-chip:hover {
+  border-color: #b794f4;
+}
+
+.toggle-chip:active {
+  transform: scale(0.96);
+}
+
+.toggle-chip.is-active {
+  background: #7030a0;
+  border-color: #7030a0;
+  color: #fff;
+}
+
+.replay-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.replay-slider {
+  flex: 1;
+  accent-color: #7030a0;
+}
+
+.replay-label {
+  font-size: 11.5px;
+  font-weight: 700;
+  color: #64748b;
+  white-space: nowrap;
+}
+
+.replay-play-btn {
+  border: none;
+  background: #e9dcfb;
+  color: #7030a0;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 5px 12px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.dwell-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12.5px;
+  color: #334155;
+  background: #f8f9fc;
+  border-radius: 999px;
+  padding: 5px 12px;
+  white-space: nowrap;
+}
+
+.insights-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.insights-list li {
+  font-size: 12px;
+  color: #475569;
+  background: #f8f9fc;
+  border-radius: 8px;
+  padding: 6px 10px;
+}
+
+.insights-list-inline {
+  flex-direction: row;
+  flex-wrap: wrap;
+}
+
+.insights-list-inline li {
+  border-radius: 999px;
+}
+
+.geofence-open-btn {
+  border: 1px solid #dcd0ff;
+  background: #f4f0fc;
+  color: #7030a0;
+  font-size: 12.5px;
+  font-weight: 700;
+  padding: 7px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+/* ============ Asset Monitoring header (shown above the map for a selected floor) ============ */
+.asset-monitor-panel {
+  background: #fff;
+  border: 1px solid #e6edf5;
+  border-radius: 10px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
+  animation: cascade-row-in 0.2s ease;
+}
+
+.asset-monitor-header {
+  background: #7030a0;
+  padding: 14px 20px;
+}
+
+.asset-monitor-header h3 {
+  margin: 0;
+  text-align: center;
+  color: #fff;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.asset-monitor-toolbar {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding: 14px 18px;
+}
+
+.asset-monitor-toolbar .filter-select {
+  flex: 0 1 190px;
+}
+
+.filter-dropdown {
+  position: relative;
+  flex: 0 1 210px;
+}
+
+.filter-dropdown-toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  text-align: left;
+}
+
+.filter-dropdown-caret {
+  font-size: 10px;
+  color: #7030a0;
+  flex: 0 0 auto;
+}
+
+.filter-dropdown-menu {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #fff;
+  border: 1px solid #e6edf5;
+  border-radius: 10px;
+  box-shadow: 0 8px 20px rgba(15, 23, 42, 0.12);
+  padding: 8px;
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-dropdown-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 8px;
+  border-radius: 6px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #334155;
+  cursor: pointer;
+}
+
+.filter-dropdown-option:hover {
+  background: #f4f0fc;
+}
+
+.btn-live {
+  margin-left: auto;
+  border: none;
+  background: #7030a0;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  padding: 9px 26px;
+  border-radius: 999px;
+  cursor: pointer;
+  letter-spacing: 0.03em;
+  transition: background 0.15s ease, box-shadow 0.15s ease;
+}
+
+.btn-live:hover {
+  background: #5c2585;
+}
+
+.btn-live.is-live {
+  background: #22c55e;
+  box-shadow: 0 0 0 4px rgba(34, 197, 94, 0.18);
+}
+
+/* ============ Pin popup footer / detail link ============ */
+.pin-popup-footer {
+  padding: 0 22px 18px;
+  display: flex;
+  justify-content: flex-end;
+}
+
+.btn-view-details {
+  border: none;
+  background: #e9dcfb;
+  color: #7030a0;
+  font-size: 13px;
+  font-weight: 700;
+  padding: 7px 16px;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+/* ============ Sliding contextual detail panel ============ */
+.detail-slide-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  max-width: 92vw;
+  background: #fff;
+  box-shadow: -8px 0 24px rgba(15, 23, 42, 0.18);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1700;
+  display: flex;
+  flex-direction: column;
+}
+
+.detail-slide-panel.is-open {
+  transform: translateX(0);
+}
+
+/* Same treatment as .detail-slide-panel — docks at the right edge, same as the asset-details panel. */
+.zone-assets-slide-panel {
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 360px;
+  max-width: 92vw;
+  background: #fff;
+  box-shadow: -8px 0 24px rgba(15, 23, 42, 0.18);
+  transform: translateX(100%);
+  transition: transform 0.3s ease;
+  z-index: 1700;
+  display: flex;
+  flex-direction: column;
+}
+
+.zone-assets-slide-panel.is-open {
+  transform: translateX(0);
+}
+
+.detail-slide-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px;
+  background: #e9dcfb;
+}
+
+.detail-slide-header h3 {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  color: #7030a0;
+}
+
+.detail-slide-body {
+  padding: 18px 20px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.detail-slide-section h4 {
+  margin: 0 0 8px;
+  font-size: 12.5px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: #64748b;
+}
+
+.timeline-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.timeline-list li {
+  display: flex;
+  gap: 10px;
+  font-size: 12.5px;
+  color: #334155;
+}
+
+.timeline-time {
+  flex: 0 0 auto;
+  font-weight: 700;
+  color: #7030a0;
+  min-width: 52px;
+}
+
+.detail-locate-btn {
+  align-self: flex-start;
+}
+
+/* ============ Geofencing modal ============ */
+.geofence-modal {
+  width: 620px;
+}
+
+.geofence-form {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+
+.geofence-form .filter-select {
+  flex: 1 1 140px;
+}
+
+.geofence-table {
+  margin-bottom: 12px;
+}
+
+.geofence-empty {
+  font-size: 13px;
+  color: #64748b;
+}
+
+.geofence-events h4 {
+  margin: 12px 0 8px;
+  font-size: 12.5px;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
 }
 

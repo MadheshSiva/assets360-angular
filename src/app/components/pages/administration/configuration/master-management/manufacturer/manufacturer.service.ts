@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { InspectionManufacturerItem } from './manufacturer.model';
+import { MasterManagementManufacturerItem } from './manufacturer.model';
 
 @Injectable({ providedIn: 'root' })
-export class InspectionManufacturerService {
-  private readonly records: InspectionManufacturerItem[] = [
+export class MasterManagementManufacturerService {
+  private readonly records: MasterManagementManufacturerItem[] = [
     {
       manufacturerCode: 'MFR-1001',
       assetId: 'AST-1001',
@@ -44,18 +44,18 @@ export class InspectionManufacturerService {
 
   private nextSequence = 1004;
 
-  getRecords(): InspectionManufacturerItem[] {
+  getRecords(): MasterManagementManufacturerItem[] {
     return this.records;
   }
 
-  addRecord(record: InspectionManufacturerItem): InspectionManufacturerItem {
+  addRecord(record: MasterManagementManufacturerItem): MasterManagementManufacturerItem {
     const manufacturerCode = record.manufacturerCode?.trim() || `MFR-${this.nextSequence++}`;
-    const created: InspectionManufacturerItem = { ...record, manufacturerCode };
+    const created: MasterManagementManufacturerItem = { ...record, manufacturerCode };
     this.records.push(created);
     return created;
   }
 
-  updateRecord(manufacturerCode: string, changes: InspectionManufacturerItem): void {
+  updateRecord(manufacturerCode: string, changes: MasterManagementManufacturerItem): void {
     const index = this.records.findIndex((r) => r.manufacturerCode === manufacturerCode);
     if (index !== -1) {
       this.records[index] = { ...this.records[index], ...changes };
@@ -71,7 +71,7 @@ export class InspectionManufacturerService {
     }
   }
 
-  search(term: string): InspectionManufacturerItem[] {
+  search(term: string): MasterManagementManufacturerItem[] {
     const value = term.trim().toLowerCase();
     if (!value) return this.records;
     return this.records.filter((r) =>

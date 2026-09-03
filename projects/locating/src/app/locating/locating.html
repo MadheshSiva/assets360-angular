@@ -1,6 +1,6 @@
 <section class="locating-page">
   <div class="locating-layout">
-    <!-- Left Panel: real Project -> Area -> (Zone/Building -> Floor -> Zone) hierarchy, read-only -->
+    <!-- Left Panel: real Project -> Area -> State -> (Zone/Floor -> Zone) hierarchy, read-only -->
     <aside class="filter-panel" *ngIf="!isPanelCollapsed">
       <h2 class="panel-title">Locating</h2>
 
@@ -28,57 +28,68 @@
 
     <!-- Right Panel: Map + Top Filters -->
     <div class="map-panel">
-      <header class="map-filters" *ngIf="currentFilters as filters">
-        <div class="filter-level-label">{{ activeLevel === 'area' ? 'Area filters' : 'Floor filters' }}</div>
+      <!-- Phase 2 toolbar row 1: role, search, advanced filters, geofencing — sits above the map, not in the sidebar -->
+      
 
-        <div class="filter-group">
-          <label>Time :</label>
-          <div class="period-tabs">
-            <button type="button" class="period-tab" [class.is-active]="filters.period === 'day'"
-              (click)="selectPeriod(filters, 'day')">Day</button>
-            <button type="button" class="period-tab" [class.is-active]="filters.period === 'week'"
-              (click)="selectPeriod(filters, 'week')">Week</button>
-            <button type="button" class="period-tab" [class.is-active]="filters.period === 'month'"
-              (click)="selectPeriod(filters, 'month')">Month</button>
-          </div>
-        </div>
+      
 
-        <div class="filter-group">
-          <label>Select Parameter :</label>
-          <select [(ngModel)]="filters.parameter" (ngModelChange)="onParameterChange(filters)" class="filter-select">
-            <option value="" disabled>-- Select Parameter --</option>
+
+      
+
+      <!-- Asset Monitoring header: shown above the map once a floor (or a zone on a floor) is
+           selected in the left-side locating card, mirroring a Staff Monitoring floor header
+           but with asset-tracking options/sample data instead of employee/visitor data. -->
+      <div class="asset-monitor-panel" *ngIf="showFloorPlan && floorFilters as filters">
+        
+
+        <div class="asset-monitor-toolbar">
+          <select class="filter-select" [(ngModel)]="filters.parameter" (ngModelChange)="onParameterChange(filters)">
+            <option value="" disabled>Option</option>
             <option *ngFor="let p of parameters" [value]="p.value">{{ p.label }}</option>
           </select>
-        </div>
 
-        <div class="filter-group" *ngIf="hasCategoryItems(filters)">
-          <label>Select {{ filters.parameter === 'employee' ? 'Employees' : filters.parameter === 'asset' ? 'Assets' : 'Devices' }} :</label>
-          <div class="item-multiselect">
-            <label class="item-option" *ngFor="let item of itemsForParameter(filters.parameter)">
-              <input type="checkbox" [checked]="isItemSelected(filters, item.id)"
-                (change)="toggleItemSelection(filters, item.id)" />
-              <span>{{ item.name }}</span>
-            </label>
+          <div class="filter-dropdown" *ngIf="hasCategoryItems(filters)">
+            <button type="button" class="filter-select filter-dropdown-toggle"
+              (click)="$event.stopPropagation(); isItemDropdownOpen = !isItemDropdownOpen">
+              <span>{{ selectedItemsSummary(filters) }}</span>
+              <span class="filter-dropdown-caret" aria-hidden="true">&#9662;</span>
+            </button>
+            <div class="filter-dropdown-menu" *ngIf="isItemDropdownOpen" (click)="$event.stopPropagation()">
+              <label class="filter-dropdown-option" *ngFor="let item of itemsForParameter(filters.parameter)">
+                <input type="checkbox" [checked]="isItemSelected(filters, item.id)"
+                  (change)="toggleItemSelection(filters, item.id)" />
+                {{ item.name }}
+              </label>
+            </div>
           </div>
-        </div>
 
-        <div class="filter-group" *ngIf="isDeviceCategory(filters) && filters.selectedItemIds.length > 0">
-          <label>Device Attribute :</label>
-          <select [(ngModel)]="filters.deviceAttribute" (ngModelChange)="onDeviceAttributeChange()" class="filter-select">
-            <option value="">-- None --</option>
-            <option *ngFor="let a of deviceAttributes" [value]="a.value">{{ a.label }}</option>
+          <select class="filter-select" [(ngModel)]="filters.category">
+            <option *ngFor="let c of assetTrackingCategories" [value]="c.value">{{ c.label }}</option>
           </select>
+
+          <button type="button" class="btn-live" [class.is-live]="liveTrackingEnabled" (click)="toggleLiveTracking()">
+            Live
+          </button>
         </div>
-      </header>
+      </div>
 
       <!-- Map + its own FAB, anchored to the map's right edge -->
       <div class="map-wrapper">
-        <app-map *ngIf="!showFloorPlan" [pins]="mapPins" (pinClick)="onPinClick($event)"></app-map>
+        <app-map
+          *ngIf="!showFloorPlan"
+          [pins]="mapPins"
+          [controlsDisabled]="mapControlsDisabled"
+          (pinClick)="onPinClick($event)"
+        ></app-map>
 
         <app-floor-plan
           *ngIf="showFloorPlan"
           [floorId]="activeFloor?.id ?? null"
           [zones]="floorPlanZones"
+          [controlsDisabled]="mapControlsDisabled"
+          [assetLabel]="zoneAssetLabel"
+          (assetClick)="onZoneAssetClick($event)"
+          (assetsSummaryClick)="onZoneAssetsSummaryClick($event)"
         ></app-floor-plan>
 
         <button type="button" class="panel-fab" [class.is-collapsed]="isPanelCollapsed" (click)="togglePanel()"
@@ -86,6 +97,7 @@
           <span class="fab-chevron">{{ isPanelCollapsed ? '&rsaquo;' : '&lsaquo;' }}</span>
         </button>
       </div>
+
     </div>
 
     <!-- Statistics Panel: shown when FAB is toggled open -->
@@ -94,13 +106,15 @@
         <h2 class="panel-title">Statistics</h2>
 
         <div class="stats-period-tabs">
-          <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'day'"
-            (click)="selectStatsPeriod('day')">Day</button>
-          <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'week'"
-            (click)="selectStatsPeriod('week')">Week</button>
-          <button type="button" class="period-tab" [class.is-active]="selectedPeriod === 'month'"
-            (click)="selectStatsPeriod('month')">Month</button>
+          <button type="button" class="period-tab" *ngFor="let p of periodButtons"
+            [class.is-active]="selectedPeriod === p.value"
+            (click)="selectStatsPeriod(p.value)">{{ p.label }}</button>
         </div>
+
+        <select class="filter-select stats-period-select" [(ngModel)]="selectedPeriod">
+          <option value="week">Week</option>
+          <option value="month">Month</option>
+        </select>
 
         <button type="button" class="stats-settings-btn" (click)="openStatsModal()"
           aria-label="Select statistics to show">
@@ -199,6 +213,170 @@
             </dl>
           </div>
         </div>
+
+        <div class="pin-popup-footer">
+          <button type="button" class="btn-view-details" (click)="openDetailPanel()">View full details &rarr;</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Left-docked panel: every asset placed in a drawn zone, opened via the "<Label>: N" badge -->
+    <aside class="zone-assets-slide-panel" [class.is-open]="zoneAssetsPanel">
+      <ng-container *ngIf="zoneAssetsPanel as panel">
+        <header class="detail-slide-header">
+          <h3>{{ panel.title }}</h3>
+          <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeZoneAssetsPanel()">&times;</button>
+        </header>
+
+        <div class="detail-slide-body">
+          <table class="pin-popup-table">
+            <thead>
+              <tr><th>Name</th><th>Type</th><th>Status</th><th>Location</th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let item of panel.items" class="is-clickable-row" (click)="openZoneAssetDetailFromSummary(item.assetId)">
+                <td>{{ item.name }}</td>
+                <td>{{ item.type }}</td>
+                <td><span class="status-label" [class]="'status-label-' + item.status">{{ item.status }}</span></td>
+                <td>
+                  <button
+                    type="button"
+                    class="zone-asset-locate-btn"
+                    title="Zoom to this asset on the floor plan"
+                    (click)="locateZoneAsset(item.assetId, $event)"
+                  >
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
+                      <circle cx="12" cy="10" r="3"></circle>
+                    </svg>
+                  </button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </ng-container>
+    </aside>
+
+    <!-- Phase 2: contextual sliding detail panel (adds to, doesn't replace, the popup above) -->
+    <aside class="detail-slide-panel" [class.is-open]="detailPanel">
+      <ng-container *ngIf="detailPanel as panel">
+        <header class="detail-slide-header">
+          <h3>{{ panel.title }}</h3>
+          <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeDetailPanel()">&times;</button>
+        </header>
+
+        <div class="detail-slide-body">
+          <section class="detail-slide-section" *ngIf="panel.kind === 'asset'">
+            <h4>Profile Details</h4>
+            <dl class="pin-popup-fields">
+              <dt>Name</dt><dd>{{ panel.data.name }}</dd>
+              <dt>Type</dt><dd>{{ panel.data.type }}</dd>
+              <dt>Status</dt><dd>{{ panel.data.status }}</dd>
+              <dt>Zone</dt><dd>{{ panel.data.zoneLabel }}</dd>
+            </dl>
+          </section>
+
+          <section class="detail-slide-section" *ngIf="panel.kind === 'device'">
+            <h4>Last Health Report</h4>
+            <dl class="pin-popup-fields">
+              <dt>Battery</dt><dd>{{ panel.data.battery }}%</dd>
+              <dt>RSSI</dt><dd>{{ panel.data.rssi }} dBm</dd>
+              <dt>Firmware</dt><dd>{{ panel.data.firmware }}</dd>
+            </dl>
+          </section>
+
+          <section class="detail-slide-section" *ngIf="detailPanelAlarms.length">
+            <h4>Recent Alarms</h4>
+            <ul class="insights-list">
+              <li *ngFor="let alarm of detailPanelAlarms">{{ alarm }}</li>
+            </ul>
+          </section>
+
+          <section class="detail-slide-section">
+            <h4>Timeline Activity</h4>
+            <ul class="timeline-list">
+              <li *ngFor="let entry of detailPanelTimeline">
+                <span class="timeline-time">{{ entry.time }}</span>
+                <span>{{ entry.text }}</span>
+              </li>
+            </ul>
+          </section>
+
+          <section class="detail-slide-section" *ngIf="panel.kind === 'asset'">
+            <h4>Last Health Report</h4>
+            <dl class="pin-popup-fields">
+              <dt>Battery</dt><dd>{{ panel.data.battery }}%</dd>
+              <dt>Signal</dt><dd>{{ panel.data.signal }}</dd>
+              <dt>Last Sync</dt><dd>{{ panel.data.lastSync }}</dd>
+            </dl>
+          </section>
+
+          <button type="button" class="btn-save detail-locate-btn" *ngIf="panel.kind === 'count'" (click)="locateDetailOnMap()">
+            Locate on map
+          </button>
+
+          <button type="button" class="btn-close detail-locate-btn" *ngIf="panel.kind === 'asset'" (click)="removeDetailAsset()">
+            Remove from zone
+          </button>
+        </div>
+      </ng-container>
+    </aside>
+
+    <!-- Phase 2: geofencing rule builder -->
+    <div class="modal-overlay" *ngIf="isGeofenceModalOpen" (click)="closeGeofenceModal()">
+      <div class="stats-modal geofence-modal" (click)="$event.stopPropagation()">
+        <div class="stats-modal-header">
+          <h3>Geofencing rules</h3>
+        </div>
+
+        <div class="stats-modal-body">
+          <div class="geofence-form">
+            <select class="filter-select" [(ngModel)]="newRuleZoneId">
+              <option value="" disabled>-- Select zone --</option>
+              <option *ngFor="let z of zoneFilterOptions" [value]="z.id">{{ z.name }}</option>
+            </select>
+            <select class="filter-select" [(ngModel)]="newRuleTrigger">
+              <option value="enter">On enter</option>
+              <option value="exit">On exit</option>
+            </select>
+            <select class="filter-select" [(ngModel)]="newRuleAction">
+              <option *ngFor="let a of geofenceActions" [value]="a">{{ geofenceActionLabels[a] }}</option>
+            </select>
+            <button type="button" class="btn-save" [disabled]="!newRuleZoneId" (click)="addGeofenceRule()">Add rule</button>
+          </div>
+
+          <table class="pin-popup-table geofence-table" *ngIf="geofenceRules.length">
+            <thead>
+              <tr><th>Zone</th><th>Trigger</th><th>Action</th><th>Enabled</th><th></th></tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let rule of geofenceRules">
+                <td>{{ rule.zoneName }}</td>
+                <td>{{ rule.trigger === 'enter' ? 'On enter' : 'On exit' }}</td>
+                <td>{{ geofenceActionLabels[rule.action] }}</td>
+                <td>
+                  <input type="checkbox" [checked]="rule.enabled" (change)="toggleGeofenceRule(rule.id)" />
+                </td>
+                <td>
+                  <button type="button" class="modal-close-btn" (click)="deleteGeofenceRule(rule.id)">&times;</button>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+          <p class="geofence-empty" *ngIf="!geofenceRules.length">No rules yet — add one above.</p>
+
+          <div class="geofence-events" *ngIf="geofenceEvents.length">
+            <h4>Recent activity</h4>
+            <ul class="insights-list">
+              <li *ngFor="let evt of geofenceEvents">{{ evt.at }} — {{ evt.message }}</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="stats-modal-footer">
+          <button type="button" class="btn-close" (click)="closeGeofenceModal()">Close</button>
+        </div>
       </div>
     </div>
   </div>
@@ -206,7 +384,7 @@
   <div class="tracked-summary">
     <h3>Tracked Assets</h3>
     <div class="tracked-grid">
-      <div class="tracked-card" *ngFor="let person of trackedPeople">
+      <div class="tracked-card" *ngFor="let person of filteredTrackedPeople">
         <div class="tracked-card-head">
           <span class="status-dot" [class]="'status-' + person.status"></span>
           <strong>{{ person.name }}</strong>

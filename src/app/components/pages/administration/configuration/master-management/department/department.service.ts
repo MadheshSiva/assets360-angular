@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { InspectionDepartmentItem } from './department.model';
+import { MasterManagementDepartmentItem } from './department.model';
 
 @Injectable({ providedIn: 'root' })
-export class InspectionDepartmentService {
+export class MasterManagementDepartmentService {
   readonly businessUnitMaster: string[] = [
     'Facilities Operations',
     'Manufacturing Plants',
     'Retail & Warehousing'
   ];
 
-  private readonly records: InspectionDepartmentItem[] = [
+  private readonly records: MasterManagementDepartmentItem[] = [
     {
       departmentCode: 'DEPT-1001',
       assetId: 'AST-1001',
@@ -44,18 +44,18 @@ export class InspectionDepartmentService {
 
   private nextSequence = 1004;
 
-  getRecords(): InspectionDepartmentItem[] {
+  getRecords(): MasterManagementDepartmentItem[] {
     return this.records;
   }
 
-  addRecord(record: InspectionDepartmentItem): InspectionDepartmentItem {
+  addRecord(record: MasterManagementDepartmentItem): MasterManagementDepartmentItem {
     const departmentCode = record.departmentCode?.trim() || `DEPT-${this.nextSequence++}`;
-    const created: InspectionDepartmentItem = { ...record, departmentCode };
+    const created: MasterManagementDepartmentItem = { ...record, departmentCode };
     this.records.push(created);
     return created;
   }
 
-  updateRecord(departmentCode: string, changes: InspectionDepartmentItem): void {
+  updateRecord(departmentCode: string, changes: MasterManagementDepartmentItem): void {
     const index = this.records.findIndex((r) => r.departmentCode === departmentCode);
     if (index !== -1) {
       this.records[index] = { ...this.records[index], ...changes };
@@ -71,7 +71,7 @@ export class InspectionDepartmentService {
     }
   }
 
-  search(term: string): InspectionDepartmentItem[] {
+  search(term: string): MasterManagementDepartmentItem[] {
     const value = term.trim().toLowerCase();
     if (!value) return this.records;
     return this.records.filter((r) =>

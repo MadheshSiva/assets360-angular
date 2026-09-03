@@ -39,53 +39,75 @@
             <button
               *ngIf="row.node.kind === 'project'"
               type="button"
-              class="row-action-btn"
-              title="Add Area"
+              class="row-action-btn row-action-btn-label row-action-add-area"
+              title="Add a Country to this project"
               (click)="openAddArea(row.node, $event)"
             >
-              <img src="addd.png" alt="Add Area" />
+              <span class="row-action-plus">+</span> Country
             </button>
 
-            <ng-container *ngIf="row.node.kind === 'area'">
+            <button
+              *ngIf="row.node.kind === 'area'"
+              type="button"
+              class="row-action-btn row-action-btn-label row-action-add-area"
+              title="Add a State to this country"
+              (click)="openAddState(row.node, $event)"
+            >
+              <span class="row-action-plus">+</span> Area
+            </button>
+
+            <ng-container *ngIf="row.node.kind === 'state'">
               <button
                 *ngIf="canAddZone(row.node)"
                 type="button"
-                class="row-action-btn"
-                title="Add Zone"
+                class="row-action-btn row-action-btn-label row-action-add-zone"
+                title="Add a Zone directly inside this area (outdoor / indoor+outdoor map types only)"
                 (click)="openAddZone(row.node, $event)"
               >
-                <img src="addd.png" alt="Add Zone" />
+                <span class="row-action-plus">+</span> Zone
               </button>
               <button
                 *ngIf="canAddBuilding(row.node)"
                 type="button"
-                class="row-action-btn"
-                title="Add Building"
+                class="row-action-btn row-action-btn-label row-action-add-building"
+                title="Add a Building to this area (indoor / indoor+outdoor map types only)"
                 (click)="openAddBuilding(row.node, $event)"
               >
-                <img src="addd.png" alt="Add Building" />
+                <span class="row-action-plus">+</span> Building
               </button>
             </ng-container>
 
             <button
               *ngIf="row.node.kind === 'building'"
               type="button"
-              class="row-action-btn"
-              title="Add Floor"
+              class="row-action-btn row-action-btn-label row-action-add-floor"
+              title="Add a Floor to this building"
               (click)="openAddFloor(row.node, $event)"
             >
-              <img src="addd.png" alt="Add Floor" />
+              <span class="row-action-plus">+</span> Floor
             </button>
 
             <button
               *ngIf="row.node.kind === 'floor'"
               type="button"
-              class="row-action-btn"
-              title="Add Zone"
+              class="row-action-btn row-action-btn-label row-action-add-zone"
+              title="Add a Zone to this floor"
               (click)="openAddZone(row.node, $event)"
             >
-              <img src="addd.png" alt="Add Zone" />
+              <span class="row-action-plus">+</span> Zone
             </button>
+
+            <ng-container *ngIf="row.node.kind === 'zone'">
+              <button
+                *ngIf="canAddSubZone(row.node)"
+                type="button"
+                class="row-action-btn row-action-btn-label row-action-add-zone"
+                title="Add a sub-zone to this zone"
+                (click)="openAddZone(row.node, $event)"
+              >
+                <span class="row-action-plus">+</span> Sub Zone
+              </button>
+            </ng-container>
 
             <button
               type="button"
@@ -113,10 +135,16 @@
     </aside>
 
     <div class="map-panel">
-      <app-map *ngIf="!showFloorPlan" [pins]="mapPins()"></app-map>
+      <img *ngIf="activeZoneImage as img" [src]="img" class="zone-map-image" alt="Zone map" />
+
+      <app-map
+        *ngIf="!activeZoneImage && !showFloorPlan"
+        [pins]="mapPins()"
+        [locations]="mapLocations()"
+      ></app-map>
 
       <app-floor-plan
-        *ngIf="showFloorPlan"
+        *ngIf="!activeZoneImage && showFloorPlan"
         [floorId]="activeFloor?.id ?? null"
         [zones]="floorPlanZones"
       ></app-floor-plan>
@@ -200,57 +228,903 @@
     </div>
   </div>
 
-  <!-- Add Area / Building / Floor / Zone (shared) -->
+  <!-- Add Area / State / Building / Floor / Zone (shared) -->
   <div class="modal-overlay" *ngIf="childModal" (click)="closeChildModal()">
-    <div class="modal-card modal-card-sm" (click)="$event.stopPropagation()">
+    <div
+      class="modal-card"
+      [class.modal-card-sm]="
+        childModal.kind !== 'area' &&
+        childModal.kind !== 'state' &&
+        childModal.kind !== 'building' &&
+        childModal.kind !== 'floor' &&
+        childModal.kind !== 'zone'
+      "
+      [class.modal-card-lg]="
+        childModal.kind === 'area' ||
+        childModal.kind === 'state' ||
+        childModal.kind === 'building' ||
+        childModal.kind === 'floor' ||
+        childModal.kind === 'zone'
+      "
+      (click)="$event.stopPropagation()"
+    >
       <header class="modal-header">
-        <h2 class="modal-title">{{ childModalTitle }}</h2>
+        <h2 class="modal-title">
+          <span class="modal-title-icon" *ngIf="childModal.kind === 'area'">&#127760;</span>
+          <span class="modal-title-icon" *ngIf="childModal.kind === 'state'">&#127976;</span>
+          <span class="modal-title-icon" *ngIf="childModal.kind === 'building'">&#127961;</span>
+          <span class="modal-title-icon" *ngIf="childModal.kind === 'floor'">&#128205;</span>
+          <span class="modal-title-icon" *ngIf="childModal.kind === 'zone' && childModal.zoneParentKind !== 'zone'">&#127970;</span>
+          <span class="modal-title-icon" *ngIf="childModal.kind === 'zone' && childModal.zoneParentKind === 'zone'">&#9201;</span>
+          {{ childModalTitle }}
+        </h2>
         <button type="button" class="modal-close-btn" aria-label="Close" (click)="closeChildModal()">
           &times;
         </button>
       </header>
 
       <div class="modal-body">
-        <label class="field-label" for="child-name">
-          Name <span class="required-mark">*</span>
-        </label>
-        <input
-          id="child-name"
-          type="text"
-          class="field-input"
-          [(ngModel)]="childFormName"
-          (keydown.enter)="submitChildModal()"
-          autofocus
-        />
-
-        <ng-container *ngIf="childModal?.kind === 'area'">
-          <label class="field-label" for="child-area-type">Area Type</label>
-          <select id="child-area-type" class="field-input" [(ngModel)]="childFormAreaType">
-            <option value="indoor">Indoor</option>
-            <option value="outdoor">Outdoor</option>
-            <option value="indoor_outdoor">Indoor + Outdoor</option>
-          </select>
-          <p class="field-hint" *ngIf="childFormAreaType === 'indoor'">
-            Zones for this area are added within its buildings' floors.
-          </p>
-          <p class="field-hint" *ngIf="childFormAreaType !== 'indoor'">
-            Zones can be added directly on this area.
-          </p>
+        <ng-container
+          *ngIf="
+            childModal?.kind !== 'area' &&
+            childModal?.kind !== 'state' &&
+            childModal?.kind !== 'building' &&
+            childModal?.kind !== 'floor' &&
+            childModal?.kind !== 'zone'
+          "
+        >
+          <label class="field-label" for="child-name">
+            Name <span class="required-mark">*</span>
+          </label>
+          <input
+            id="child-name"
+            type="text"
+            class="field-input"
+            [(ngModel)]="childFormName"
+            (keydown.enter)="submitChildModal()"
+            autofocus
+          />
         </ng-container>
 
-        <ng-container *ngIf="childModal?.kind === 'zone'">
-          <label class="field-label" for="child-zone-color">Color</label>
-          <select id="child-zone-color" class="field-input" [(ngModel)]="childFormZoneColor">
-            <option *ngFor="let c of zoneColors" [value]="c.value">{{ c.label }}</option>
-          </select>
+        <ng-container *ngIf="childModal?.kind === 'area'">
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-country-name">
+                Country Name <span class="required-mark">*</span>
+              </label>
+              <select
+                id="child-country-name"
+                class="field-input"
+                [(ngModel)]="childFormName"
+                (ngModelChange)="onCountryNameChange()"
+              >
+                <option value="" disabled>-- Select Country --</option>
+                <option *ngFor="let c of countryOptions" [value]="c.name">{{ c.name }}</option>
+              </select>
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-country-description">Description</label>
+              <input
+                id="child-country-description"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormDescription"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-country-timezone">
+                Time Zone <span class="required-mark">*</span>
+              </label>
+              <select id="child-country-timezone" class="field-input" [(ngModel)]="childFormTimeZone">
+                <option value="" disabled>-- Select Timezone --</option>
+                <option *ngFor="let tz of timeZoneOptions" [value]="tz">{{ tz }}</option>
+              </select>
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-country-code">Country Code</label>
+              <input
+                id="child-country-code"
+                type="text"
+                class="field-input"
+                placeholder="Auto-filled"
+                [ngModel]="childFormCountryCode"
+                readonly
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-country-lat">Latitude</label>
+              <input
+                id="child-country-lat"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 20.5937"
+                [(ngModel)]="childFormLatitude"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-country-lng">Longitude</label>
+              <input
+                id="child-country-lng"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 78.9629"
+                [(ngModel)]="childFormLongitude"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-country-zoom">Zoom Level</label>
+              <input
+                id="child-country-zoom"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 5"
+                [(ngModel)]="childFormZoomLevel"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label">Status</label>
+              <button
+                type="button"
+                class="status-toggle"
+                [class.is-active]="childFormStatus === 'active'"
+                (click)="toggleChildFormStatus()"
+              >
+                <span class="status-toggle-knob"></span>
+                <span class="status-toggle-label">{{ childFormStatus === 'active' ? 'Active' : 'Inactive' }}</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="childModal?.kind === 'state'">
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-state-name">
+                Area Name <span class="required-mark">*</span>
+              </label>
+              <input
+                id="child-state-name"
+                type="text"
+                class="field-input"
+                placeholder="e.g. Dubai"
+                [(ngModel)]="childFormName"
+                autofocus
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-state-description">Description</label>
+              <input
+                id="child-state-description"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormDescription"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-state-lat">Latitude</label>
+              <input
+                id="child-state-lat"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 25.2048"
+                [(ngModel)]="childFormLatitude"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-state-lng">Longitude</label>
+              <input
+                id="child-state-lng"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 55.2708"
+                [(ngModel)]="childFormLongitude"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-state-zoom">Zoom Level</label>
+              <input
+                id="child-state-zoom"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 8"
+                [(ngModel)]="childFormZoomLevel"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label">Status</label>
+              <button
+                type="button"
+                class="status-toggle"
+                [class.is-active]="childFormStatus === 'active'"
+                (click)="toggleChildFormStatus()"
+              >
+                <span class="status-toggle-knob"></span>
+                <span class="status-toggle-label">{{ childFormStatus === 'active' ? 'Active' : 'Inactive' }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-state-map-type">Outdoor Map</label>
+              <select id="child-state-map-type" class="field-input" [(ngModel)]="childFormStateType">
+                <option value="" disabled>-- Select Map Type --</option>
+                <option value="indoor">{{ areaTypeLabels.indoor }}</option>
+                <option value="outdoor">{{ areaTypeLabels.outdoor }}</option>
+                <option value="indoor_outdoor">{{ areaTypeLabels.indoor_outdoor }}</option>
+              </select>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="childModal?.kind === 'building'">
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-building-name">
+                Building Name <span class="required-mark">*</span>
+              </label>
+              <input
+                id="child-building-name"
+                type="text"
+                class="field-input"
+                placeholder="e.g. Muscat"
+                [(ngModel)]="childFormName"
+                autofocus
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-building-description">Description</label>
+              <input
+                id="child-building-description"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormDescription"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-building-lat">Latitude</label>
+              <input
+                id="child-building-lat"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 23.5880"
+                [(ngModel)]="childFormLatitude"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-building-lng">Longitude</label>
+              <input
+                id="child-building-lng"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 58.3829"
+                [(ngModel)]="childFormLongitude"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-building-zoom">Zoom Level</label>
+              <input
+                id="child-building-zoom"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 10"
+                [(ngModel)]="childFormZoomLevel"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label">Status</label>
+              <button
+                type="button"
+                class="status-toggle"
+                [class.is-active]="childFormStatus === 'active'"
+                (click)="toggleChildFormStatus()"
+              >
+                <span class="status-toggle-knob"></span>
+                <span class="status-toggle-label">{{ childFormStatus === 'active' ? 'Active' : 'Inactive' }}</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="childModal?.kind === 'floor'">
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-floor-name">
+                Floor Name <span class="required-mark">*</span>
+              </label>
+              <input
+                id="child-floor-name"
+                type="text"
+                class="field-input"
+                placeholder="e.g. Main Street"
+                [(ngModel)]="childFormName"
+                autofocus
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-floor-description">Description</label>
+              <input
+                id="child-floor-description"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormDescription"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-floor-map">Upload Map</label>
+              <label class="upload-map-btn" for="child-floor-map">
+                <span class="upload-map-icon">&#128247;</span>
+                <span class="upload-map-text"
+                  >Click to upload <span class="upload-map-hint">JPG, PNG, JPEG only</span></span
+                >
+              </label>
+              <input
+                id="child-floor-map"
+                type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                class="upload-map-input"
+                (change)="onMapFileSelected($event)"
+              />
+              <p class="field-hint" *ngIf="childFormMapFileName">Selected: {{ childFormMapFileName }}</p>
+            </div>
+            <div class="field-col">
+              <label class="field-label">Status</label>
+              <button
+                type="button"
+                class="status-toggle"
+                [class.is-active]="childFormStatus === 'active'"
+                (click)="toggleChildFormStatus()"
+              >
+                <span class="status-toggle-knob"></span>
+                <span class="status-toggle-label">{{ childFormStatus === 'active' ? 'Active' : 'Inactive' }}</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="childModal?.kind === 'zone' && childModal?.zoneParentKind !== 'zone'">
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-zone-name">
+                Building Name <span class="required-mark">*</span>
+              </label>
+              <input
+                id="child-zone-name"
+                type="text"
+                class="field-input"
+                placeholder="e.g. Block A"
+                [(ngModel)]="childFormName"
+                autofocus
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-zone-description">Description</label>
+              <input
+                id="child-zone-description"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormDescription"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-zone-map">Upload Map</label>
+              <label class="upload-map-btn" for="child-zone-map">
+                <span class="upload-map-icon">&#128247;</span>
+                <span class="upload-map-text"
+                  >Click to upload <span class="upload-map-hint">JPG, PNG, JPEG only</span></span
+                >
+              </label>
+              <input
+                id="child-zone-map"
+                type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                class="upload-map-input"
+                (change)="onMapFileSelected($event)"
+              />
+              <p class="field-hint" *ngIf="childFormMapFileName">Selected: {{ childFormMapFileName }}</p>
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-zone-top">Top Zone</label>
+              <input
+                id="child-zone-top"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormTopZone"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-zone-priority">Priority</label>
+              <input
+                id="child-zone-priority"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormPriority"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-zone-exit">Exit</label>
+              <input
+                id="child-zone-exit"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormExit"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label">Assembly Point</label>
+              <button
+                type="button"
+                class="status-toggle"
+                [class.is-active]="childFormAssemblyPoint === 'active'"
+                (click)="toggleChildFormAssemblyPoint()"
+              >
+                <span class="status-toggle-knob"></span>
+                <span class="status-toggle-label">{{
+                  childFormAssemblyPoint === 'active' ? 'Active' : 'Inactive'
+                }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-zone-zoom">Zoom Level</label>
+              <input
+                id="child-zone-zoom"
+                type="text"
+                class="field-input"
+                placeholder="e.g. 10"
+                [(ngModel)]="childFormZoomLevel"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label">Status</label>
+              <button
+                type="button"
+                class="status-toggle"
+                [class.is-active]="childFormStatus === 'active'"
+                (click)="toggleChildFormStatus()"
+              >
+                <span class="status-toggle-knob"></span>
+                <span class="status-toggle-label">{{ childFormStatus === 'active' ? 'Active' : 'Inactive' }}</span>
+              </button>
+            </div>
+          </div>
+        </ng-container>
+
+        <ng-container *ngIf="childModal?.kind === 'zone' && childModal?.zoneParentKind === 'zone'">
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-subzone-name">
+                Subzone Name <span class="required-mark">*</span>
+              </label>
+              <input
+                id="child-subzone-name"
+                type="text"
+                class="field-input"
+                placeholder="e.g. Subzone A"
+                [(ngModel)]="childFormName"
+                autofocus
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-subzone-description">Description</label>
+              <input
+                id="child-subzone-description"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormDescription"
+              />
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label" for="child-subzone-map">Upload Map</label>
+              <label class="upload-map-btn" for="child-subzone-map">
+                <span class="upload-map-icon">&#128247;</span>
+                <span class="upload-map-text"
+                  >Click to upload <span class="upload-map-hint">JPG, PNG, JPEG only</span></span
+                >
+              </label>
+              <input
+                id="child-subzone-map"
+                type="file"
+                accept="image/jpeg,image/png,image/jpg"
+                class="upload-map-input"
+                (change)="onMapFileSelected($event)"
+              />
+              <p class="field-hint" *ngIf="childFormMapFileName">Selected: {{ childFormMapFileName }}</p>
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-subzone-top">Top Zone Description</label>
+              <input
+                id="child-subzone-top"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormTopZone"
+              />
+            </div>
+          </div>
+
+          <div class="field-row field-row-3">
+            <div class="field-col">
+              <label class="field-label" for="child-subzone-priority">Priority</label>
+              <input
+                id="child-subzone-priority"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormPriority"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label" for="child-subzone-exit">Exit</label>
+              <input
+                id="child-subzone-exit"
+                type="text"
+                class="field-input"
+                placeholder="Short description"
+                [(ngModel)]="childFormExit"
+              />
+            </div>
+            <div class="field-col">
+              <label class="field-label">Assembly Point</label>
+              <button
+                type="button"
+                class="status-toggle"
+                [class.is-active]="childFormAssemblyPoint === 'active'"
+                (click)="toggleChildFormAssemblyPoint()"
+              >
+                <span class="status-toggle-knob"></span>
+                <span class="status-toggle-label">{{
+                  childFormAssemblyPoint === 'active' ? 'Active' : 'Inactive'
+                }}</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="field-row">
+            <div class="field-col">
+              <label class="field-label">Status</label>
+              <button
+                type="button"
+                class="status-toggle"
+                [class.is-active]="childFormStatus === 'active'"
+                (click)="toggleChildFormStatus()"
+              >
+                <span class="status-toggle-knob"></span>
+                <span class="status-toggle-label">{{ childFormStatus === 'active' ? 'Active' : 'Inactive' }}</span>
+              </button>
+            </div>
+          </div>
         </ng-container>
 
         <p class="modal-error" *ngIf="childFormError">{{ childFormError }}</p>
+
+        <div class="country-list-section" *ngIf="childModal?.kind === 'area'">
+          <div class="country-list-divider"><span class="country-list-label">Country List</span></div>
+          <div class="country-list-wrap">
+            <table class="country-list-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Country Name</th>
+                  <th>Description</th>
+                  <th>Time Zone</th>
+                  <th>Country Code</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let country of countryListRows; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ country.name }}</td>
+                  <td>{{ country.description || '-' }}</td>
+                  <td>{{ country.timeZone || '-' }}</td>
+                  <td>{{ country.countryCode || '-' }}</td>
+                  <td>
+                    <span class="country-status-badge" [class.is-inactive]="country.status === 'inactive'">
+                      {{ country.status === 'inactive' ? 'Inactive' : 'Active' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="country-list-action"
+                      aria-label="Delete country"
+                      (click)="deleteNode(country, $event)"
+                    >
+                      &#128465;
+                    </button>
+                  </td>
+                </tr>
+                <tr class="country-list-empty" *ngIf="countryListRows.length === 0">
+                  <td colspan="7">No countries added yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="country-list-section" *ngIf="childModal?.kind === 'state'">
+          <div class="country-list-divider"><span class="country-list-label">State List</span></div>
+          <div class="country-list-wrap">
+            <table class="country-list-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Area Name</th>
+                  <th>Description</th>
+                  <th>Outdoor Map</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let state of stateListRows; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ state.name }}</td>
+                  <td>{{ state.description || '-' }}</td>
+                  <td>{{ areaTypeLabels[state.type] }}</td>
+                  <td>{{ state.coords.lat | number: '1.0-4' }}</td>
+                  <td>{{ state.coords.lng | number: '1.0-4' }}</td>
+                  <td>
+                    <span class="country-status-badge" [class.is-inactive]="state.status === 'inactive'">
+                      {{ state.status === 'inactive' ? 'Inactive' : 'Active' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="country-list-action"
+                      aria-label="Delete area"
+                      (click)="deleteNode(state, $event)"
+                    >
+                      &#128465;
+                    </button>
+                  </td>
+                </tr>
+                <tr class="country-list-empty" *ngIf="stateListRows.length === 0">
+                  <td colspan="8">No Area added yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="country-list-section" *ngIf="childModal?.kind === 'building'">
+          <div class="country-list-divider"><span class="country-list-label">City List</span></div>
+          <div class="country-list-wrap">
+            <table class="country-list-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Building Name</th>
+                  <th>Description</th>
+                  <th>Latitude</th>
+                  <th>Longitude</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let building of buildingListRows; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ building.name }}</td>
+                  <td>{{ building.description || '-' }}</td>
+                  <td>{{ building.coords.lat | number: '1.0-4' }}</td>
+                  <td>{{ building.coords.lng | number: '1.0-4' }}</td>
+                  <td>
+                    <span class="country-status-badge" [class.is-inactive]="building.status === 'inactive'">
+                      {{ building.status === 'inactive' ? 'Inactive' : 'Active' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="country-list-action"
+                      aria-label="Delete building"
+                      (click)="deleteNode(building, $event)"
+                    >
+                      &#128465;
+                    </button>
+                  </td>
+                </tr>
+                <tr class="country-list-empty" *ngIf="buildingListRows.length === 0">
+                  <td colspan="7">No Building added yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="country-list-section" *ngIf="childModal?.kind === 'floor'">
+          <div class="country-list-divider"><span class="country-list-label">Street List</span></div>
+          <div class="country-list-wrap">
+            <table class="country-list-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Floor Name</th>
+                  <th>Description</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let floor of floorListRows; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ floor.name }}</td>
+                  <td>{{ floor.description || '-' }}</td>
+                  <td>
+                    <span class="country-status-badge" [class.is-inactive]="floor.status === 'inactive'">
+                      {{ floor.status === 'inactive' ? 'Inactive' : 'Active' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="country-list-action"
+                      aria-label="Delete floor"
+                      (click)="deleteNode(floor, $event)"
+                    >
+                      &#128465;
+                    </button>
+                  </td>
+                </tr>
+                <tr class="country-list-empty" *ngIf="floorListRows.length === 0">
+                  <td colspan="5">No Floor added yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="country-list-section" *ngIf="childModal?.kind === 'zone' && childModal?.zoneParentKind !== 'zone'">
+          <div class="country-list-divider"><span class="country-list-label">List of Zone</span></div>
+          <div class="country-list-wrap">
+            <table class="country-list-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>zone Name</th>
+                  <th>Description</th>
+                  <th>Upload Map</th>
+                  <th>Top Zone</th>
+                  <th>Priority</th>
+                  <th>Exit</th>
+                  <th>Assemble point</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let zone of zoneListRows; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ zone.name }}</td>
+                  <td>{{ zone.description || '-' }}</td>
+                  <td>{{ zone.mapImage ? 'Uploaded' : '-' }}</td>
+                  <td>{{ zone.topZone || '-' }}</td>
+                  <td>{{ zone.priority || '-' }}</td>
+                  <td>{{ zone.exit || '-' }}</td>
+                  <td>
+                    <span class="country-status-badge" [class.is-inactive]="zone.assemblyPoint === 'inactive'">
+                      {{ zone.assemblyPoint === 'inactive' ? 'Inactive' : 'Active' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="country-list-action"
+                      aria-label="Delete zone"
+                      (click)="deleteNode(zone, $event)"
+                    >
+                      &#128465;
+                    </button>
+                  </td>
+                </tr>
+                <tr class="country-list-empty" *ngIf="zoneListRows.length === 0">
+                  <td colspan="9">No Zone added yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="country-list-section" *ngIf="childModal?.kind === 'zone' && childModal?.zoneParentKind === 'zone'">
+          <div class="country-list-divider"><span class="country-list-label">Subzone List</span></div>
+          <div class="country-list-wrap">
+            <table class="country-list-table">
+              <thead>
+                <tr>
+                  <th>S.No</th>
+                  <th>Subzone Name</th>
+                  <th>Description</th>
+                  <th>Priority</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let subzone of zoneListRows; let i = index">
+                  <td>{{ i + 1 }}</td>
+                  <td>{{ subzone.name }}</td>
+                  <td>{{ subzone.description || '-' }}</td>
+                  <td>{{ subzone.priority || '-' }}</td>
+                  <td>
+                    <span class="country-status-badge" [class.is-inactive]="subzone.status === 'inactive'">
+                      {{ subzone.status === 'inactive' ? 'Inactive' : 'Active' }}
+                    </span>
+                  </td>
+                  <td>
+                    <button
+                      type="button"
+                      class="country-list-action"
+                      aria-label="Delete subzone"
+                      (click)="deleteNode(subzone, $event)"
+                    >
+                      &#128465;
+                    </button>
+                  </td>
+                </tr>
+                <tr class="country-list-empty" *ngIf="zoneListRows.length === 0">
+                  <td colspan="6">No subzones added yet.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
       </div>
 
       <footer class="modal-footer">
         <button type="button" class="btn btn-secondary" (click)="closeChildModal()">Cancel</button>
-        <button type="button" class="btn btn-primary" (click)="submitChildModal()">Create</button>
+        <button type="button" class="btn btn-primary" (click)="submitChildModal()">{{ childModalSubmitLabel }}</button>
       </footer>
     </div>
   </div>

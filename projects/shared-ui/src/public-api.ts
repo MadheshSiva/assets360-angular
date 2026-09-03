@@ -10,3 +10,5 @@ export * from './lib/map/map';
 export * from './lib/floor-plan/floor-plan';
 export * from './lib/site-hierarchy/site-hierarchy.model';
 export * from './lib/site-hierarchy/site-hierarchy.service';
+export * from './lib/role/role';
+export * from './lib/geofence/geofence';

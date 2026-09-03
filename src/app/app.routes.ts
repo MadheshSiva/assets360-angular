@@ -87,12 +87,12 @@ import { MasterManagementUpdateSourceMaster } from './components/pages/administr
 import { MasterManagementChartTypeMaster } from './components/pages/administration/configuration/master-management/chart-type-master/chart-type-master';
 import { MasterManagementPermissionMaster } from './components/pages/administration/configuration/master-management/permission-master/permission-master';
 import { MasterManagementModuleAccessMaster } from './components/pages/administration/configuration/master-management/module-access-master/module-access-master';
-import { InspectionOrganization } from './components/pages/administration/configuration/inspection/organization/organization';
-import { InspectionBusinessUnit } from './components/pages/administration/configuration/inspection/business-unit/business-unit';
-import { InspectionDepartment } from './components/pages/administration/configuration/inspection/department/department';
-import { InspectionSite } from './components/pages/administration/configuration/inspection/site/site';
-import { InspectionManufacturer } from './components/pages/administration/configuration/inspection/manufacturer/manufacturer';
-import { InspectionSupplier } from './components/pages/administration/configuration/inspection/supplier/supplier';
+import { MasterManagementOrganization } from './components/pages/administration/configuration/master-management/organization/organization';
+import { MasterManagementBusinessUnit } from './components/pages/administration/configuration/master-management/business-unit/business-unit';
+import { MasterManagementDepartment } from './components/pages/administration/configuration/master-management/department/department';
+import { MasterManagementSite } from './components/pages/administration/configuration/master-management/site/site';
+import { MasterManagementManufacturer } from './components/pages/administration/configuration/master-management/manufacturer/manufacturer';
+import { MasterManagementSupplier } from './components/pages/administration/configuration/master-management/supplier/supplier';
 import { InspectionTypeMaster } from './components/pages/administration/configuration/inspection/inspection-type/inspection-type';
 import { InspectionTaskCategory } from './components/pages/administration/configuration/inspection/task-category/task-category';
 import { InspectionTask } from './components/pages/administration/configuration/inspection/inspection-task/inspection-task';
@@ -265,13 +265,13 @@ export const routes: Routes = [
               { path: 'master-management/chart-type-master', component: MasterManagementChartTypeMaster },
               { path: 'master-management/permission-master', component: MasterManagementPermissionMaster },
               { path: 'master-management/module-access-master', component: MasterManagementModuleAccessMaster },
-              { path: 'inspection', redirectTo: 'inspection/organization', pathMatch: 'full' },
-              { path: 'inspection/organization', component: InspectionOrganization },
-              { path: 'inspection/business-unit', component: InspectionBusinessUnit },
-              { path: 'inspection/department', component: InspectionDepartment },
-              { path: 'inspection/site', component: InspectionSite },
-              { path: 'inspection/manufacturer', component: InspectionManufacturer },
-              { path: 'inspection/supplier', component: InspectionSupplier },
+              { path: 'master-management/organization', component: MasterManagementOrganization },
+              { path: 'master-management/business-unit', component: MasterManagementBusinessUnit },
+              { path: 'master-management/department', component: MasterManagementDepartment },
+              { path: 'master-management/site', component: MasterManagementSite },
+              { path: 'master-management/manufacturer', component: MasterManagementManufacturer },
+              { path: 'master-management/supplier', component: MasterManagementSupplier },
+              { path: 'inspection', redirectTo: 'inspection/inspection-type', pathMatch: 'full' },
               { path: 'inspection/inspection-type', component: InspectionTypeMaster },
               { path: 'inspection/task-category', component: InspectionTaskCategory },
               { path: 'inspection/inspection-task', component: InspectionTask },

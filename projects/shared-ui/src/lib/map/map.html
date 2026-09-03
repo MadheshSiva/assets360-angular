@@ -5,6 +5,7 @@
     <button type="button" class="map-control-btn" (click)="zoomOut()" aria-label="Zoom out">&minus;</button>
 
     <button
+      *ngIf="!controlsDisabled"
       type="button"
       class="map-control-btn"
       [class.is-active]="isDrawing"
@@ -17,6 +18,7 @@
     </button>
 
     <button
+      *ngIf="!controlsDisabled"
       type="button"
       class="map-control-btn"
       [class.is-active]="isPlacingSensor"
@@ -31,7 +33,28 @@
       </svg>
     </button>
 
-    <div class="map-control-btn-wrap">
+    <div class="map-control-btn-wrap" *ngIf="!controlsDisabled">
+      <button type="button" class="map-control-btn" title="Zone type" (click)="toggleZoneTypePicker()">
+        <svg class="map-control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M4 4h16v16H4z"></path>
+          <path d="M4 12h16"></path>
+        </svg>
+      </button>
+      <div class="map-popover map-zonetype-popover" *ngIf="showZoneTypePicker">
+        <button
+          *ngFor="let t of zoneTypeOptions"
+          type="button"
+          class="map-zonetype-option"
+          [class.is-active]="(selectedZone?.zoneType ?? drawZoneType) === t.value"
+          (click)="setZoneType(t.value)"
+        >
+          <span class="map-zonetype-swatch" [style.background]="t.color"></span>
+          {{ t.label }}
+        </button>
+      </div>
+    </div>
+
+    <div class="map-control-btn-wrap" *ngIf="!controlsDisabled">
       <button type="button" class="map-control-btn" title="Zone color" (click)="toggleColorPicker()">
         <span class="map-color-swatch" [style.background]="selectedZone?.color ?? drawColor"></span>
       </button>
@@ -48,6 +71,7 @@
     </div>
 
     <button
+      *ngIf="!controlsDisabled"
       type="button"
       class="map-control-btn"
       title="Delete selected zone"
@@ -61,7 +85,7 @@
       </svg>
     </button>
 
-    <div class="map-control-btn-wrap">
+    <div class="map-control-btn-wrap" *ngIf="!controlsDisabled">
       <button type="button" class="map-control-btn" title="Zone opacity" (click)="toggleOpacitySlider()">
         <svg class="map-control-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z"></path>

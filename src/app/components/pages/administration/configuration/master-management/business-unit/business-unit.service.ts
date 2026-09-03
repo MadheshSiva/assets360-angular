@@ -1,15 +1,15 @@
 import { Injectable } from '@angular/core';
-import { InspectionBusinessUnitItem } from './business-unit.model';
+import { MasterManagementBusinessUnitItem } from './business-unit.model';
 
 @Injectable({ providedIn: 'root' })
-export class InspectionBusinessUnitService {
+export class MasterManagementBusinessUnitService {
   readonly organizationMaster: string[] = [
     'PurpleIQ Global Holdings',
     'Northbridge Manufacturing Inc.',
     'Meridian Facilities Ltd.'
   ];
 
-  private readonly records: InspectionBusinessUnitItem[] = [
+  private readonly records: MasterManagementBusinessUnitItem[] = [
     {
       businessUnitCode: 'BU-1001',
       assetId: 'AST-1001',
@@ -50,18 +50,18 @@ export class InspectionBusinessUnitService {
 
   private nextSequence = 1004;
 
-  getRecords(): InspectionBusinessUnitItem[] {
+  getRecords(): MasterManagementBusinessUnitItem[] {
     return this.records;
   }
 
-  addRecord(record: InspectionBusinessUnitItem): InspectionBusinessUnitItem {
+  addRecord(record: MasterManagementBusinessUnitItem): MasterManagementBusinessUnitItem {
     const businessUnitCode = record.businessUnitCode?.trim() || `BU-${this.nextSequence++}`;
-    const created: InspectionBusinessUnitItem = { ...record, businessUnitCode };
+    const created: MasterManagementBusinessUnitItem = { ...record, businessUnitCode };
     this.records.push(created);
     return created;
   }
 
-  updateRecord(businessUnitCode: string, changes: InspectionBusinessUnitItem): void {
+  updateRecord(businessUnitCode: string, changes: MasterManagementBusinessUnitItem): void {
     const index = this.records.findIndex((r) => r.businessUnitCode === businessUnitCode);
     if (index !== -1) {
       this.records[index] = { ...this.records[index], ...changes };
@@ -77,7 +77,7 @@ export class InspectionBusinessUnitService {
     }
   }
 
-  search(term: string): InspectionBusinessUnitItem[] {
+  search(term: string): MasterManagementBusinessUnitItem[] {
     const value = term.trim().toLowerCase();
     if (!value) return this.records;
     return this.records.filter((r) =>
