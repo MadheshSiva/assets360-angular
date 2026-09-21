@@ -4,20 +4,16 @@ import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { MasterLinkIcons } from '@shared/master-link-icons/master-link-icons';
 import { RowActions } from 'shared-ui';
-
-export interface AuditVerificationEntry {
-  assetId: string;
-  assetName: string;
-  auditDate: string;
-  auditorDetails: string;
-  physicalVerificationResult: string;
-  discrepanciesFound: string;
-  auditHistoryLogs: string;
-}
+import {
+  AssetAuditVerificationService,
+  AppAssetAuditVerification,
+  AssetAuditVerificationFormValue
+} from '../../../../../services/asset-audit-verification.service';
 
 export interface AuditVerificationForm {
   assetId: string;
   assetName: string;
+  /** yyyy-MM-dd, bound to a native date input */
   auditDate: string;
   auditorDetails: string;
   physicalVerificationResult: string;
@@ -51,31 +47,20 @@ export class AssetAuditVerification {
   // Master: physical verification result
   verificationResultOptions: string[] = ['Verified', 'Not Verified', 'Pending', 'Verified with Exceptions'];
 
-  entries: AuditVerificationEntry[] = [
-    {
-      assetId: 'AST-0001',
-      assetName: 'Forklift Unit 4',
-      auditDate: '2026-06-28',
-      auditorDetails: 'J. Fernando',
-      physicalVerificationResult: 'Verified',
-      discrepanciesFound: '-',
-      auditHistoryLogs: 'Logged automatically on 2026-06-28 09:12'
-    },
-    {
-      assetId: 'AST-0002',
-      assetName: 'HVAC Compressor B',
-      auditDate: '2026-06-20',
-      auditorDetails: 'A. Perera',
-      physicalVerificationResult: 'Verified with Exceptions',
-      discrepanciesFound: 'Serial number mismatch on tag',
-      auditHistoryLogs: 'Logged automatically on 2026-06-20 14:05'
-    }
-  ];
+  entries: AppAssetAuditVerification[] = [];
+  loading = false;
+  errorMessage = '';
 
   showFormModal = false;
   isEditMode = false;
-  private editingEntry: AuditVerificationEntry | null = null;
+  private editingEntry: AppAssetAuditVerification | null = null;
   form: AuditVerificationForm = this.emptyForm();
+
+  deleteTarget: AppAssetAuditVerification | null = null;
+
+  constructor(private service: AssetAuditVerificationService) {
+    this.loadEntries();
+  }
 
   private emptyForm(): AuditVerificationForm {
     return {
@@ -101,9 +86,9 @@ export class AssetAuditVerification {
   }
 
   onImportRows(rows: Record<string, string>[]): void {
-    this.entries = [
-      ...this.entries,
-      ...rows.map((row) => ({
+    // TODO: submit imported rows to the backend instead of only pushing to the local list
+    rows.forEach((row) => {
+      const fields: AssetAuditVerificationFormValue = {
         assetId: row['assetId'] ?? '',
         assetName: row['assetName'] ?? '',
         auditDate: row['auditDate'] ?? '',
@@ -111,8 +96,9 @@ export class AssetAuditVerification {
         physicalVerificationResult: row['physicalVerificationResult'] ?? '',
         discrepanciesFound: row['discrepanciesFound'] ?? '',
         auditHistoryLogs: row['auditHistoryLogs'] ?? ''
-      }))
-    ];
+      };
+      this.service.create(fields).subscribe({ next: () => this.loadEntries() });
+    });
     this.showImportModal = false;
   }
 
@@ -121,20 +107,20 @@ export class AssetAuditVerification {
   }
 
   onRefresh(): void {
-    // TODO: reload audit & verification data from backend
+    this.loadEntries();
   }
 
   onDelete(): void {
-    // TODO: delete selected entries
+    // TODO: bulk-delete selected entries (no row-selection UI yet)
   }
 
-  editRow(entry: AuditVerificationEntry): void {
+  editRow(entry: AppAssetAuditVerification): void {
     this.isEditMode = true;
     this.editingEntry = entry;
     this.form = {
       assetId: entry.assetId,
       assetName: entry.assetName,
-      auditDate: entry.auditDate,
+      auditDate: entry.auditDate ? entry.auditDate.slice(0, 10) : '',
       auditorDetails: entry.auditorDetails,
       physicalVerificationResult: entry.physicalVerificationResult,
       discrepanciesFound: entry.discrepanciesFound,
@@ -149,15 +135,51 @@ export class AssetAuditVerification {
   }
 
   submitForm(): void {
-    if (this.isEditMode && this.editingEntry) {
-      Object.assign(this.editingEntry, this.form);
-    } else {
-      this.entries = [...this.entries, { ...this.form }];
-    }
-    this.closeFormModal();
+    const fields: AssetAuditVerificationFormValue = { ...this.form };
+
+    const request$ = this.isEditMode && this.editingEntry
+      ? this.service.update(this.editingEntry.id, fields)
+      : this.service.create(fields);
+
+    request$.subscribe({
+      next: () => {
+        this.closeFormModal();
+        this.loadEntries();
+      },
+      error: () => this.errorMessage = 'Failed to save audit & verification. Please try again.'
+    });
   }
 
-  deleteRow(entry: AuditVerificationEntry): void {
-    this.entries = this.entries.filter((e) => e !== entry);
+  deleteRow(entry: AppAssetAuditVerification): void {
+    this.deleteTarget = entry;
+  }
+
+  cancelDelete(): void {
+    this.deleteTarget = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.deleteTarget) return;
+    const id = this.deleteTarget.id;
+    this.deleteTarget = null;
+    this.service.delete(id).subscribe({
+      next: () => this.loadEntries(),
+      error: () => this.errorMessage = 'Failed to delete entry. Please try again.'
+    });
+  }
+
+  private loadEntries(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.service.getAll().subscribe({
+      next: (entries) => {
+        this.entries = entries;
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load audit & verification data.';
+        this.loading = false;
+      }
+    });
   }
 }

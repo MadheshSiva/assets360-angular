@@ -53,6 +53,8 @@
     >{{ tab.label }}</button>
   </div>
 
+  <p class="error-text" *ngIf="errorMessage">{{ errorMessage }}</p>
+
   <ng-container *ngIf="activeTab === 'configuration'">
     <!-- Table -->
     <div class="table-wrapper">
@@ -77,26 +79,42 @@
             <td>{{ entry.assetName }}</td>
             <td>{{ entry.auditCode }}</td>
             <td>{{ entry.auditName }}</td>
-            <td>{{ entry.auditStartDate }}</td>
-            <td>{{ entry.auditEndDate || '-' }}</td>
+            <td>{{ entry.auditStartDate | slice:0:10 }}</td>
+            <td>{{ (entry.auditEndDate | slice:0:10) || '-' }}</td>
             <td class="active-cell">
               <span class="status-badge" [class.status-active]="entry.active" [class.status-inactive]="!entry.active">{{ entry.active ? 'Active' : 'Inactive' }}</span>
             </td>
-            <td class="system-cell">{{ entry.createdDate || '-' }}</td>
+            <td class="system-cell">{{ (entry.createdAt | slice:0:10) || '-' }}</td>
             <td class="system-cell">{{ entry.createdBy || '-' }}</td>
             <td class="actions-col">
               <app-row-actions (edit)="editRow(entry)" (delete)="deleteRow(entry)"></app-row-actions>
             </td>
           </tr>
 
-          <tr *ngIf="entries.length === 0">
+          <tr *ngIf="!loading && entries.length === 0">
             <td colspan="10" class="empty-row">No audit records found.</td>
+          </tr>
+          <tr *ngIf="loading">
+            <td colspan="10" class="empty-row">Loading...</td>
           </tr>
         </tbody>
       </table>
     </div>
   </ng-container>
 
+</div>
+
+<div class="confirm-overlay" *ngIf="deleteTarget" (click)="cancelDelete()">
+  <div class="confirm-card" (click)="$event.stopPropagation()">
+    <h3 class="confirm-title">Delete Audit</h3>
+    <p class="confirm-message">
+      Are you sure you want to delete audit <strong>{{ deleteTarget.auditName }}</strong> for <strong>{{ deleteTarget.assetName }}</strong>? This action cannot be undone.
+    </p>
+    <div class="confirm-footer">
+      <button type="button" class="btn btn-cancel" (click)="cancelDelete()">Cancel</button>
+      <button type="button" class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
 </div>
 
 <app-import-file-modal
@@ -151,11 +169,11 @@
         </div>
         <div class="form-field">
           <label>AUDIT START DATE</label>
-          <input type="text" name="auditStartDate" [(ngModel)]="form.auditStartDate" />
+          <input type="date" name="auditStartDate" [(ngModel)]="form.auditStartDate" />
         </div>
         <div class="form-field">
           <label>AUDIT END DATE</label>
-          <input type="text" name="auditEndDate" [(ngModel)]="form.auditEndDate" />
+          <input type="date" name="auditEndDate" [(ngModel)]="form.auditEndDate" />
         </div>
         <div class="form-field">
           <label>ACTIVE</label>

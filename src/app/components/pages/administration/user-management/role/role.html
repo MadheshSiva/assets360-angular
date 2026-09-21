@@ -34,6 +34,8 @@
       </div>
     </header>
 
+    <p class="role-error-text" *ngIf="errorMessage">{{ errorMessage }}</p>
+
     <div class="role-table-wrapper">
       <table class="role-table">
         <thead>
@@ -60,7 +62,7 @@
                   <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4Z"></path>
                 </svg>
               </button>
-              <button type="button" class="role-mini-btn" title="Delete" (click)="deleteRole(role.roleId)">
+              <button type="button" class="role-mini-btn" title="Delete" (click)="deleteRole(role)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M3 6h18"></path>
                   <path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
@@ -69,11 +71,27 @@
               </button>
             </td>
           </tr>
-          <tr *ngIf="filteredRoles.length === 0" class="role-empty-row">
+          <tr *ngIf="!loading && filteredRoles.length === 0" class="role-empty-row">
             <td colspan="6" class="role-empty">No roles found.</td>
+          </tr>
+          <tr *ngIf="loading" class="role-empty-row">
+            <td colspan="6" class="role-empty">Loading roles...</td>
           </tr>
         </tbody>
       </table>
+    </div>
+  </div>
+
+  <div class="confirm-overlay" *ngIf="deleteTarget" (click)="cancelDelete()">
+    <div class="confirm-card" (click)="$event.stopPropagation()">
+      <h3 class="confirm-title">Delete Role</h3>
+      <p class="confirm-message">
+        Are you sure you want to delete <strong>{{ deleteTarget.roleName }}</strong>? This action cannot be undone.
+      </p>
+      <div class="confirm-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+      </div>
     </div>
   </div>
 </section>

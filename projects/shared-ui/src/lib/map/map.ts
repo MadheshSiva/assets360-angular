@@ -163,8 +163,14 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
   }
 
   ngOnChanges(changes: SimpleChanges): void {
-    if (changes['locations'] && !changes['locations'].firstChange && this.map) {
-      this.updateInitialLocation();
+    if (changes['locations'] && !changes['locations'].firstChange) {
+      if (this.map) {
+        this.updateInitialLocation();
+      } else if (this.isBrowser && this.mapEl && this.locations.length > 0 && !this.mapInitStarted) {
+        // Locations arrived after ngAfterViewInit already found nothing to initialize with
+        // (e.g. data loaded asynchronously) — initialize now instead of staying blank forever.
+        this.initializeMap();
+      }
     }
     if (changes['pins'] && !changes['pins'].firstChange) {
       if (this.map) {
@@ -194,6 +200,11 @@ export class MapComponent implements AfterViewInit, OnDestroy, OnChanges {
     if (!this.mapEl || (this.locations.length === 0 && this.pins.length === 0)) return;
     this.mapInitStarted = true;
     this.L = await loadLeaflet();
+    if (!this.mapEl || (this.locations.length === 0 && this.pins.length === 0)) {
+      // locations/pins were cleared while Leaflet was loading — nothing to render (yet).
+      this.mapInitStarted = false;
+      return;
+    }
     const L = this.L;
 
     if (this.pins.length > 0) {

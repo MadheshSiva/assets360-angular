@@ -1,6 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { Observable, map } from 'rxjs';
 import { HierarchyNode } from "../../models/hierarchy-node.model"
+import { environment } from '../../../environments/environment';
+import { AuthService } from '../service/auth/auth.service';
 
 export interface ModulePermission {
   module: string;
@@ -8,13 +11,51 @@ export interface ModulePermission {
   edit: boolean;
 }
 
+/** UI-friendly role model derived from the API's RoleDto. */
 export interface AppRole {
-  roleId: number;
+  /** Mongo id used for GET/PUT/DELETE by id. */
+  id: string;
+  /** Human-readable role code assigned by the backend, e.g. "R639243719001560584". */
+  roleId: string;
   roleName: string;
   description: string;
   accessPermission: ModulePermission[];
-  hierarchyPermission: string[];
   clientId: string;
+  tenantId: string;
+}
+
+/** Permission entry shape expected/returned by the user-account roles API. */
+export interface AssignedPermission {
+  featureName: string;
+  viewOption: boolean;
+  editOption: boolean;
+}
+
+/** Request body for POST/PUT {userAccountApiUrl}user-account/api/roles[/{id}] */
+export interface RoleRequest {
+  roleName: string;
+  description: string;
+  assignedPermissions: AssignedPermission[];
+  createdBy: string;
+  clientId: string;
+  tenantId: string;
+}
+
+/** Raw shape returned by the user-account roles API. */
+export interface RoleDto {
+  id: string;
+  roleId: string;
+  roleName: string;
+  description: string;
+  assignedPermissions: AssignedPermission[];
+  createdBy: string;
+  createdAt: string;
+  updatedBy: string | null;
+  updatedAt: string | null;
+  clientId: string;
+  tenantId: string;
+  status: string;
+  isDeleted: boolean;
 }
 
 export const DEFAULT_MODULES: string[] = [
@@ -33,50 +74,39 @@ function buildDefaultPermissions(): ModulePermission[] {
   return DEFAULT_MODULES.map(module => ({ module, view: false, edit: false }));
 }
 
+function toAppRole(dto: RoleDto): AppRole {
+  return {
+    id: dto.id,
+    roleId: dto.roleId,
+    roleName: dto.roleName,
+    description: dto.description,
+    accessPermission: dto.assignedPermissions.map(p => ({ module: p.featureName, view: p.viewOption, edit: p.editOption })),
+    clientId: dto.clientId,
+    tenantId: dto.tenantId
+  };
+}
+
 @Injectable({ providedIn: 'root' })
 export class RoleService {
-  private rolesSubject = new BehaviorSubject<AppRole[]>([
-    {
-      roleId: 1,
-      roleName: 'Admin',
-      description: 'Full system access',
-      accessPermission: DEFAULT_MODULES.map(module => ({ module, view: true, edit: true })),
-      hierarchyPermission: [],
-      clientId: 'CLT-1001'
-    },
-    {
-      roleId: 2,
-      roleName: 'Operator',
-      description: 'Manages daily operations',
-      accessPermission: DEFAULT_MODULES.map(module => ({ module, view: true, edit: false })),
-      hierarchyPermission: [],
-      clientId: 'CLT-1002'
-    },
-    {
-      roleId: 3,
-      roleName: 'Viewer',
-      description: 'Read-only access',
-      accessPermission: DEFAULT_MODULES.map(module => ({ module, view: true, edit: false })),
-      hierarchyPermission: [],
-      clientId: 'CLT-1003'
-    },
-    {
-      roleId: 4,
-      roleName: 'Auditor',
-      description: 'Reviews logs and reports',
-      accessPermission: DEFAULT_MODULES.map(module => ({ module, view: true, edit: false })),
-      hierarchyPermission: [],
-      clientId: 'CLT-1004'
-    }
-  ]);
-  private nextIdSubject = new BehaviorSubject<number>(5);
+  private rolesApiUrl = `${environment.userAccountApiUrl}user-account/api/roles`;
 
-  getRoles(): AppRole[] {
-    return this.rolesSubject.value;
+  constructor(private http: HttpClient, private auth: AuthService) {}
+
+  getRoles(): Observable<AppRole[]> {
+    return this.http.get<RoleDto[]>(this.rolesApiUrl).pipe(map(list => list.map(toAppRole)));
+  }
+
+  getRole(id: string): Observable<AppRole> {
+    return this.http.get<RoleDto>(`${this.rolesApiUrl}/${id}`).pipe(map(toAppRole));
   }
 
   getEmptyPermissions(): ModulePermission[] {
     return buildDefaultPermissions();
+  }
+
+  /** Fills in any modules missing from a role's saved permissions so the form always shows the full list. */
+  mergePermissions(existing: ModulePermission[]): ModulePermission[] {
+    return DEFAULT_MODULES.map(module => existing.find(p => p.module === module) ?? { module, view: false, edit: false });
   }
 
   /**
@@ -135,33 +165,48 @@ export class RoleService {
     ];
   }
 
-  addRole(role: Omit<AppRole, 'roleId'>): AppRole {
-    const currentId = this.nextIdSubject.value;
-    const newRole: AppRole = { ...role, roleId: currentId } as AppRole;
-    this.rolesSubject.next([newRole, ...this.rolesSubject.value]);
-    this.nextIdSubject.next(currentId + 1);
-    return newRole;
+  /** POST /user-account/api/roles */
+  createRole(roleName: string, description: string, permissions: ModulePermission[]): Observable<AppRole> {
+    return this.http.post<RoleDto>(this.rolesApiUrl, this.buildRequest(roleName, description, permissions))
+      .pipe(map(toAppRole));
   }
 
-  updateRole(roleId: number, changes: Partial<AppRole>): void {
-    this.rolesSubject.next(
-      this.rolesSubject.value.map(r => r.roleId === roleId ? { ...r, ...changes } as AppRole : r)
-    );
+  /** PUT /user-account/api/roles/{id} */
+  updateRole(id: string, roleName: string, description: string, permissions: ModulePermission[]): Observable<AppRole> {
+    return this.http.put<RoleDto>(`${this.rolesApiUrl}/${id}`, this.buildRequest(roleName, description, permissions))
+      .pipe(map(toAppRole));
   }
 
-  deleteRole(roleId: number): void {
-    this.rolesSubject.next(this.rolesSubject.value.filter(r => r.roleId !== roleId));
+  /** DELETE /user-account/api/roles/{id} */
+  deleteRole(id: string): Observable<void> {
+    return this.http.delete<void>(`${this.rolesApiUrl}/${id}`);
   }
 
-  search(term: string): AppRole[] {
+  /** Client-side filter over an already-fetched role list. */
+  filterRoles(roles: AppRole[], term: string): AppRole[] {
     const t = term.trim().toLowerCase();
-    if (!t) return this.rolesSubject.value;
-    return this.rolesSubject.value.filter(r =>
+    if (!t) return roles;
+    return roles.filter(r =>
       r.roleName.toLowerCase().includes(t) ||
       r.description.toLowerCase().includes(t) ||
       r.clientId.toLowerCase().includes(t) ||
       r.accessPermission.some(p => p.module.toLowerCase().includes(t))
     );
+  }
+
+  private buildRequest(roleName: string, description: string, permissions: ModulePermission[]): RoleRequest {
+    return {
+      roleName,
+      description,
+      assignedPermissions: permissions.map(p => ({
+        featureName: p.module,
+        viewOption: p.view,
+        editOption: p.edit
+      })),
+      createdBy: this.auth.getUserEmail() || 'unknown',
+      clientId: environment.clientId,
+      tenantId: environment.tenantId
+    };
   }
 
   /** Helper for display in the list table, e.g. "Dashboard (V), Events (V/E)" */

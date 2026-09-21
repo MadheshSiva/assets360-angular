@@ -1,26 +1,22 @@
-import { Component, EventEmitter, Input, Output } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
+import { AppUser, UserFormValue } from '../../../../services/users.service';
 
-export interface NewUser {
-  userId: string;
-  userName: string;
-  shortName: string;
-  contactNo: string;
-  emailId: string;
+export interface RoleOption {
+  roleId: string;
   roleName: string;
-  adUserName: string;
 }
 
-function emptyUser(): NewUser {
+function emptyModel(): UserFormValue {
   return {
-    userId: '',
     userName: '',
     shortName: '',
     contactNo: '',
-    emailId: '',
-    roleName: 'Admin',
-    adUserName: '',
+    email: '',
+    loginPassword: '',
+    activeDirectoryUserName: '',
+    userRoleId: ''
   };
 }
 
@@ -31,24 +27,47 @@ function emptyUser(): NewUser {
   templateUrl: './add-user-modal.html',
   styleUrls: ['./add-user-modal.css'],
 })
-export class AddUserModal {
+export class AddUserModal implements OnChanges {
   /** Controls whether the modal is shown */
   @Input() visible = false;
 
-  /** Dropdown options for ROLE NAME */
-  @Input() roleOptions: string[] = ['Admin', 'Manager', 'Staff', 'Doctor'];
+  /** Dropdown options for ROLE, sourced from the real roles list */
+  @Input() roleOptions: RoleOption[] = [];
+
+  /** When set, the modal edits this user instead of creating a new one */
+  @Input() editingUser: AppUser | null = null;
 
   /** Emitted when the user confirms with valid data */
-  @Output() save = new EventEmitter<NewUser>();
+  @Output() save = new EventEmitter<UserFormValue>();
 
   /** Emitted when the modal is dismissed without saving */
   @Output() cancel = new EventEmitter<void>();
 
-  model: NewUser = emptyUser();
+  model: UserFormValue = emptyModel();
+
+  get isEditMode(): boolean {
+    return !!this.editingUser;
+  }
+
+  ngOnChanges(changes: SimpleChanges): void {
+    if ((changes['visible'] || changes['editingUser']) && this.visible) {
+      this.model = this.editingUser
+        ? {
+            userName: this.editingUser.userName,
+            shortName: this.editingUser.shortName,
+            contactNo: this.editingUser.contactNo,
+            email: this.editingUser.email,
+            loginPassword: '',
+            activeDirectoryUserName: this.editingUser.activeDirectoryUserName,
+            userRoleId: this.editingUser.userRoleId
+          }
+        : emptyModel();
+    }
+  }
 
   onSave(): void {
     // Minimal required-field guard; swap for proper form validation as needed
-    if (!this.model.userId.trim() || !this.model.userName.trim() || !this.model.emailId.trim()) {
+    if (!this.model.userName.trim() || !this.model.email.trim() || !this.model.loginPassword.trim()) {
       return;
     }
 
@@ -67,7 +86,7 @@ export class AddUserModal {
   }
 
   private resetAndClose(): void {
-    this.model = emptyUser();
+    this.model = emptyModel();
     this.visible = false;
   }
 }

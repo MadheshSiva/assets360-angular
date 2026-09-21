@@ -28,6 +28,8 @@
     </div>
   </div>
 
+  <p class="error-text" *ngIf="errorMessage">{{ errorMessage }}</p>
+
   <!-- Table -->
   <div class="table-wrapper">
     <table class="lh-table">
@@ -55,11 +57,27 @@
           </td>
         </tr>
 
-        <tr *ngIf="entries.length === 0">
+        <tr *ngIf="!loading && entries.length === 0">
           <td colspan="7" class="empty-row">No activity / audit trail records found.</td>
+        </tr>
+        <tr *ngIf="loading">
+          <td colspan="7" class="empty-row">Loading...</td>
         </tr>
       </tbody>
     </table>
   </div>
 
+</div>
+
+<div class="confirm-overlay" *ngIf="deleteTarget" (click)="cancelDelete()">
+  <div class="confirm-card" (click)="$event.stopPropagation()">
+    <h3 class="confirm-title">Delete Entry</h3>
+    <p class="confirm-message">
+      Are you sure you want to delete the activity log for <strong>{{ deleteTarget.assetName }}</strong>? This action cannot be undone.
+    </p>
+    <div class="confirm-footer">
+      <button type="button" class="btn btn-cancel" (click)="cancelDelete()">Cancel</button>
+      <button type="button" class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+    </div>
+  </div>
 </div>

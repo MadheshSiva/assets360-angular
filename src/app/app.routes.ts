@@ -298,7 +298,8 @@ export const routes: Routes = [
               { path: '', redirectTo: 'user', pathMatch: 'full' },
               { path: 'user', component: User },
               { path: 'role', component: Role },
-              { path: 'role/create', component: CreateRole }
+              { path: 'role/create', component: CreateRole },
+              { path: 'role/edit/:id', component: CreateRole }
             ]
           }
         ]

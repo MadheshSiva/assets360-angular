@@ -15,7 +15,6 @@
           class="search-input"
           placeholder="Search Users"
           [(ngModel)]="searchTerm"
-          (ngModelChange)="onSearch()"
         />
       </div>
 
@@ -42,6 +41,8 @@
       </div>
     </div>
 
+    <p class="user-error-text" *ngIf="errorMessage">{{ errorMessage }}</p>
+
     <!-- Table -->
     <div class="table-wrap">
       <table class="user-table">
@@ -53,7 +54,6 @@
             <th>Contact No</th>
             <th>Email Id</th>
             <th>Role</th>
-            <th>Role Name</th>
             <th>AD User Name</th>
             <th class="action-col">Action</th>
           </tr>
@@ -64,10 +64,9 @@
             <td class="user-name">{{ user.userName }}</td>
             <td>{{ user.shortName }}</td>
             <td>{{ user.contactNo }}</td>
-            <td>{{ user.emailId }}</td>
-            <td>{{ user.role }}</td>
-            <td>{{ user.roleName }}</td>
-            <td>{{ user.adUserName }}</td>
+            <td>{{ user.email }}</td>
+            <td>{{ roleName(user) }}</td>
+            <td>{{ user.activeDirectoryUserName }}</td>
             <td class="action-col">
               <button class="icon-btn small" type="button" title="Edit" (click)="onEdit(user)">
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -87,19 +86,35 @@
             </td>
           </tr>
 
-          <tr *ngIf="filteredUsers.length === 0">
-            <td colspan="9" class="empty-row">No users match your search.</td>
+          <tr *ngIf="!loading && filteredUsers.length === 0">
+            <td colspan="8" class="empty-row">No users match your search.</td>
+          </tr>
+          <tr *ngIf="loading">
+            <td colspan="8" class="empty-row">Loading users...</td>
           </tr>
         </tbody>
       </table>
+    </div>
   </div>
 
   <app-add-user-modal
     [visible]="showAddModal"
-    [roleOptions]="['Admin','Manager','Staff','Doctor']"
+    [roleOptions]="roleOptions"
+    [editingUser]="editingUser"
     (save)="onUserSaved($event)"
-    (cancel)="showAddModal = false"
+    (cancel)="onModalCancel()"
   ></app-add-user-modal>
 
-</div>
+  <div class="confirm-overlay" *ngIf="deleteTarget" (click)="cancelDelete()">
+    <div class="confirm-card" (click)="$event.stopPropagation()">
+      <h3 class="confirm-title">Delete User</h3>
+      <p class="confirm-message">
+        Are you sure you want to delete <strong>{{ deleteTarget.userName }}</strong>? This action cannot be undone.
+      </p>
+      <div class="confirm-footer">
+        <button type="button" class="btn btn-secondary" (click)="cancelDelete()">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDelete()">Delete</button>
+      </div>
+    </div>
+  </div>
 </div>

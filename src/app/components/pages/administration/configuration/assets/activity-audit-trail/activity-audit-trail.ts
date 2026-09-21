@@ -1,15 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RowActions } from 'shared-ui';
-
-export interface ActivityAuditTrailEntry {
-  assetId: string;
-  assetName: string;
-  whoCreatedUpdatedAsset: string;
-  changesMade: string;
-  timestampLogs: string;
-  accessLogs: string;
-}
+import { AssetActivityService, AppAssetActivity } from '../../../../../services/asset-activity.service';
 
 @Component({
   standalone: true,
@@ -20,42 +12,61 @@ export interface ActivityAuditTrailEntry {
 })
 export class AssetActivityAuditTrail {
   // All columns in this module are system-generated — there is no manual "Add" entry.
-  entries: ActivityAuditTrailEntry[] = [
-    {
-      assetId: 'AST-0001',
-      assetName: 'Forklift Unit 4',
-      whoCreatedUpdatedAsset: 'N. Silva',
-      changesMade: 'Location changed: Warehouse A → Warehouse B',
-      timestampLogs: '2026-07-04 09:10',
-      accessLogs: 'Viewed by A. Perera at 2026-07-04 09:15'
-    },
-    {
-      assetId: 'AST-0002',
-      assetName: 'HVAC Compressor B',
-      whoCreatedUpdatedAsset: 'System',
-      changesMade: 'Status changed: Active → Under Maintenance',
-      timestampLogs: '2026-07-03 16:42',
-      accessLogs: 'Viewed by J. Fernando at 2026-07-03 17:00'
-    }
-  ];
+  entries: AppAssetActivity[] = [];
+  loading = false;
+  errorMessage = '';
+  deleteTarget: AppAssetActivity | null = null;
+
+  constructor(private service: AssetActivityService) {
+    this.loadEntries();
+  }
 
   onDownload(): void {
     // TODO: export current activity / audit trail list
   }
 
   onRefresh(): void {
-    // TODO: reload activity / audit trail data from backend
+    this.loadEntries();
   }
 
   onDelete(): void {
-    // TODO: delete selected entries
+    // TODO: bulk-delete selected entries (no row-selection UI yet)
   }
 
-  editRow(entry: ActivityAuditTrailEntry): void {
+  editRow(entry: AppAssetActivity): void {
     // TODO: open edit form for this activity / audit trail entry
   }
 
-  deleteRow(entry: ActivityAuditTrailEntry): void {
-    this.entries = this.entries.filter((e) => e !== entry);
+  deleteRow(entry: AppAssetActivity): void {
+    this.deleteTarget = entry;
+  }
+
+  cancelDelete(): void {
+    this.deleteTarget = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.deleteTarget) return;
+    const id = this.deleteTarget.id;
+    this.deleteTarget = null;
+    this.service.delete(id).subscribe({
+      next: () => this.loadEntries(),
+      error: () => this.errorMessage = 'Failed to delete entry. Please try again.'
+    });
+  }
+
+  private loadEntries(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.service.getAll().subscribe({
+      next: (entries) => {
+        this.entries = entries;
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load activity / audit trail data.';
+        this.loading = false;
+      }
+    });
   }
 }

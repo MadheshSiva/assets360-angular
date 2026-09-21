@@ -56,6 +56,9 @@
       </div>
     </div>
 
+    <p class="load-error-text" *ngIf="loadError">{{ loadError }}</p>
+    <p class="loading-text" *ngIf="loading">Loading devices...</p>
+
     <div class="table-wrap">
       <table class="devices-table">
         <thead>
@@ -63,35 +66,41 @@
             <th>Sl. No</th>
             <th>Model</th>
             <th>Type</th>
-            <th>Unique ID (MAC)</th>
+            <th>Unique ID</th>
             <th>Project</th>
             <th>Country</th>
             <th>Area</th>
             <th>Building</th>
             <th>Floor</th>
             <th>Zone</th>
+            <th>Status</th>
             <th>Actions</th>
           </tr>
         </thead>
         <tbody>
           <tr *ngFor="let device of filteredDevices; let i = index">
             <td>{{ i + 1 }}</td>
-            <td>{{ device.model }}</td>
+            <td>{{ device.modelId }}</td>
             <td>{{ device.type }}</td>
-            <td class="mono">{{ device.macId }}</td>
-            <td>{{ device.project }}</td>
-            <td>{{ device.country }}</td>
-            <td>{{ device.area }}</td>
-            <td>{{ device.building }}</td>
-            <td>{{ device.floor }}</td>
-            <td class="zone-cell">{{ device.zone }}</td>
+            <td class="mono">{{ device.uniqueId }}</td>
+            <td>{{ device.projectName || '-' }}</td>
+            <td>{{ device.countryName || '-' }}</td>
+            <td>{{ device.areaName || '-' }}</td>
+            <td>{{ device.buildingName || '-' }}</td>
+            <td>{{ device.floorName || '-' }}</td>
+            <td class="zone-cell">{{ device.zoneName || '-' }}</td>
+            <td>
+              <span class="status-badge" [class.is-inactive]="device.status === 'Inactive'">
+                {{ device.status === 'Inactive' ? 'Inactive' : 'Active' }}
+              </span>
+            </td>
             <td>
               <app-row-actions (edit)="editRow(device)" (delete)="deleteRow(device)"></app-row-actions>
             </td>
           </tr>
 
-          <tr *ngIf="filteredDevices.length === 0">
-            <td colspan="11" class="empty-row">No devices found.</td>
+          <tr *ngIf="!loading && filteredDevices.length === 0">
+            <td colspan="12" class="empty-row">No devices found.</td>
           </tr>
         </tbody>
       </table>
@@ -99,8 +108,8 @@
   </div>
 </section>
 
-<!-- Add Device Modal -->
-<div class="modal-overlay" *ngIf="showAddModal" (click)="closeAddModal()">
+<!-- Add / Edit Device Modal -->
+<div class="modal-overlay" *ngIf="showDeviceModal" (click)="closeDeviceModal()">
   <div class="modal" (click)="$event.stopPropagation()">
     <div class="modal-header">
       <div class="modal-title-wrap">
@@ -118,24 +127,24 @@
             <rect x="15" y="14.5" width="2.2" height="2.2" fill="currentColor"/>
           </svg>
         </span>
-        <h2 class="modal-title">Add Device</h2>
+        <h2 class="modal-title">{{ isEditMode ? 'Edit Device' : 'Add Device' }}</h2>
       </div>
-      <button class="modal-close" (click)="closeAddModal()" title="Close">
+      <button class="modal-close" (click)="closeDeviceModal()" title="Close" [disabled]="deviceFormSaving">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
         </svg>
       </button>
     </div>
 
-    <form class="modal-form" (ngSubmit)="submitAddDevice()" #deviceForm="ngForm">
+    <form class="modal-form" (ngSubmit)="submitDeviceForm()" #deviceFormRef="ngForm">
       <div class="form-grid">
         <div class="form-field">
           <label>MODEL <span class="required">*</span></label>
           <input
             type="text"
-            name="model"
+            name="modelId"
             placeholder="e.g. Cisco AP-1234"
-            [(ngModel)]="newDevice.model"
+            [(ngModel)]="deviceForm.modelId"
             required
           />
         </div>
@@ -143,7 +152,7 @@
         <div class="form-field">
           <label>TYPE <span class="required">*</span></label>
           <div class="select-wrap">
-            <select name="type" [(ngModel)]="newDevice.type" required>
+            <select name="type" [(ngModel)]="deviceForm.type" required>
               <option value="" disabled selected>-- Select Type --</option>
               <option value="Fixed">Fixed</option>
               <option value="Mobile">Mobile</option>
@@ -152,12 +161,23 @@
         </div>
 
         <div class="form-field">
-          <label>UNIQUE ID (MAC) <span class="required">*</span></label>
+          <label>UNIQUE ID <span class="required">*</span></label>
           <input
             type="text"
-            name="macId"
+            name="uniqueId"
             placeholder="e.g. 00:1A:2B:3C:4D:5E"
-            [(ngModel)]="newDevice.macId"
+            [(ngModel)]="deviceForm.uniqueId"
+            required
+          />
+        </div>
+
+        <div class="form-field">
+          <label>TECHNOLOGY <span class="required">*</span></label>
+          <input
+            type="text"
+            name="technology"
+            placeholder="e.g. BLE, Wi-Fi, LoRa"
+            [(ngModel)]="deviceForm.technology"
             required
           />
         </div>
@@ -165,61 +185,81 @@
         <div class="form-field">
           <label>PROJECT <span class="required">*</span></label>
           <div class="select-wrap">
-            <select name="project" [(ngModel)]="newDevice.project" required>
+            <select name="projectId" [(ngModel)]="deviceForm.projectId" (ngModelChange)="onProjectChange()" required>
               <option value="" disabled selected>-- Select Project --</option>
-              <option *ngFor="let p of projectOptions" [value]="p">{{ p }}</option>
+              <option *ngFor="let p of projects" [value]="p.id">{{ p.projectName }}</option>
             </select>
           </div>
         </div>
 
         <div class="form-field">
-          <label>COUNTRY <span class="required">*</span></label>
+          <label>COUNTRY</label>
           <div class="select-wrap">
-            <select name="country" [(ngModel)]="newDevice.country" required>
+            <select
+              name="countryId"
+              [(ngModel)]="deviceForm.countryId"
+              (ngModelChange)="onCountryChange()"
+              [disabled]="!deviceForm.projectId"
+            >
               <option value="" disabled selected>-- Select Country --</option>
-              <option *ngFor="let c of countryOptions" [value]="c">{{ c }}</option>
+              <option *ngFor="let c of countryOptionsFor(deviceForm.projectId)" [value]="c.id">{{ c.countryName }}</option>
             </select>
           </div>
         </div>
 
         <div class="form-field">
           <label>AREA</label>
-          <input
-            type="text"
-            name="area"
-            placeholder="e.g. North Wing"
-            [(ngModel)]="newDevice.area"
-          />
+          <div class="select-wrap">
+            <select
+              name="areaId"
+              [(ngModel)]="deviceForm.areaId"
+              (ngModelChange)="onAreaChange()"
+              [disabled]="!deviceForm.countryId"
+            >
+              <option value="" disabled selected>-- Select Area --</option>
+              <option *ngFor="let a of areaOptionsFor(deviceForm.countryId)" [value]="a.id">{{ a.areaName }}</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-field">
           <label>BUILDING</label>
-          <input
-            type="text"
-            name="building"
-            placeholder="e.g. Block A"
-            [(ngModel)]="newDevice.building"
-          />
+          <div class="select-wrap">
+            <select
+              name="buildingId"
+              [(ngModel)]="deviceForm.buildingId"
+              (ngModelChange)="onBuildingChange()"
+              [disabled]="!deviceForm.areaId"
+            >
+              <option value="" disabled selected>-- Select Building --</option>
+              <option *ngFor="let b of buildingOptionsFor(deviceForm.areaId)" [value]="b.id">{{ b.buildingName }}</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-field">
           <label>FLOOR</label>
-          <input
-            type="text"
-            name="floor"
-            placeholder="e.g. Ground Floor"
-            [(ngModel)]="newDevice.floor"
-          />
+          <div class="select-wrap">
+            <select
+              name="floorId"
+              [(ngModel)]="deviceForm.floorId"
+              (ngModelChange)="onFloorChange()"
+              [disabled]="!deviceForm.buildingId"
+            >
+              <option value="" disabled selected>-- Select Floor --</option>
+              <option *ngFor="let f of floorOptionsFor(deviceForm.buildingId)" [value]="f.id">{{ f.floorName }}</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-field">
           <label>ZONE</label>
-          <input
-            type="text"
-            name="zone"
-            placeholder="e.g. Zone A"
-            [(ngModel)]="newDevice.zone"
-          />
+          <div class="select-wrap">
+            <select name="zoneId" [(ngModel)]="deviceForm.zoneId" [disabled]="!deviceForm.floorId">
+              <option value="" disabled selected>-- Select Zone --</option>
+              <option *ngFor="let z of zoneOptionsFor(deviceForm.floorId)" [value]="z.id">{{ z.zoneName }}</option>
+            </select>
+          </div>
         </div>
 
         <div class="form-field">
@@ -228,63 +268,51 @@
             <button
               type="button"
               class="toggle"
-              [class.toggle-on]="newDevice.active"
-              (click)="newDevice.active = !newDevice.active"
+              [class.toggle-on]="deviceForm.status === 'Active'"
+              (click)="toggleDeviceFormStatus()"
             >
               <span class="toggle-knob"></span>
             </button>
-            <span class="toggle-label">{{ newDevice.active ? 'Active' : 'Inactive' }}</span>
+            <span class="toggle-label">{{ deviceForm.status }}</span>
           </div>
         </div>
       </div>
 
+      <p class="modal-error" *ngIf="deviceFormError">{{ deviceFormError }}</p>
+
       <div class="modal-footer">
-        <button type="button" class="btn btn-cancel" (click)="closeAddModal()">Cancel</button>
-        <button type="submit" class="btn btn-submit" [disabled]="!deviceForm.valid">Add Device</button>
+        <button type="button" class="btn btn-cancel" (click)="closeDeviceModal()" [disabled]="deviceFormSaving">Cancel</button>
+        <button type="submit" class="btn btn-submit" [disabled]="!deviceFormRef.valid || deviceFormSaving">
+          {{ deviceFormSaving ? 'Saving...' : (isEditMode ? 'Save Changes' : 'Add Device') }}
+        </button>
       </div>
-      <div class="device-list-section">
-      <div class="device-list-divider">
-        <span class="device-list-label">Device List</span>
-      </div>
+    </form>
+  </div>
+</div>
 
-      <div class="device-list-wrap">
-        <table class="device-list-table">
-          <thead>
-            <tr>
-              <th>Sl. No</th>
-              <th>Model</th>
-              <th>Type</th>
-              <th>Unique ID (MAC)</th>
-              <th>Project</th>
-              <th>Country</th>
-              <th>Area</th>
-              <th>Building</th>
-              <th>Floor</th>
-              <th>Zone</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let device of sessionDevices; let i = index">
-              <td>{{ i + 1 }}</td>
-              <td>{{ device.model }}</td>
-              <td>{{ device.type }}</td>
-              <td>{{ device.macId }}</td>
-              <td>{{ device.project }}</td>
-              <td>{{ device.country }}</td>
-              <td>{{ device.area }}</td>
-              <td>{{ device.building }}</td>
-              <td>{{ device.floor }}</td>
-              <td>{{ device.zone }}</td>
-            </tr>
-
-            <tr class="device-list-empty" *ngIf="sessionDevices.length === 0">
-              <td colspan="10">No devices added yet.</td>
-            </tr>
-          </tbody>
-        </table>
+<!-- Delete confirmation -->
+<div class="modal-overlay" *ngIf="deleteTarget" (click)="cancelDeleteDevice()">
+  <div class="modal modal-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">Delete {{ deleteTarget.modelId }}</h2>
+      <button class="modal-close" (click)="cancelDeleteDevice()" title="Close" [disabled]="deleting">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+        </svg>
+      </button>
+    </div>
+    <div class="modal-form">
+      <p class="confirm-message">
+        Are you sure you want to delete <strong>{{ deleteTarget.modelId }}</strong> ({{ deleteTarget.uniqueId }})? This action cannot be undone.
+      </p>
+      <p class="modal-error" *ngIf="deleteError">{{ deleteError }}</p>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-cancel" (click)="cancelDeleteDevice()" [disabled]="deleting">Cancel</button>
+        <button type="button" class="btn btn-danger" (click)="confirmDeleteDevice()" [disabled]="deleting">
+          {{ deleting ? 'Deleting...' : 'Delete' }}
+        </button>
       </div>
     </div>
-    </form>
   </div>
 </div>
 
@@ -295,3 +323,16 @@
   (cancelled)="showImportModal = false"
   (imported)="onImportRows($event)"
 ></app-import-file-modal>
+
+<div class="toast-stack" aria-live="polite">
+  <div
+    *ngFor="let toast of toasts"
+    class="toast"
+    [class.toast-success]="toast.type === 'success'"
+    [class.toast-error]="toast.type === 'error'"
+  >
+    <span class="toast-icon">{{ toast.type === 'success' ? '✓' : '⚠' }}</span>
+    <span class="toast-text">{{ toast.text }}</span>
+    <button type="button" class="toast-close" aria-label="Dismiss" (click)="dismissToast(toast.id)">&times;</button>
+  </div>
+</div>

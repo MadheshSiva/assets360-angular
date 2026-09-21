@@ -6,11 +6,11 @@ import {
   Coords,
   Floor,
   HierarchyNode,
+  OuterZone,
   Project,
   ProjectStatus,
   State,
   Zone,
-  areaAllowsBuildings,
   areaAllowsDirectZones,
   childrenOf,
 } from './site-hierarchy.model';
@@ -46,9 +46,11 @@ export interface AddZoneInput {
   description?: string;
   mapImage?: string;
   topZone?: string;
+  isTopZone?: 'active' | 'inactive';
   priority?: string;
-  exit?: string;
+  exit?: 'active' | 'inactive';
   assemblyPoint?: 'active' | 'inactive';
+  timeTakenAssemblePoint?: number;
   status?: 'active' | 'inactive';
   coords?: Coords;
 }
@@ -58,13 +60,6 @@ export interface AddBuildingInput {
   description?: string;
   status?: 'active' | 'inactive';
   coords?: Coords;
-}
-
-export interface AddFloorInput {
-  name: string;
-  description?: string;
-  mapImage?: string;
-  status?: 'active' | 'inactive';
 }
 
 /**
@@ -129,17 +124,32 @@ export class SiteHierarchyService {
       floors: [thirdRightFloor],
     };
 
+    const outerZone: OuterZone = {
+      kind: 'outerZone',
+      id: 'outerzone-1',
+      name: 'Main Outer Zone',
+      coords: areaCoords,
+      buildings: [building],
+    };
+
+    // A direct outdoor zone on Oman itself, alongside its indoor outer-zone/building/floor/zone chain.
+    const outdoorParkingZone = zone('zone-3', 'Outdoor Parking', '#2563eb', {
+      lat: 25.2058,
+      lng: 55.2695,
+      zoom: 15,
+    });
+
     const state: State = {
       kind: 'state',
       id: 'state-1',
       name: 'Oman',
-      type: 'indoor',
+      type: 'indoor_outdoor',
       coords: areaCoords,
-      zones: [],
-      buildings: [building],
+      zones: [outdoorParkingZone],
+      outerZones: [outerZone],
     };
 
-    // Country -> State -> Building -> Floor -> Zone.
+    // Country -> State -> Outer Zone -> Building -> Floor -> Zone.
     const area: Area = {
       kind: 'area',
       id: 'area-1',
@@ -248,7 +258,7 @@ export class SiteHierarchyService {
       type: input.type,
       coords: input.coords ?? this.jitteredCoords(area.coords),
       zones: [],
-      buildings: [],
+      outerZones: [],
       description: input.description || undefined,
       status: input.status ?? 'active',
     };
@@ -274,6 +284,7 @@ export class SiteHierarchyService {
       priority: input.priority || undefined,
       exit: input.exit || undefined,
       assemblyPoint: input.assemblyPoint ?? 'active',
+      timeTakenAssemblePoint: input.timeTakenAssemblePoint,
       status: input.status ?? 'active',
     };
     state.zones = [...state.zones, zone];
@@ -281,65 +292,22 @@ export class SiteHierarchyService {
     return zone;
   }
 
-  addBuilding(stateId: string, input: AddBuildingInput): Building | undefined {
-    const state = this.findNode(stateId);
-    if (!state || state.kind !== 'state' || !areaAllowsBuildings(state.type)) return undefined;
+  addBuilding(outerZoneId: string, input: AddBuildingInput): Building | undefined {
+    const outerZone = this.findNode(outerZoneId);
+    if (!outerZone || outerZone.kind !== 'outerZone') return undefined;
 
     const building: Building = {
       kind: 'building',
       id: this.genId('building'),
       name: input.name,
-      coords: input.coords ?? this.jitteredCoords(state.coords),
+      coords: input.coords ?? this.jitteredCoords(outerZone.coords),
       floors: [],
       description: input.description || undefined,
       status: input.status ?? 'active',
     };
-    state.buildings = [...state.buildings, building];
+    outerZone.buildings = [...outerZone.buildings, building];
     this._projects.update((projects) => [...projects]);
     return building;
-  }
-
-  addFloor(buildingId: string, input: AddFloorInput): Floor | undefined {
-    const building = this.findNode(buildingId);
-    if (!building || building.kind !== 'building') return undefined;
-
-    const floor: Floor = {
-      kind: 'floor',
-      id: this.genId('floor'),
-      name: input.name,
-      coords: this.jitteredCoords(building.coords),
-      zones: [],
-      description: input.description || undefined,
-      mapImage: input.mapImage || undefined,
-      status: input.status ?? 'active',
-    };
-    building.floors = [...building.floors, floor];
-    this._projects.update((projects) => [...projects]);
-    return floor;
-  }
-
-  addZoneToFloor(floorId: string, input: AddZoneInput): Zone | undefined {
-    const floor = this.findNode(floorId);
-    if (!floor || floor.kind !== 'floor') return undefined;
-
-    const zone: Zone = {
-      kind: 'zone',
-      id: this.genId('zone'),
-      name: input.name,
-      color: input.color,
-      coords: input.coords ?? this.jitteredCoords(floor.coords, 1),
-      zones: [],
-      description: input.description || undefined,
-      mapImage: input.mapImage || undefined,
-      topZone: input.topZone || undefined,
-      priority: input.priority || undefined,
-      exit: input.exit || undefined,
-      assemblyPoint: input.assemblyPoint ?? 'active',
-      status: input.status ?? 'active',
-    };
-    floor.zones = [...floor.zones, zone];
-    this._projects.update((projects) => [...projects]);
-    return zone;
   }
 
   addSubZone(parentZoneId: string, input: AddZoneInput): Zone | undefined {
@@ -356,14 +324,179 @@ export class SiteHierarchyService {
       description: input.description || undefined,
       mapImage: input.mapImage || undefined,
       topZone: input.topZone || undefined,
+      isTopZone: input.isTopZone,
       priority: input.priority || undefined,
       exit: input.exit || undefined,
       assemblyPoint: input.assemblyPoint ?? 'active',
+      timeTakenAssemblePoint: input.timeTakenAssemblePoint,
       status: input.status ?? 'active',
     };
     parentZone.zones = [...parentZone.zones, zone];
     this._projects.update((projects) => [...projects]);
     return zone;
+  }
+
+  // ===== Backend-hydrated data (Projects only) =====
+  // Project, Area (Country), State (Area), Outer Zone, Building, Floor, Zone, and Sub-Zone records
+  // are owned by a real backend; the methods below let the Projects component fetch/create/update/
+  // delete them over HTTP and feed the results back into this shared tree, without this library
+  // needing to know about HttpClient or environment config. The Zone API only models a zone added
+  // directly under a Floor, and the Sub-Zone API only models a zone nested one level under one of
+  // those — so a zone added directly to a State (outdoor), or a sub-zone nested under a State-direct
+  // zone, has no backend shape to persist through and remains purely local via
+  // addZoneToState/addSubZone above.
+
+  /** Replaces the whole project tree — used once real project + country data has been fetched. */
+  seedProjects(projects: Project[]): void {
+    this._projects.set(projects);
+  }
+
+  /** Inserts an already-built project (e.g. one just created via a real backend call). */
+  insertProject(project: Project): void {
+    this._projects.update((projects) => [...projects, project]);
+  }
+
+  /** Patches editable fields (including name) on an existing project in place. */
+  updateProjectFields(id: string, changes: Partial<Pick<Project, 'name' | 'description' | 'weekStart' | 'weekEnd' | 'status'>>): boolean {
+    const node = this.findNode(id);
+    if (!node || node.kind !== 'project') return false;
+    Object.assign(node, changes);
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Inserts an already-built area/country under an existing project. */
+  insertArea(projectId: string, area: Area): boolean {
+    const project = this.findNode(projectId);
+    if (!project || project.kind !== 'project') return false;
+    project.areas = [...project.areas, area];
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Patches editable fields (including name) on an existing area/country in place. */
+  updateAreaFields(id: string, changes: Partial<Pick<Area, 'name' | 'description' | 'timeZone' | 'countryCode' | 'status' | 'coords'>>): boolean {
+    const node = this.findNode(id);
+    if (!node || node.kind !== 'area') return false;
+    Object.assign(node, changes);
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Inserts an already-built state/area (UI label "Area") under an existing country. */
+  insertState(countryId: string, state: State): boolean {
+    const area = this.findNode(countryId);
+    if (!area || area.kind !== 'area') return false;
+    area.states = [...area.states, state];
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Patches editable fields (including name) on an existing state/area in place. */
+  updateStateFields(id: string, changes: Partial<Pick<State, 'name' | 'description' | 'status' | 'coords' | 'type'>>): boolean {
+    const node = this.findNode(id);
+    if (!node || node.kind !== 'state') return false;
+    Object.assign(node, changes);
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Inserts an already-built outer zone under an existing state/area. */
+  insertOuterZone(stateId: string, outerZone: OuterZone): boolean {
+    const state = this.findNode(stateId);
+    if (!state || state.kind !== 'state') return false;
+    state.outerZones = [...state.outerZones, outerZone];
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Patches editable fields (including name) on an existing outer zone in place. */
+  updateOuterZoneFields(id: string, changes: Partial<Pick<OuterZone, 'name' | 'description' | 'status' | 'coords'>>): boolean {
+    const node = this.findNode(id);
+    if (!node || node.kind !== 'outerZone') return false;
+    Object.assign(node, changes);
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Inserts an already-built building under an existing outer zone. */
+  insertBuilding(outerZoneId: string, building: Building): boolean {
+    const outerZone = this.findNode(outerZoneId);
+    if (!outerZone || outerZone.kind !== 'outerZone') return false;
+    outerZone.buildings = [...outerZone.buildings, building];
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Patches editable fields (including name) on an existing building in place. */
+  updateBuildingFields(id: string, changes: Partial<Pick<Building, 'name' | 'description' | 'status' | 'coords'>>): boolean {
+    const node = this.findNode(id);
+    if (!node || node.kind !== 'building') return false;
+    Object.assign(node, changes);
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Inserts an already-built floor under an existing building. */
+  insertFloor(buildingId: string, floor: Floor): boolean {
+    const building = this.findNode(buildingId);
+    if (!building || building.kind !== 'building') return false;
+    building.floors = [...building.floors, floor];
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Patches editable fields (including name) on an existing floor in place. */
+  updateFloorFields(id: string, changes: Partial<Pick<Floor, 'name' | 'description' | 'status' | 'mapImage'>>): boolean {
+    const node = this.findNode(id);
+    if (!node || node.kind !== 'floor') return false;
+    Object.assign(node, changes);
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Inserts an already-built zone under an existing floor. */
+  insertZone(floorId: string, zone: Zone): boolean {
+    const floor = this.findNode(floorId);
+    if (!floor || floor.kind !== 'floor') return false;
+    floor.zones = [...floor.zones, zone];
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Patches editable fields (including name) on an existing zone or sub-zone in place. */
+  updateZoneFields(
+    id: string,
+    changes: Partial<
+      Pick<
+        Zone,
+        | 'name'
+        | 'description'
+        | 'status'
+        | 'mapImage'
+        | 'topZone'
+        | 'isTopZone'
+        | 'priority'
+        | 'exit'
+        | 'assemblyPoint'
+        | 'timeTakenAssemblePoint'
+      >
+    >,
+  ): boolean {
+    const node = this.findNode(id);
+    if (!node || node.kind !== 'zone') return false;
+    Object.assign(node, changes);
+    this._projects.update((projects) => [...projects]);
+    return true;
+  }
+
+  /** Inserts an already-built sub-zone under an existing zone. */
+  insertSubZone(zoneId: string, subZone: Zone): boolean {
+    const zone = this.findNode(zoneId);
+    if (!zone || zone.kind !== 'zone') return false;
+    zone.zones = [...zone.zones, subZone];
+    this._projects.update((projects) => [...projects]);
+    return true;
   }
 
   rename(nodeId: string, newName: string): boolean {
@@ -374,13 +507,11 @@ export class SiteHierarchyService {
     return true;
   }
 
-  /** Returns false (and does nothing) if this would remove the last remaining project. */
   deleteNode(nodeId: string): boolean {
     const found = this.findWithParent(nodeId);
     if (!found) return false;
 
     if (found.parent === null) {
-      if (this._projects().length <= 1) return false;
       this._projects.update((projects) => projects.filter((p) => p.id !== nodeId));
       return true;
     }
@@ -395,6 +526,9 @@ export class SiteHierarchyService {
         break;
       case 'state':
         parent.zones = parent.zones.filter((z) => z.id !== nodeId);
+        parent.outerZones = parent.outerZones.filter((o) => o.id !== nodeId);
+        break;
+      case 'outerZone':
         parent.buildings = parent.buildings.filter((b) => b.id !== nodeId);
         break;
       case 'building':

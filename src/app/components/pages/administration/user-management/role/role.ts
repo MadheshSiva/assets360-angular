@@ -14,13 +14,16 @@ import { RoleService, AppRole } from '../../../../services/user.service';
 export class Role {
   roles: AppRole[] = [];
   searchTerm = '';
+  loading = false;
+  errorMessage = '';
+  deleteTarget: AppRole | null = null;
 
   constructor(private service: RoleService, private router: Router) {
-    this.roles = this.service.getRoles();
+    this.loadRoles();
   }
 
   get filteredRoles(): AppRole[] {
-    return this.service.search(this.searchTerm);
+    return this.service.filterRoles(this.roles, this.searchTerm);
   }
 
   summarize(role: AppRole): string {
@@ -33,20 +36,47 @@ export class Role {
 
   refresh(): void {
     this.searchTerm = '';
-    this.roles = this.service.getRoles();
+    this.loadRoles();
   }
 
   exportRoles(): void {
     // hook up CSV/export logic here
   }
 
-  deleteRole(id: number): void {
-    if (!confirm('Delete this role?')) return;
-    this.service.deleteRole(id);
-    this.roles = this.service.getRoles();
+  deleteRole(role: AppRole): void {
+    this.deleteTarget = role;
+  }
+
+  cancelDelete(): void {
+    this.deleteTarget = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.deleteTarget) return;
+    const id = this.deleteTarget.id;
+    this.deleteTarget = null;
+    this.service.deleteRole(id).subscribe({
+      next: () => this.loadRoles(),
+      error: () => this.errorMessage = 'Failed to delete role. Please try again.'
+    });
   }
 
   editRole(role: AppRole): void {
-    // open edit-role modal / navigate to edit form
+    this.router.navigate(['/administration/user-management/role/edit', role.id]);
+  }
+
+  private loadRoles(): void {
+    this.loading = true;
+    this.errorMessage = '';
+    this.service.getRoles().subscribe({
+      next: (roles) => {
+        this.roles = roles;
+        this.loading = false;
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load roles.';
+        this.loading = false;
+      }
+    });
   }
 }
