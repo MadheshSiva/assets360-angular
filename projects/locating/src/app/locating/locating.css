@@ -69,7 +69,7 @@
   border: none;
   border-top-left-radius:10px;
   border-bottom-left-radius:10px;
-  background: #7030a0;
+  background: #1d1160;
   color: #fff;
   display: flex;
   align-items: center;
@@ -118,7 +118,7 @@
 .stat-value {
   font-size: 18px;
   font-weight: 800;
-  color: #7030a0;
+  color: #1d1160;
 } 
 .panel-fab .fab-chevron {
   font-size: 22px;
@@ -217,7 +217,7 @@
 .cascade-row.is-active {
   background: #e9dcfb;
   border-color: #dcd0ff;
-  color: #7030a0 ;
+  color: #1d1160 ;
   font-weight: 700;
 }
 
@@ -288,7 +288,7 @@
 }
 
 .filter-group label {
-  color: #7030a0;
+  color: #1d1160;
   font-size: 14px;
   font-weight: 700;
   white-space: nowrap;
@@ -482,16 +482,16 @@
 }
 
 .period-tab.is-active {
-  background: #7030a0;
+  background: #1d1160;
   color: #fff;
 }
 
 .stats-period-select {
   padding: 4px 10px;
   border-radius: 999px;
-  border: 1.5px solid #7030a0;
+  border: 1.5px solid #1d1160;
   background: #fff;
-  color: #7030a0;
+  color: #1d1160;
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
@@ -502,9 +502,9 @@
   width: 24px;
   height: 23px;
   border-radius: 50%;
-  border: 1.5px solid #7030a0;
+  border: 1.5px solid #1d1160;
   background: #fff;
-  color: #7030a0;
+  color: #1d1160;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -514,7 +514,7 @@
 }
 
 .stats-settings-btn:hover {
-  background: #7030a0;
+  background: #1d1160;
   color: #fff;
 }
 
@@ -555,7 +555,7 @@
   margin: 0;
   font-size: 18px;
   font-weight: 800;
-  color: #7030a0;
+  color: #1d1160;
 }
 
 .stats-modal-body {
@@ -597,7 +597,7 @@
   align-items: center;
   justify-content: center;
   font-size: 12px;
-  color: #7030a0;
+  color: #1d1160;
   flex: 0 0 auto;
 }
 
@@ -631,7 +631,7 @@
 
 .btn-save {
   background: #e9dcfb;
-  color: #7030a0;
+  color: #1d1160;
 }
 
 /* ============ Area / Floor filter bar additions ============ */
@@ -641,7 +641,7 @@
   font-weight: 800;
   letter-spacing: 0.04em;
   text-transform: uppercase;
-  color: #7030a0;
+  color: #1d1160;
   background: #f0e6fa;
   padding: 4px 12px;
   border-radius: 999px;
@@ -685,7 +685,7 @@
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.02em;
-  color: #7030a0;
+  color: #1d1160;
   background: #f0e6fa;
   white-space: nowrap;
 }
@@ -720,7 +720,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 800;
-  color: #7030a0;
+  color: #1d1160;
 }
 
 .modal-close-btn {
@@ -728,14 +728,14 @@
   background: transparent;
   font-size: 20px;
   line-height: 1;
-  color: #7030a0;
+  color: #1d1160;
   cursor: pointer;
   padding: 2px 6px;
   border-radius: 6px;
 }
 
 .modal-close-btn:hover {
-  background: rgba(112, 48, 160, 0.12);
+  background: rgba(29, 17, 96, 0.12);
 }
 
 .pin-popup-body {
@@ -954,7 +954,7 @@
   padding: 7px 14px;
   font-size: 13px;
   font-weight: 700;
-  color: #7030a0;
+  color: #1d1160;
   cursor: pointer;
 }
 
@@ -1029,8 +1029,8 @@
 }
 
 .toggle-chip.is-active {
-  background: #7030a0;
-  border-color: #7030a0;
+  background: #1d1160;
+  border-color: #1d1160;
   color: #fff;
 }
 
@@ -1042,7 +1042,7 @@
 
 .replay-slider {
   flex: 1;
-  accent-color: #7030a0;
+  accent-color: #1d1160;
 }
 
 .replay-label {
@@ -1055,7 +1055,7 @@
 .replay-play-btn {
   border: none;
   background: #e9dcfb;
-  color: #7030a0;
+  color: #1d1160;
   font-size: 12px;
   font-weight: 700;
   padding: 5px 12px;
@@ -1104,7 +1104,7 @@
 .geofence-open-btn {
   border: 1px solid #dcd0ff;
   background: #f4f0fc;
-  color: #7030a0;
+  color: #1d1160;
   font-size: 12.5px;
   font-weight: 700;
   padding: 7px 14px;
@@ -1123,7 +1123,7 @@
 }
 
 .asset-monitor-header {
-  background: #7030a0;
+  background: #1d1160;
   padding: 14px 20px;
 }
 
@@ -1164,7 +1164,7 @@
 
 .filter-dropdown-caret {
   font-size: 10px;
-  color: #7030a0;
+  color: #1d1160;
   flex: 0 0 auto;
 }
 
@@ -1205,7 +1205,7 @@
 .btn-live {
   margin-left: auto;
   border: none;
-  background: #7030a0;
+  background: #1d1160;
   color: #fff;
   font-size: 13px;
   font-weight: 800;
@@ -1235,7 +1235,7 @@
 .btn-view-details {
   border: none;
   background: #e9dcfb;
-  color: #7030a0;
+  color: #1d1160;
   font-size: 13px;
   font-weight: 700;
   padding: 7px 16px;
@@ -1297,7 +1297,7 @@
   margin: 0;
   font-size: 16px;
   font-weight: 800;
-  color: #7030a0;
+  color: #1d1160;
 }
 
 .detail-slide-body {
@@ -1336,7 +1336,7 @@
 .timeline-time {
   flex: 0 0 auto;
   font-weight: 700;
-  color: #7030a0;
+  color: #1d1160;
   min-width: 52px;
 }
 

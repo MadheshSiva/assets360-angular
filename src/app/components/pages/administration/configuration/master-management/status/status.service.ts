@@ -29,7 +29,7 @@ export class MasterManagementStatusService {
       assetId: 'AST-1003',
       assetName: 'Chiller Pump 2',
       statusName: 'On Hold',
-      colorCode: '#7030a0',
+      colorCode: '#1d1160',
       allowedTransitions: ['In Progress', 'Cancelled'],
       isActive: true
     },

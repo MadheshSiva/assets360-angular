@@ -1,26 +1,7 @@
 <section class="insp-page">
-  <!-- Header -->
-  <div class="insp-header">
-    <h1 class="insp-title">Inspection Dashboard</h1>
-    <div class="insp-header-actions">
-      <button class="insp-btn insp-btn-primary" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-          <path d="M12 5v14M5 12h14" />
-        </svg>
-        New Work Order
-      </button>
-      <button class="insp-btn insp-btn-outline" type="button">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-          <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3" />
-        </svg>
-        Filter
-      </button>
-    </div>
-  </div>
-
   <!-- Stat Cards Row -->
-  <div class="insp-stat-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onStatCardDrop($event)">
-    <article class="insp-stat-card" *ngFor="let card of statCards" cdkDrag>
+  <div class="insp-stat-grid" *ngIf="visibleStatCards.length" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onStatCardDrop($event)">
+    <article class="insp-stat-card" *ngFor="let card of visibleStatCards" cdkDrag>
       <div class="insp-stat-top">
         <app-widget-drag-handle></app-widget-drag-handle>
         <div class="insp-stat-icon-wrap" [ngClass]="getIconClass(card.icon)">
@@ -57,8 +38,8 @@
   </div>
 
   <!-- Row A: Work Orders (wide) + My Inspections (narrow) -->
-  <div class="insp-row-a" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRowADrop($event)">
-    <ng-container *ngFor="let widgetId of rowAOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
+  <div class="insp-row-a" *ngIf="visible(rowAOrder).length" [class.partial]="visible(rowAOrder).length < rowAOrder.length" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRowADrop($event)">
+    <ng-container *ngFor="let widgetId of visible(rowAOrder); trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
       <!-- Work Orders -->
       <article *ngSwitchCase="'workOrders'" cdkDrag class="insp-panel insp-workorders-panel">
@@ -157,8 +138,8 @@
   </div>
 
   <!-- Row B: Recent Inspections + Inspection Summary + Approval Summary -->
-  <div class="insp-row-b" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRowBDrop($event)">
-    <ng-container *ngFor="let widgetId of rowBOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
+  <div class="insp-row-b" *ngIf="visible(rowBOrder).length" [class.partial]="visible(rowBOrder).length < rowBOrder.length" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRowBDrop($event)">
+    <ng-container *ngFor="let widgetId of visible(rowBOrder); trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
       <!-- Recent Inspections -->
       <article *ngSwitchCase="'recent'" cdkDrag class="insp-panel insp-recent-panel">
@@ -232,7 +213,7 @@
   </div>
 
   <!-- Quick Actions -->
-  <article class="insp-panel insp-quickactions-panel">
+  <article class="insp-panel insp-quickactions-panel" *ngIf="has('quickActions')">
     <div class="insp-panel-header">
       <h2>Quick Actions</h2>
     </div>
