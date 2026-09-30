@@ -1,5 +1,5 @@
 :host {
-  --purple: #7030a0;
+  --purple: #1d1160;
   display: block;
   width: 100%;
 }
@@ -227,7 +227,7 @@
   height: 38px;
   border-radius: 10px;
   background: #ede9fe;
-  color: #7030a0;
+  color: #1d1160;
   flex-shrink: 0;
 }
 
@@ -315,7 +315,7 @@
 
 .form-field input[type='text']:focus,
 .form-field input[type='date']:focus {
-  border-color: #7030a0;
+  border-color: #1d1160;
   box-shadow: 0 0 0 3px rgba(124, 58, 237, 0.12);
 }
 
@@ -354,13 +354,13 @@
 }
 
 .btn-submit {
-  background: #7030a0;
+  background: #1d1160;
   border: none;
   color: #fff;
 }
 
 .btn-submit:hover {
-  background: #7936ac;
+  background: #2e1f80;
 }
 
 @media (max-width: 640px) {

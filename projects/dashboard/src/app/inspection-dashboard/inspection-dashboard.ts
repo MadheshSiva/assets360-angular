@@ -1,8 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
 import { WidgetDragHandle } from '../shared/widget-drag-handle/widget-drag-handle';
-import { loadOrder, saveOrder, reorderByKey } from '../shared/dashboard-widgets/widget-order.util';
+import { loadOrder, saveOrder, reorderByKey, moveWithinVisible } from '../shared/dashboard-widgets/widget-order.util';
 
 export type WorkOrderFilter = 'all' | 'inprogress' | 'pendingapproval' | 'completed' | 'overdue';
 
@@ -86,24 +86,39 @@ interface InspPopup {
   styleUrls: ['./inspection-dashboard.css'],
 })
 export class InspectionDashboard {
+  /** Widget ids (see WIDGET_CATALOG 'inspection') the user chose to show. */
+  @Input() selected: string[] = [];
+
   // ===== Widget drag-and-drop ordering =====
   readonly rowAOrder: string[] = loadOrder('piq.dashboard.inspection.rowAOrder', ['workOrders', 'myInspections']);
   readonly rowBOrder: string[] = loadOrder('piq.dashboard.inspection.rowBOrder', ['recent', 'summary', 'approval']);
 
   trackByWidgetId = (_: number, id: string) => id;
 
+  has(id: string): boolean {
+    return this.selected.includes(id);
+  }
+
+  visible(order: string[]): string[] {
+    return order.filter((id) => this.has(id));
+  }
+
+  get visibleStatCards(): InspStatCard[] {
+    return this.statCards.filter((c) => this.has('stat:' + c.key));
+  }
+
   onStatCardDrop(event: CdkDragDrop<InspStatCard[]>): void {
-    moveItemInArray(this.statCards, event.previousIndex, event.currentIndex);
+    moveWithinVisible(this.statCards, (c) => this.has('stat:' + c.key), event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.inspection.statOrder', this.statCards.map((c) => c.key));
   }
 
   onRowADrop(event: CdkDragDrop<string[]>): void {
-    moveItemInArray(this.rowAOrder, event.previousIndex, event.currentIndex);
+    moveWithinVisible(this.rowAOrder, (id) => this.has(id), event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.inspection.rowAOrder', this.rowAOrder);
   }
 
   onRowBDrop(event: CdkDragDrop<string[]>): void {
-    moveItemInArray(this.rowBOrder, event.previousIndex, event.currentIndex);
+    moveWithinVisible(this.rowBOrder, (id) => this.has(id), event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.inspection.rowBOrder', this.rowBOrder);
   }
 
@@ -156,7 +171,7 @@ export class InspectionDashboard {
     return this.workOrders.filter((wo) => wo.statusClass === this.workOrderFilter);
   }
 
-  private readonly avatarPalette = ['#7030a0', '#2563eb', '#22a06b', '#f0a93b', '#e15252', '#0891b2'];
+  private readonly avatarPalette = ['#1d1160', '#2563eb', '#22a06b', '#f0a93b', '#e15252', '#0891b2'];
 
   avatarColor(index: number): string {
     return this.avatarPalette[index % this.avatarPalette.length];
@@ -188,7 +203,7 @@ export class InspectionDashboard {
     { label: 'Passed', value: 68, percent: 53, color: '#22a06b' },
     { label: 'Failed', value: 25, percent: 20, color: '#e15252' },
     { label: 'In Progress', value: 23, percent: 18, color: '#f0a93b' },
-    { label: 'Pending Approval', value: 12, percent: 9, color: '#7030a0' },
+    { label: 'Pending Approval', value: 12, percent: 9, color: '#1d1160' },
   ];
 
   get donutGradient(): string {

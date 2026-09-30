@@ -17,10 +17,10 @@
 
 .user-mgmt-tab:hover {
   background: #f5f3ff;
-  color: #7030a0;
+  color: #1d1160;
 }
 
 .user-mgmt-tab.active {
-  background: #7030a0;
+  background: #1d1160;
   color: #fff;
 }

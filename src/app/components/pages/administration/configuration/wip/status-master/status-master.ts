@@ -71,7 +71,7 @@ export class WipStatusMaster {
       statusCode: '',
       sequenceOrder: null,
       isClosedStatus: false,
-      colorCode: '#7030a0',
+      colorCode: '#1d1160',
       allowedTransitions: [],
       requiresApproval: false,
       isDefault: false

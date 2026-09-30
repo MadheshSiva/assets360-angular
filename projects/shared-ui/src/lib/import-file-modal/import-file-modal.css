@@ -86,9 +86,9 @@
   width: 100%;
   height: 48px;
   border-radius: 10px;
-  border: 1.5px dashed #7030a0;
+  border: 1.5px dashed #1d1160;
   background: #faf7fd;
-  color: #7030a0;
+  color: #1d1160;
   font-size: 14px;
   font-weight: 700;
   font-family: inherit;
@@ -156,13 +156,13 @@
 }
 
 .btn-submit {
-  background: #7030a0;
+  background: #1d1160;
   border: none;
   color: #fff;
 }
 
 .btn-submit:hover:not(:disabled) {
-  background: #7936ac;
+  background: #2e1f80;
 }
 
 .btn-submit:disabled {

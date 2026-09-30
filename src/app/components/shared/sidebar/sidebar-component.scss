@@ -7,6 +7,7 @@
 
 .sidebar {
   position: fixed;
+  overflow-x: auto;
   inset: 0 auto 0 0;
   z-index: 100;
   width: var(--piq-sidebar-width);
@@ -15,7 +16,7 @@
   display: flex;
   background-color: white;
   flex-direction: column;
-  gap: 14px;
+  gap: 8px;
   padding: 16px 12px;
   overflow: visible;
   transition: width 0.25s ease;
@@ -92,7 +93,7 @@
 .brand-copy strong {
   font-size: 18px;
   font-weight: 700;
-  color: #7030a0;
+  color: #1d1160;
   line-height: 1;
   white-space: nowrap;
   letter-spacing: -0.2px;
@@ -131,10 +132,10 @@
   // Layered depth: inner top highlight, inner bottom shadow, crisp edge ring, outer glow
   box-shadow:
     inset 0 1px 1px rgba(255, 255, 255, 0.9),   // top specular highlight
-    inset 0 -1px 2px rgba(112, 48, 160, 0.15),  // bottom internal shadow (glass thickness)
+    inset 0 -1px 2px rgba(29, 17, 96, 0.15),  // bottom internal shadow (glass thickness)
     inset 0 0 0 1px rgba(255, 255, 255, 0.5),   // subtle glass edge
-    0 0 0 1px rgba(112, 48, 160, 0.18),         // outer edge tint
-    0 6px 16px rgba(112, 48, 160, 0.20),        // ambient drop shadow
+    0 0 0 1px rgba(29, 17, 96, 0.18),         // outer edge tint
+    0 6px 16px rgba(29, 17, 96, 0.20),        // ambient drop shadow
     0 2px 5px rgba(15, 23, 42, 0.10);
 
   transition:
@@ -185,7 +186,7 @@
     font-size: 16px;
     pointer-events: none;
     stroke: currentColor;
-    color: #7030a0;
+    color: #1d1160;
   }
 
   &.collapsed .collapse-btn__glass {
@@ -202,10 +203,10 @@
       );
     box-shadow:
       inset 0 1px 1px rgba(255, 255, 255, 1),
-      inset 0 -1px 2px rgba(112, 48, 160, 0.2),
+      inset 0 -1px 2px rgba(29, 17, 96, 0.2),
       inset 0 0 0 1px rgba(255, 255, 255, 0.6),
-      0 0 0 1px rgba(112, 48, 160, 0.28),
-      0 10px 22px rgba(112, 48, 160, 0.28),
+      0 0 0 1px rgba(29, 17, 96, 0.28),
+      0 10px 22px rgba(29, 17, 96, 0.28),
       0 3px 8px rgba(15, 23, 42, 0.12);
   }
 
@@ -214,7 +215,7 @@
   }
 
   &:focus-visible {
-    outline: 2px solid #7030a0;
+    outline: 2px solid #1d1160;
     outline-offset: 3px;
   }
 }
@@ -224,7 +225,6 @@
   background: var(--piq-surface);
   border: 1px solid var(--piq-border-subtle);
   border-radius: 14px;
-  padding: 14px 10px;
   box-shadow: var(--piq-shadow-sidebar);
   display: flex;
   flex-direction: column;
@@ -242,6 +242,16 @@
   align-content: start;
   flex: 1;
   box-shadow: none;
+
+  // Scroll the menu when it is taller than the screen
+  min-height: 0;
+  overflow-y: auto;
+  overflow-x: hidden;
+  // Extra room on the left so the active indicator bar (left: -13px) isn't clipped
+  margin-left: -16px;
+  padding: 2px 0 2px 16px;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(29, 17, 96, 0.35) transparent;
 }
 
 .nav-item {
@@ -269,7 +279,7 @@
   position: relative; // IMPORTANT (needed for absolute positioning)
 
   &.active {
-    color: #7030a0;
+    color: #1d1160;
     font-weight: 600;
 
     // BEFORE ELEMENT
@@ -281,17 +291,14 @@
       transform: translateY(-50%);
       width: 5px;
       height: 40px;
-      background: #7030a0;
+      background: #1d1160;
       border-top-right-radius: 10px;
       border-bottom-right-radius: 10px;
     }
 
     .nav-icon {
-      background-color: #7030a0;
-
-      img {
-        filter: brightness(0) invert(1);
-      }
+      background-color: #1d1160;
+      color: #fff;
     }
   }
 }
@@ -306,12 +313,11 @@
   border-radius: 6px;
   background: transparent;
   position: relative;
-  transition: background 0.2s ease;
+  color: #1d1160;
+  transition: background 0.2s ease, color 0.2s ease;
 
-  img {
-    width: 22px;
-    height: 22px;
-    object-fit: contain;
+  lucide-icon {
+    display: flex;
   }
 }
 
@@ -333,7 +339,7 @@
 
   &.open {
     background: var(--piq-primary-subtle);
-    color: #7030a0;
+    color: #1d1160;
   }
 }
 
@@ -379,7 +385,7 @@
   }
 
   &.active {
-    color: #7030a0;
+    color: #1d1160;
     font-weight: 600;
     position: relative;
 
@@ -391,7 +397,7 @@
       transform: translateY(-50%);
       width: 5px;
       height: 30px;
-      background: #7030a0;
+      background: #1d1160;
       border-top-right-radius: 8px;
       border-bottom-right-radius: 8px;
     }
@@ -411,7 +417,7 @@
 
   background: #fff;
   border-left: 1px solid #e7e2f5;
-  box-shadow: 6px 0 24px rgba(112, 48, 160, 0.15);
+  box-shadow: 6px 0 24px rgba(29, 17, 96, 0.15);
   border-radius: 12px;
   padding: 16px 12px;
   z-index: 1900;
@@ -457,7 +463,7 @@
   gap: 10px;
   padding: 0 14px;
   border-radius: 10px;
-  color: var(--piq-primary, #7030a0);
+  color: var(--piq-primary, #1d1160);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
@@ -466,11 +472,11 @@
 
   &:hover:not(.active) {
     background: var(--piq-primary-subtle, #f3edfb);
-    color: var(--piq-primary, #7030a0);
+    color: var(--piq-primary, #1d1160);
   }
 
   &.active {
-    color: #7030a0;
+    color: #1d1160;
     font-weight: 600;
 
     &::before {
@@ -481,7 +487,7 @@
       transform: translateY(-50%);
       width: 5px;
       height: 30px;
-      background: #7030a0;
+      background: #1d1160;
       border-top-right-radius: 8px;
       border-bottom-right-radius: 8px;
     }
@@ -491,10 +497,10 @@
 // The expandable "User Management" row stays highlighted while open
 .nav-flyout-item--parent.open {
   background: var(--piq-primary-subtle, #f3edfb);
-  color: #7030a0;
+  color: #1d1160;
 
   .nav-flyout-item__arrow {
-    color: #7030a0;
+    color: #1d1160;
     transform: rotate(90deg);
   }
 }
@@ -520,7 +526,7 @@
 }
 
 .nav-flyout-item:hover .nav-flyout-item__arrow {
-  color: #7030a0;
+  color: #1d1160;
 }
 
 // ============= Nested sub-list (User / Role under User Management) =============
@@ -540,7 +546,7 @@
   align-items: center;
   padding: 0 12px;
   border-radius: 8px;
-  color: var(--piq-primary, #7030a0);
+  color: var(--piq-primary, #1d1160);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
@@ -548,11 +554,11 @@
 
   &:hover:not(.active) {
     background: var(--piq-primary-subtle, #f3edfb);
-    color: var(--piq-primary, #7030a0);
+    color: var(--piq-primary, #1d1160);
   }
 
   &.active {
-    color: #7030a0;
+    color: #1d1160;
     font-weight: 600;
     background: var(--piq-primary-subtle, #f3edfb);
   }
@@ -569,10 +575,10 @@
 
   &.open {
     background: var(--piq-primary-subtle, #f3edfb);
-    color: #7030a0;
+    color: #1d1160;
 
     .nav-flyout-item__arrow {
-      color: #7030a0;
+      color: #1d1160;
       transform: rotate(90deg);
     }
   }
@@ -595,7 +601,7 @@
   align-items: center;
   padding: 0 12px;
   border-radius: 8px;
-  color: var(--piq-primary, #7030a0);
+  color: var(--piq-primary, #1d1160);
   text-decoration: none;
   font-size: 13px;
   font-weight: 500;
@@ -603,11 +609,11 @@
 
   &:hover:not(.active) {
     background: var(--piq-primary-subtle, #f3edfb);
-    color: var(--piq-primary, #7030a0);
+    color: var(--piq-primary, #1d1160);
   }
 
   &.active {
-    color: #7030a0;
+    color: #1d1160;
     font-weight: 600;
     background: var(--piq-primary-subtle, #f3edfb);
   }

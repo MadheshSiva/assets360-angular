@@ -3,6 +3,7 @@ import { loadRemoteModule } from '@angular-architects/native-federation';
 import { Login } from './components/pages/login/login/login';
 import { Signup } from './components/pages/signup/signup/signup';
 import { SectionUnavailable } from './section-unavailable/section-unavailable';
+import { ModulePlaceholder } from './module-placeholder/module-placeholder';
 import { Events } from './components/pages/events/events/events';
 import { Reports } from './components/pages/reports/reports/reports';
 import { CreateReport } from './components/pages/reports/create-report/create-report';
@@ -152,6 +153,18 @@ export const routes: Routes = [
     // canActivate: [authGuard],
     children: [
       { path: 'dashboard', loadChildren: remoteRoutes('dashboard') },
+      // New UI modules: placeholder pages until their screens are built
+      { path: 'assets', component: ModulePlaceholder, data: { title: 'Assets' } },
+      { path: 'tracking-iot', component: ModulePlaceholder, data: { title: 'Tracking & IoT' } },
+      { path: 'movement-custody', component: ModulePlaceholder, data: { title: 'Movement & Custody' } },
+      { path: 'maintenance', component: ModulePlaceholder, data: { title: 'Maintenance' } },
+      { path: 'inspection', component: ModulePlaceholder, data: { title: 'Inspection' } },
+      { path: 'inventory', component: ModulePlaceholder, data: { title: 'Inventory' } },
+      { path: 'wip-operations', component: ModulePlaceholder, data: { title: 'WIP / Operations' } },
+      { path: 'audit-compliance', component: ModulePlaceholder, data: { title: 'Audit & Compliance' } },
+      { path: 'contracts-warranty', component: ModulePlaceholder, data: { title: 'Contracts & Warranty' } },
+      { path: 'financial', component: ModulePlaceholder, data: { title: 'Financial' } },
+      { path: 'reports-analytics', component: ModulePlaceholder, data: { title: 'Reports & Analytics' } },
       { path: 'locating', loadChildren: remoteRoutes('locating') },
       { path: 'events', component: Events },
       { path: 'report', component: Reports },

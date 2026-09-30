@@ -4,29 +4,12 @@
 
         <!-- ── MAIN CONTENT ─────────────────────────────────────────── -->
         <main class="main-content">
-           <header class="assets-header">
-             <div>
-               <h1>Assets Dashboard</h1>
-               <p>Overview of asset status and utilization</p>
-             </div>
-             <div class="header-actions">
-               <button class="dash-btn dash-btn-primary" type="button">
-                 + Add Widget
-               </button>
-               <button class="dash-btn dash-btn-outline" type="button">
-                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="15" height="15">
-                   <polygon points="22 3 2 3 10 12.46 10 19 14 21 14 12.46 22 3"/>
-                 </svg>
-                 Filter
-               </button>
-             </div>
-           </header>
-           <div class="content-container">
+           <div class="content-container" *ngIf="visibleStatCards.length">
              <div class="stat-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onStatCardDrop($event)">
-                <div *ngFor="let card of statCards; let i = index" class="stat-card" cdkDrag role="button" tabindex="0" (click)="onStatCardClick(card, i)" (keydown.enter)="onStatCardClick(card, i)">
+                <div *ngFor="let card of visibleStatCards" class="stat-card" cdkDrag role="button" tabindex="0" (click)="onStatCardClick(card, statIndex(card))" (keydown.enter)="onStatCardClick(card, statIndex(card))">
                     <app-widget-drag-handle (click)="$event.stopPropagation()"></app-widget-drag-handle>
-                    <div class="stat-card-icon" [ngClass]="getStatIconClass(i)">
-                        <ng-container [ngSwitch]="i">
+                    <div class="stat-card-icon" [ngClass]="getStatIconClass(statIndex(card))">
+                        <ng-container [ngSwitch]="statIndex(card)">
                             <svg *ngSwitchCase="0" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2">
                                 <path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z" />
                                 <polyline points="3.27 6.96 12 12.01 20.73 6.96" />
@@ -81,8 +64,8 @@
             END ASSET MAP -->
 
             <!-- ROW 2: Asset Status Donut + Assets by Type Donut + Recent Alerts -->
-            <div class="row2-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow2Drop($event)">
-            <ng-container *ngFor="let widgetId of row2Order; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
+            <div class="row2-grid" *ngIf="visible(row2Order).length" [class.partial]="visible(row2Order).length < row2Order.length" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow2Drop($event)">
+            <ng-container *ngFor="let widgetId of visible(row2Order); trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
                 <!-- Asset Status Donut -->
                 <div *ngSwitchCase="'donutStatus'" cdkDrag class="panel donut-panel">
@@ -167,8 +150,8 @@
             </div>
 
             <!-- Alerts (65%) + Top Active Assets (35%) side by side -->
-            <div class="alerts-row" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onAlertsRowDrop($event)">
-            <ng-container *ngFor="let widgetId of alertsRowOrder; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
+            <div class="alerts-row" *ngIf="visible(alertsRowOrder).length" [class.partial]="visible(alertsRowOrder).length < alertsRowOrder.length" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onAlertsRowDrop($event)">
+            <ng-container *ngFor="let widgetId of visible(alertsRowOrder); trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
                 <!-- Recent Alerts -->
                 <div *ngSwitchCase="'alerts'" cdkDrag class="panel alerts-panel">
@@ -253,8 +236,8 @@
             <!-- END ROW 2 -->
 
             <!-- ROW 3: Utilization Chart + Geofence Summary -->
-            <div class="row3-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow3Drop($event)">
-            <ng-container *ngFor="let widgetId of row3Order; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
+            <div class="row3-grid" *ngIf="visible(row3Order).length" [class.partial]="visible(row3Order).length < row3Order.length" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow3Drop($event)">
+            <ng-container *ngFor="let widgetId of visible(row3Order); trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
                 <!-- Utilization Chart -->
                 <div *ngSwitchCase="'utilization'" cdkDrag class="panel utilization-panel">
@@ -326,8 +309,8 @@
             <!-- END ROW 3 -->
 
             <!-- ROW 4: Recent Activity Table + Top Active Assets + Top by Distance -->
-            <div class="row4-grid" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow4Drop($event)">
-            <ng-container *ngFor="let widgetId of row4Order; trackBy: trackByWidgetId" [ngSwitch]="widgetId">
+            <div class="row4-grid" *ngIf="visible(row4Order).length" [class.partial]="visible(row4Order).length < row4Order.length" cdkDropList cdkDropListOrientation="mixed" (cdkDropListDropped)="onRow4Drop($event)">
+            <ng-container *ngFor="let widgetId of visible(row4Order); trackBy: trackByWidgetId" [ngSwitch]="widgetId">
 
                 <!-- Recent Activity Table -->
                 <div *ngSwitchCase="'activityTable'" cdkDrag class="panel table-panel">
