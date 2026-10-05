@@ -1,8 +1,8 @@
-import { Component, Input } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { WidgetDragHandle } from '../shared/widget-drag-handle/widget-drag-handle';
-import { loadOrder, saveOrder, reorderByKey, moveWithinVisible } from '../shared/dashboard-widgets/widget-order.util';
+import { loadOrder, saveOrder, reorderByKey } from '../shared/dashboard-widgets/widget-order.util';
 
 interface WipStatCard {
   label: string;
@@ -43,39 +43,24 @@ interface WipActiveJob {
   styleUrls: ['./wip-dashboard.css'],
 })
 export class WipDashboard {
-  /** Widget ids (see WIDGET_CATALOG 'wip') the user chose to show. */
-  @Input() selected: string[] = [];
-
   // ===== Widget drag-and-drop ordering =====
   readonly midOrder: string[] = loadOrder('piq.dashboard.wip.midOrder', ['donut', 'trend']);
   readonly bottomOrder: string[] = loadOrder('piq.dashboard.wip.bottomOrder', ['alerts', 'jobs']);
 
   trackByWidgetId = (_: number, id: string) => id;
 
-  has(id: string): boolean {
-    return this.selected.includes(id);
-  }
-
-  visible(order: string[]): string[] {
-    return order.filter((id) => this.has(id));
-  }
-
-  get visibleStatCards(): WipStatCard[] {
-    return this.wipStatCards.filter((c) => this.has('stat:' + c.label));
-  }
-
   onStatCardDrop(event: CdkDragDrop<WipStatCard[]>): void {
-    moveWithinVisible(this.wipStatCards, (c) => this.has('stat:' + c.label), event.previousIndex, event.currentIndex);
+    moveItemInArray(this.wipStatCards, event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.wip.statOrder', this.wipStatCards.map((c) => c.label));
   }
 
   onMidDrop(event: CdkDragDrop<string[]>): void {
-    moveWithinVisible(this.midOrder, (id) => this.has(id), event.previousIndex, event.currentIndex);
+    moveItemInArray(this.midOrder, event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.wip.midOrder', this.midOrder);
   }
 
   onBottomDrop(event: CdkDragDrop<string[]>): void {
-    moveWithinVisible(this.bottomOrder, (id) => this.has(id), event.previousIndex, event.currentIndex);
+    moveItemInArray(this.bottomOrder, event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.wip.bottomOrder', this.bottomOrder);
   }
 
@@ -133,7 +118,7 @@ export class WipDashboard {
 
   wipStatusDistribution: WipStatusDistribution[] = [
     { label: 'In Progress', percent: 35, color: '#e391c9' },
-    { label: 'Planned',     percent: 20, color: '#1d1160' },
+    { label: 'Planned',     percent: 20, color: '#7030a0' },
     { label: 'Completed',   percent: 10, color: '#a8d5a2' },
     { label: 'Delayed',     percent: 35, color: '#f08080' },
   ];

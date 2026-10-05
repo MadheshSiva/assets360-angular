@@ -36,7 +36,7 @@
   padding: 0;
   border: 1px solid #e2e8f0;
   background: #fff;
-  color: #1d1160;
+  color: #7030a0;
   font-size: 16px;
   font-weight: 700;
   line-height: 1;
@@ -70,8 +70,8 @@
 }
 
 .tool-btn.is-active {
-  background: #1d1160;
-  border-color: #1d1160;
+  background: #7030a0;
+  border-color: #7030a0;
   color: #fff;
 }
 
@@ -155,7 +155,7 @@
 }
 
 .color-swatch.is-selected {
-  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #1d1160;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #7030a0;
 }
 
 .color-swatch-custom {
@@ -194,7 +194,7 @@
   direction: rtl;
   width: 20px;
   height: 100px;
-  accent-color: #1d1160;
+  accent-color: #7030a0;
   cursor: pointer;
 }
 

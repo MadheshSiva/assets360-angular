@@ -113,17 +113,17 @@ body, .dashboard-wrapper {
 }
 
 .dash-btn-primary {
-  background: #1d1160;
+  background: #7030a0;
   color: #fff;
 }
 
 .dash-btn-primary:hover {
-  background: #140b45;
+  background: #5d2384;
 }
 
 .dash-btn-outline {
   background: #fff;
-  color: #1d1160;
+  color: #7030a0;
   border: 1.5px solid #c9a8e0;
 }
 
@@ -212,7 +212,7 @@ body, .dashboard-wrapper {
    =================================================== */
 .stat-grid {
    display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 12px;
 }
 
@@ -607,7 +607,7 @@ body, .dashboard-wrapper {
 
 @media (max-width: 1200px) {
   .stat-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   }
 }
 
@@ -733,7 +733,7 @@ body, .dashboard-wrapper {
   font: inherit;
   font-size: 11.5px;
   font-weight: 700;
-  color: #1d1160;
+  color: #7030a0;
   background: #f4f0fc;
   border: 1px solid #dcd0ff;
   border-radius: 999px;
@@ -744,20 +744,4 @@ body, .dashboard-wrapper {
 
 .locate-btn:hover {
   background: #e9dcfb;
-}
-
-/* ===================================================
-   PARTIAL ROWS: only some of a row's widgets are selected,
-   so let the visible ones share the full width
-   =================================================== */
-.row2-grid.partial,
-.row3-grid.partial,
-.row4-grid.partial {
-  grid-template-columns: 1fr;
-}
-
-.alerts-row.partial .alerts-panel,
-.alerts-row.partial .top-active-panel {
-  flex: 1 1 100%;
-  max-width: 100%;
 }

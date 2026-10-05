@@ -24,19 +24,6 @@ export function saveOrder(storageKey: string, order: string[]): void {
   }
 }
 
-/**
- * Applies a drag-and-drop move made in a filtered (visible-only) list to the full list,
- * so hidden widgets keep their place. `prev`/`cur` are indexes within the visible items.
- */
-export function moveWithinVisible<T>(all: T[], isVisible: (item: T) => boolean, prev: number, cur: number): void {
-  const visible = all.filter(isVisible);
-  const from = all.indexOf(visible[prev]);
-  const to = all.indexOf(visible[cur]);
-  if (from < 0 || to < 0 || from === to) return;
-  const [item] = all.splice(from, 1);
-  all.splice(to, 0, item);
-}
-
 /** Reorders `items` to match the saved order (matched via `keyOf`), keeping unknown/new items appended. */
 export function reorderByKey<T>(items: T[], storageKey: string, keyOf: (item: T) => string): T[] {
   const defaultOrder = items.map(keyOf);

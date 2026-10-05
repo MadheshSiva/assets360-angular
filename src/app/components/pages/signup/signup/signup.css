@@ -17,7 +17,7 @@
   justify-content: space-between;
   padding: 3rem;
   background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.25), transparent 28%),
-    linear-gradient(180deg, #1d1160 0%, #7c3aed 48%, #a855f7 100%);
+    linear-gradient(180deg, #7030a0 0%, #7c3aed 48%, #a855f7 100%);
   color: white;
   gap: 2rem;
 }

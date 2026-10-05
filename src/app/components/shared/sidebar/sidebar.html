@@ -35,7 +35,7 @@
           [attr.title]="collapsed ? item.label : null"
         >
           <span class="nav-icon">
-            <lucide-icon *ngIf="item.icon" [img]="item.icon" [size]="18" [strokeWidth]="2"></lucide-icon>
+            <img [src]="item.icon" [alt]="item.label" />
           </span>
           <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
         </a>
@@ -47,7 +47,7 @@
           [class.open]="isDropdownOpen(item.label)"
         >
           <span class="nav-icon">
-            <lucide-icon *ngIf="item.icon" [img]="item.icon" [size]="18" [strokeWidth]="2"></lucide-icon>
+            <img [src]="item.icon" [alt]="item.label" />
           </span>
           <span class="nav-label" *ngIf="!collapsed">{{ item.label }}</span>
           <span class="nav-caret" *ngIf="!collapsed">

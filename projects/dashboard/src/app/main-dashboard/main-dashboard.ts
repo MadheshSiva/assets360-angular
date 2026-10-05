@@ -1,10 +1,10 @@
-import { Component, OnInit, ChangeDetectorRef, Input } from '@angular/core';
+import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MapComponent, MapPin } from 'shared-ui';
 import { WidgetDragHandle } from '../shared/widget-drag-handle/widget-drag-handle';
-import { loadOrder, saveOrder, reorderByKey, moveWithinVisible } from '../shared/dashboard-widgets/widget-order.util';
+import { loadOrder, saveOrder, reorderByKey } from '../shared/dashboard-widgets/widget-order.util';
 
 interface StatCard {
   label: string;
@@ -84,12 +84,7 @@ interface DashboardData {
   styleUrls: ['./main-dashboard.css'],
 })
 export class MainDashboard implements OnInit {
-  /** Widget ids (see WIDGET_CATALOG 'asset') the user chose to show. */
-  @Input() selected: string[] = [];
-
   statCards: StatCard[] = [];
-  // Position of each card in the source data, so icons/popups stay tied to the card, not its slot
-  private statDataIndex = new Map<string, number>();
 
   // ===== Widget drag-and-drop ordering =====
   readonly row2Order: string[] = loadOrder('piq.dashboard.main.row2Order', ['donutStatus', 'donutType']);
@@ -99,29 +94,13 @@ export class MainDashboard implements OnInit {
 
   trackByWidgetId = (_: number, id: string) => id;
 
-  has(id: string): boolean {
-    return this.selected.includes(id);
-  }
-
-  visible(order: string[]): string[] {
-    return order.filter((id) => this.has(id));
-  }
-
-  get visibleStatCards(): StatCard[] {
-    return this.statCards.filter((c) => this.has('stat:' + c.label));
-  }
-
-  statIndex(card: StatCard): number {
-    return this.statDataIndex.get(card.label) ?? 0;
-  }
-
   private persistDrop(event: CdkDragDrop<string[]>, order: string[], storageKey: string): void {
-    moveWithinVisible(order, (id) => this.has(id), event.previousIndex, event.currentIndex);
+    moveItemInArray(order, event.previousIndex, event.currentIndex);
     saveOrder(storageKey, order);
   }
 
   onStatCardDrop(event: CdkDragDrop<StatCard[]>): void {
-    moveWithinVisible(this.statCards, (c) => this.has('stat:' + c.label), event.previousIndex, event.currentIndex);
+    moveItemInArray(this.statCards, event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.main.statOrder', this.statCards.map((c) => c.label));
   }
 
@@ -170,8 +149,7 @@ export class MainDashboard implements OnInit {
 
     const data: DashboardData = await response.json();
     console.log('Dashboard data loaded:', data);
-    this.statDataIndex = new Map((data?.statCards ?? []).map((c, i) => [c.label, i]));
-    this.statCards =reorderByKey(data?.statCards ?? [], 'piq.dashboard.main.statOrder', (c) => c.label);
+    this.statCards = reorderByKey(data?.statCards ?? [], 'piq.dashboard.main.statOrder', (c) => c.label);
     this.assetStatusDonut = data?.assetStatusDonut;
     this.assetsByTypeDonut = data?.assetsByTypeDonut;
     this.recentAlerts = data?.recentAlerts;

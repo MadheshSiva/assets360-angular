@@ -1,15 +1,13 @@
 import { Component, ElementRef, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { DragDropModule, CdkDragDrop } from '@angular/cdk/drag-drop';
+import { DragDropModule, CdkDragDrop, moveItemInArray } from '@angular/cdk/drag-drop';
 import { MainDashboard } from '../main-dashboard/main-dashboard';
 import { WipDashboard } from '../wip-dashboard/wip-dashboard';
 import { InspectionDashboard } from '../inspection-dashboard/inspection-dashboard';
 import { MapComponent, MapPin } from 'shared-ui';
 import { WidgetDragHandle } from '../shared/widget-drag-handle/widget-drag-handle';
-import { loadOrder, saveOrder, reorderByKey, moveWithinVisible } from '../shared/dashboard-widgets/widget-order.util';
-import { WIDGET_CATALOG, WidgetCategory, WidgetCategoryKey, WidgetDef } from '../shared/dashboard-widgets/widget-catalog';
-import { loadSelectedWidgets, saveSelectedWidgets } from '../shared/dashboard-widgets/widget-selection';
+import { loadOrder, saveOrder, reorderByKey } from '../shared/dashboard-widgets/widget-order.util';
 
 interface AssetsStatCard {
   label: string;
@@ -48,6 +46,8 @@ interface CardPopup {
   rows: PopupRow[];
 }
 
+export type ActiveTab = 'dashboard' | 'assets' | 'wip' | 'inspection';
+
 type DateCell = {
   date: Date;
   iso: string;
@@ -81,160 +81,10 @@ interface AssetsData {
   styleUrls: ['./dashboard.css'],
 })
 export class Dashboard implements OnInit {
-  // ===== Module tabs: one per module that has selected widgets =====
-  readonly moduleTabs: Record<WidgetCategoryKey, { tab: string; title: string }> = {
-    asset: { tab: 'Assets', title: 'Assets Dashboard' },
-    workOrder: { tab: 'Work Orders', title: 'Work Order' },
-    wip: { tab: 'WIP Dashboard', title: 'WIP Dashboard' },
-    inspection: { tab: 'Inspection', title: 'Inspection Dashboard' },
-  };
-  activeModule: WidgetCategoryKey | null = null;
+  // ===== Tabs =====
+  activeTab: ActiveTab = 'dashboard';
 
-  /** Modules with at least one selected widget, in catalog order. */
-  get visibleModules(): WidgetCategoryKey[] {
-    return this.catalog.map((c) => c.key).filter((key) => this.selectedByCategory[key].length > 0);
-  }
-
-  switchModule(key: WidgetCategoryKey): void {
-    this.activeModule = key;
-  }
-
-  /** Edit a tab = reopen the picker on that module's widgets. */
-  editModule(key: WidgetCategoryKey): void {
-    this.openWidgetPicker(key);
-  }
-
-  /** Delete a tab = remove all of that module's widgets. */
-  deleteModule(key: WidgetCategoryKey): void {
-    if (!confirm(`Remove the ${this.moduleTabs[key].tab} tab and its widgets?`)) return;
-    const ids = this.selectedIds.filter((id) => !id.startsWith(key + '.'));
-    this.setSelection(ids);
-    saveSelectedWidgets(ids);
-  }
-
-  // ===== Widget selection (Add Widget popup) =====
-  readonly catalog: WidgetCategory[] = WIDGET_CATALOG;
-  // Full ids, e.g. 'asset.stat:Total Assets', 'workOrder.timeline'
-  private selectedIds: string[] = [];
-  // Local ids per category, passed down to each module's widgets
-  selectedByCategory: Record<WidgetCategoryKey, string[]> = { asset: [], workOrder: [], wip: [], inspection: [] };
-
-  isWidgetPickerOpen = false;
-  // True while the close animation plays; the popup is removed once it finishes
-  isWidgetPickerClosing = false;
-  private pickerCloseTimer?: ReturnType<typeof setTimeout>;
-  private static readonly PICKER_CLOSE_MS = 180;
-  expandedCategory: WidgetCategoryKey | null = null;
-  private pickerDraft = new Set<string>();
-
-  get hasWidgets(): boolean {
-    return this.selectedIds.length > 0;
-  }
-
-  openWidgetPicker(expand: WidgetCategoryKey | null = null): void {
-    this.closePicker();
-    clearTimeout(this.pickerCloseTimer);
-    this.isWidgetPickerClosing = false;
-    this.pickerDraft = new Set(this.selectedIds);
-    this.expandedCategory = expand;
-    this.isWidgetPickerOpen = true;
-  }
-
-  closeWidgetPicker(): void {
-    if (!this.isWidgetPickerOpen || this.isWidgetPickerClosing) return;
-    const reduceMotion = typeof matchMedia === 'function' && matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (reduceMotion) {
-      this.isWidgetPickerOpen = false;
-      return;
-    }
-    this.isWidgetPickerClosing = true;
-    this.pickerCloseTimer = setTimeout(() => {
-      this.isWidgetPickerOpen = false;
-      this.isWidgetPickerClosing = false;
-    }, Dashboard.PICKER_CLOSE_MS);
-  }
-
-  toggleCategory(key: WidgetCategoryKey): void {
-    this.expandedCategory = this.expandedCategory === key ? null : key;
-  }
-
-  isDraftSelected(category: WidgetCategory, widget: WidgetDef): boolean {
-    return this.pickerDraft.has(`${category.key}.${widget.id}`);
-  }
-
-  toggleDraft(category: WidgetCategory, widget: WidgetDef): void {
-    const id = `${category.key}.${widget.id}`;
-    if (this.pickerDraft.has(id)) this.pickerDraft.delete(id);
-    else this.pickerDraft.add(id);
-  }
-
-  draftCount(category: WidgetCategory): number {
-    return category.widgets.filter((w) => this.isDraftSelected(category, w)).length;
-  }
-
-  isCategoryFullySelected(category: WidgetCategory): boolean {
-    return this.draftCount(category) === category.widgets.length;
-  }
-
-  toggleCategoryAll(category: WidgetCategory): void {
-    const selectAll = !this.isCategoryFullySelected(category);
-    for (const w of category.widgets) {
-      const id = `${category.key}.${w.id}`;
-      if (selectAll) this.pickerDraft.add(id);
-      else this.pickerDraft.delete(id);
-    }
-  }
-
-  get draftTotal(): number {
-    return this.pickerDraft.size;
-  }
-
-  applyWidgetPicker(): void {
-    // Keep catalog order so the saved list is stable
-    const ids = this.catalog.flatMap((c) => c.widgets.map((w) => `${c.key}.${w.id}`)).filter((id) => this.pickerDraft.has(id));
-    const before = new Set(this.visibleModules);
-    this.setSelection(ids);
-    saveSelectedWidgets(ids);
-    // Jump to a module that just got its first widgets, so the user sees what they added
-    const added = this.visibleModules.find((key) => !before.has(key));
-    if (added) this.activeModule = added;
-    this.closeWidgetPicker();
-  }
-
-  private setSelection(ids: string[]): void {
-    this.selectedIds = ids;
-    const byCategory: Record<WidgetCategoryKey, string[]> = { asset: [], workOrder: [], wip: [], inspection: [] };
-    for (const id of ids) {
-      const dot = id.indexOf('.');
-      const key = id.slice(0, dot) as WidgetCategoryKey;
-      if (byCategory[key]) byCategory[key].push(id.slice(dot + 1));
-    }
-    this.selectedByCategory = byCategory;
-    // Keep the active tab valid: fall back to the first module that still has widgets
-    const modules = this.visibleModules;
-    if (!this.activeModule || !modules.includes(this.activeModule)) {
-      this.activeModule = modules[0] ?? null;
-    }
-  }
-
-  // ===== Work Order widgets (rendered by this component) =====
-  woHas(id: string): boolean {
-    return this.selectedByCategory.workOrder.includes(id);
-  }
-
-  // 'sideStack' groups three separately selectable widgets
-  private woWidgetVisible = (id: string): boolean =>
-    id === 'sideStack' ? this.woHas('topAssets') || this.woHas('costSummary') || this.woHas('quickActions') : this.woHas(id);
-
-  get visibleWorkOrderWidgets(): string[] {
-    return this.assetsWidgetOrder.filter(this.woWidgetVisible);
-  }
-
-  get visibleStatCards(): AssetsStatCard[] {
-    return this.statCards.filter((c) => this.woHas('stat:' + c.label));
-  }
-
-  // ===== Widget drag-and-drop ordering (Work Order widgets) =====
+  // ===== Widget drag-and-drop ordering (Assets tab) =====
   readonly assetsWidgetOrder: string[] = loadOrder('piq.dashboard.assets.widgetOrder', [
     'timeline', 'compliance', 'workStatus', 'recent', 'sideStack', 'alerts', 'workload', 'maintenance',
   ]);
@@ -242,12 +92,12 @@ export class Dashboard implements OnInit {
   trackByWidgetId = (_: number, id: string) => id;
 
   onAssetsWidgetDrop(event: CdkDragDrop<string[]>): void {
-    moveWithinVisible(this.assetsWidgetOrder, this.woWidgetVisible, event.previousIndex, event.currentIndex);
+    moveItemInArray(this.assetsWidgetOrder, event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.assets.widgetOrder', this.assetsWidgetOrder);
   }
 
   onStatCardDrop(event: CdkDragDrop<AssetsStatCard[]>): void {
-    moveWithinVisible(this.statCards, (c) => this.woHas('stat:' + c.label), event.previousIndex, event.currentIndex);
+    moveItemInArray(this.statCards, event.previousIndex, event.currentIndex);
     saveOrder('piq.dashboard.assets.statOrder', this.statCards.map((c) => c.label));
   }
   cardPopup: CardPopup | null = null;
@@ -258,6 +108,24 @@ export class Dashboard implements OnInit {
     { lat: 40.7138, lng: -74.008, color: '#ef4444', label: 'WO-2452 · Forklift FL-07' },
   ];
 
+  switchTab(tab: ActiveTab): void {
+    this.activeTab = tab;
+  }
+  // ===== Tab Management =====
+  editTab(tab: ActiveTab): void {
+    // TODO: hook up your rename/edit logic here
+    console.log('Edit tab:', tab);
+  }
+
+  deleteTab(tab: ActiveTab): void {
+    // TODO: hook up your delete logic here
+    console.log('Delete tab:', tab);
+  }
+
+  addNewTab(): void {
+    // TODO: hook up your add-new-tab logic here
+    console.log('Add new tab');
+  }
   openCardPopup(card: AssetsStatCard): void {
     this.closePicker();
     this.cardPopup = this.buildCardPopup(card);
@@ -512,7 +380,6 @@ export class Dashboard implements OnInit {
   constructor(private host: ElementRef<HTMLElement>) {}
 
   async ngOnInit(): Promise<void> {
-    this.setSelection(loadSelectedWidgets());
     const response = await fetch('/assets/data/assets-data.json');
     const data: AssetsData = await response.json();
     this.statCards = reorderByKey(data.statCards, 'piq.dashboard.assets.statOrder', (c) => c.label);
@@ -565,7 +432,6 @@ export class Dashboard implements OnInit {
   onEscape(): void {
     if (this.isPickerOpen) this.isPickerOpen = false;
     if (this.cardPopup) this.closeCardPopup();
-    if (this.isWidgetPickerOpen) this.closeWidgetPicker();
   }
 
   // ===== Calendar Generation =====
