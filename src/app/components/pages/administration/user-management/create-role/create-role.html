@@ -1,8 +1,6 @@
 <section class="cr-page">
   <div class="cr-card">
-    <h2 class="cr-title">{{ isEditMode ? 'Edit Role' : 'Create New Role' }}</h2>
-
-    <p class="cr-error-text" *ngIf="loading">Loading role...</p>
+    <h2 class="cr-title">Create New Role</h2>
 
     <div class="cr-form-grid">
       <div class="cr-field">
@@ -75,13 +73,9 @@
       </div>
     </div>
 
-    <span class="cr-error-text" *ngIf="errorMessage">{{ errorMessage }}</span>
-
     <footer class="cr-footer">
-      <button type="button" class="cr-btn cr-btn-cancel" (click)="cancel()" [disabled]="saving">Cancel</button>
-      <button type="button" class="cr-btn cr-btn-save" (click)="saveRole()" [disabled]="saving">
-        {{ saving ? 'Saving...' : (isEditMode ? 'Update Role' : 'Save Role') }}
-      </button>
+      <button type="button" class="cr-btn cr-btn-cancel" (click)="cancel()">Cancel</button>
+      <button type="button" class="cr-btn cr-btn-save" (click)="saveRole()">Save Role</button>
     </footer>
   </div>
 </section>

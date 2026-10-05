@@ -3,16 +3,25 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ImportColumn, ImportFileModal } from 'shared-ui';
 import { RowActions } from 'shared-ui';
-import { AssetAuditService, AppAssetAudit, AssetAuditFormValue } from '../../../../../services/asset-audit.service';
+
+export interface AuditConfigEntry {
+  assetId: string;
+  assetName: string;
+  auditCode: string;
+  auditName: string;
+  auditStartDate: string;
+  auditEndDate: string;
+  active: boolean;
+  createdDate: string;
+  createdBy: string;
+}
 
 interface AuditConfigForm {
   assetId: string;
   assetName: string;
   auditCode: string;
   auditName: string;
-  /** yyyy-MM-dd, bound to a native date input */
   auditStartDate: string;
-  /** yyyy-MM-dd, bound to a native date input; blank means "no end date" */
   auditEndDate: string;
   active: string;
 }
@@ -42,24 +51,38 @@ export class AssetAuditConfig {
     { key: 'auditName', label: 'Audit Name' },
     { key: 'auditStartDate', label: 'Audit Start Date' },
     { key: 'auditEndDate', label: 'Audit End Date' },
-    { key: 'active', label: 'Active' }
+    { key: 'active', label: 'Active' },
+    { key: 'createdDate', label: 'Created Date' },
+    { key: 'createdBy', label: 'Created By' }
   ];
 
   showImportModal = false;
 
-  entries: AppAssetAudit[] = [];
-  loading = false;
-  errorMessage = '';
+  entries: AuditConfigEntry[] = [
+    { assetId: 'AST-0001', assetName: 'Forklift Unit 4', auditCode: '210526', auditName: '210526', auditStartDate: '2026-05-21', auditEndDate: '', active: true, createdDate: '2026-05-21', createdBy: 'Admin' },
+    { assetId: 'AST-0002', assetName: 'HVAC Compressor B', auditCode: '06042026-01', auditName: '06042026-01', auditStartDate: '2026-04-06', auditEndDate: '', active: true, createdDate: '2026-04-06', createdBy: 'Admin' },
+    { assetId: 'AST-0003', assetName: 'Laptop Dell XPS 15', auditCode: '110326', auditName: '110326', auditStartDate: '2026-03-11', auditEndDate: '', active: true, createdDate: '2026-03-11', createdBy: 'Admin' },
+    { assetId: 'AST-0004', assetName: 'Industrial Generator 2', auditCode: '030226-02', auditName: '030226-02', auditStartDate: '2026-02-03', auditEndDate: '', active: true, createdDate: '2026-02-03', createdBy: 'Admin' },
+    { assetId: 'AST-0005', assetName: 'Conveyor Belt System', auditCode: '030226-01', auditName: '030226-01', auditStartDate: '2026-02-03', auditEndDate: '', active: true, createdDate: '2026-02-03', createdBy: 'Admin' },
+    { assetId: 'AST-0006', assetName: 'Office Printer HP LaserJet', auditCode: '060126-01', auditName: '060126-01', auditStartDate: '2026-01-06', auditEndDate: '', active: true, createdDate: '2026-01-06', createdBy: 'Admin' },
+    { assetId: 'AST-0007', assetName: 'Security Camera Unit 12', auditCode: 'GFR050126', auditName: 'Galfar 05JAN26', auditStartDate: '2026-01-05', auditEndDate: '', active: true, createdDate: '2026-01-05', createdBy: 'Admin' },
+    { assetId: 'AST-0008', assetName: 'Pallet Jack Model X', auditCode: 'GFR040126-01', auditName: 'Galfar 04JAN26', auditStartDate: '2026-01-04', auditEndDate: '', active: true, createdDate: '2026-01-04', createdBy: 'Admin' },
+    { assetId: 'AST-0009', assetName: 'Desktop Workstation 07', auditCode: 'KNET231025-01', auditName: 'KNET231025-01', auditStartDate: '2025-10-22', auditEndDate: '', active: true, createdDate: '2025-10-22', createdBy: 'Admin' },
+    { assetId: 'AST-0010', assetName: 'Water Pump Unit 3', auditCode: 'HC24072501', auditName: 'HC24072501', auditStartDate: '2025-07-24', auditEndDate: '2025-10-22', active: false, createdDate: '2025-07-24', createdBy: 'Admin' },
+    { assetId: 'AST-0011', assetName: 'Air Compressor Unit', auditCode: 'HC160725', auditName: 'HC160725', auditStartDate: '2025-07-16', auditEndDate: '2025-10-22', active: false, createdDate: '2025-07-16', createdBy: 'Admin' },
+    { assetId: 'AST-0012', assetName: 'Handheld Scanner 5', auditCode: 'MH150725-01', auditName: 'MH150725-01', auditStartDate: '2025-07-15', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-15', createdBy: 'Admin' },
+    { assetId: 'AST-0013', assetName: 'Backup Power Generator', auditCode: 'MH030725-02', auditName: 'MH030725-02', auditStartDate: '2025-07-03', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-03', createdBy: 'Admin' },
+    { assetId: 'AST-0014', assetName: 'Cooling Tower Fan', auditCode: 'MH030725-01', auditName: 'MH030725-01', auditStartDate: '2025-07-03', auditEndDate: '2025-07-15', active: false, createdDate: '2025-07-03', createdBy: 'Admin' },
+    { assetId: 'AST-0015', assetName: 'Server Rack Unit 2', auditCode: 'WB180625', auditName: 'WB180625', auditStartDate: '2025-06-18', auditEndDate: '2025-07-15', active: false, createdDate: '2025-06-18', createdBy: 'Admin' }
+  ];
 
   showFormModal = false;
   isEditMode = false;
-  private editingEntry: AppAssetAudit | null = null;
+  private editingEntry: AuditConfigEntry | null = null;
   form: AuditConfigForm = this.emptyForm();
 
-  deleteTarget: AppAssetAudit | null = null;
-
-  constructor(private service: AssetAuditService) {
-    this.loadEntries();
+  private today(): string {
+    return new Date().toISOString().slice(0, 10);
   }
 
   private emptyForm(): AuditConfigForm {
@@ -91,20 +114,23 @@ export class AssetAuditConfig {
   }
 
   onImportRows(rows: Record<string, string>[]): void {
-    // TODO: submit imported rows to the backend instead of only pushing to the local list
-    rows.forEach((row) => {
-      const activeRaw = (row['active'] ?? '').trim().toLowerCase();
-      const fields: AssetAuditFormValue = {
-        assetId: row['assetId'] ?? '',
-        assetName: row['assetName'] ?? '',
-        auditCode: row['auditCode'] ?? '',
-        auditName: row['auditName'] ?? '',
-        auditStartDate: row['auditStartDate'] ?? '',
-        auditEndDate: row['auditEndDate'] || null,
-        active: activeRaw === 'yes' || activeRaw === 'true'
-      };
-      this.service.create(fields).subscribe({ next: () => this.loadEntries() });
-    });
+    this.entries = [
+      ...this.entries,
+      ...rows.map((row) => {
+        const activeRaw = (row['active'] ?? '').trim().toLowerCase();
+        return {
+          assetId: row['assetId'] ?? '',
+          assetName: row['assetName'] ?? '',
+          auditCode: row['auditCode'] ?? '',
+          auditName: row['auditName'] ?? '',
+          auditStartDate: row['auditStartDate'] ?? '',
+          auditEndDate: row['auditEndDate'] ?? '',
+          active: activeRaw === 'yes' || activeRaw === 'true',
+          createdDate: row['createdDate'] || this.today(),
+          createdBy: row['createdBy'] || 'Admin'
+        };
+      })
+    ];
     this.showImportModal = false;
   }
 
@@ -113,14 +139,14 @@ export class AssetAuditConfig {
   }
 
   onRefresh(): void {
-    this.loadEntries();
+    // TODO: reload audit configuration data from backend
   }
 
   onDelete(): void {
-    // TODO: bulk-delete selected entries (no row-selection UI yet)
+    // TODO: delete selected entries
   }
 
-  editRow(entry: AppAssetAudit): void {
+  editRow(entry: AuditConfigEntry): void {
     this.isEditMode = true;
     this.editingEntry = entry;
     this.form = {
@@ -128,29 +154,15 @@ export class AssetAuditConfig {
       assetName: entry.assetName,
       auditCode: entry.auditCode,
       auditName: entry.auditName,
-      auditStartDate: entry.auditStartDate ? entry.auditStartDate.slice(0, 10) : '',
-      auditEndDate: entry.auditEndDate ? entry.auditEndDate.slice(0, 10) : '',
+      auditStartDate: entry.auditStartDate,
+      auditEndDate: entry.auditEndDate,
       active: entry.active ? 'Yes' : 'No'
     };
     this.showFormModal = true;
   }
 
-  deleteRow(entry: AppAssetAudit): void {
-    this.deleteTarget = entry;
-  }
-
-  cancelDelete(): void {
-    this.deleteTarget = null;
-  }
-
-  confirmDelete(): void {
-    if (!this.deleteTarget) return;
-    const id = this.deleteTarget.id;
-    this.deleteTarget = null;
-    this.service.delete(id).subscribe({
-      next: () => this.loadEntries(),
-      error: () => this.errorMessage = 'Failed to delete audit. Please try again.'
-    });
+  deleteRow(entry: AuditConfigEntry): void {
+    this.entries = this.entries.filter((e) => e !== entry);
   }
 
   closeFormModal(): void {
@@ -159,41 +171,34 @@ export class AssetAuditConfig {
   }
 
   submitForm(): void {
-    const fields: AssetAuditFormValue = {
-      assetId: this.form.assetId,
-      assetName: this.form.assetName,
-      auditCode: this.form.auditCode,
-      auditName: this.form.auditName,
-      auditStartDate: this.form.auditStartDate,
-      auditEndDate: this.form.auditEndDate || null,
-      active: this.parseActive(this.form.active)
-    };
+    const active = this.parseActive(this.form.active);
 
-    const request$ = this.isEditMode && this.editingEntry
-      ? this.service.update(this.editingEntry.id, fields)
-      : this.service.create(fields);
-
-    request$.subscribe({
-      next: () => {
-        this.closeFormModal();
-        this.loadEntries();
-      },
-      error: () => this.errorMessage = 'Failed to save audit. Please try again.'
-    });
-  }
-
-  private loadEntries(): void {
-    this.loading = true;
-    this.errorMessage = '';
-    this.service.getAll().subscribe({
-      next: (entries) => {
-        this.entries = entries;
-        this.loading = false;
-      },
-      error: () => {
-        this.errorMessage = 'Failed to load audit configuration data.';
-        this.loading = false;
-      }
-    });
+    if (this.isEditMode && this.editingEntry) {
+      Object.assign(this.editingEntry, {
+        assetId: this.form.assetId,
+        assetName: this.form.assetName,
+        auditCode: this.form.auditCode,
+        auditName: this.form.auditName,
+        auditStartDate: this.form.auditStartDate,
+        auditEndDate: this.form.auditEndDate,
+        active
+      });
+    } else {
+      this.entries = [
+        ...this.entries,
+        {
+          assetId: this.form.assetId,
+          assetName: this.form.assetName,
+          auditCode: this.form.auditCode,
+          auditName: this.form.auditName,
+          auditStartDate: this.form.auditStartDate,
+          auditEndDate: this.form.auditEndDate,
+          active,
+          createdDate: this.today(),
+          createdBy: 'Admin'
+        }
+      ];
+    }
+    this.closeFormModal();
   }
 }

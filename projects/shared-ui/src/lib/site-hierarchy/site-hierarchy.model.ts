@@ -17,19 +17,12 @@ export interface Zone {
   zones: Zone[];
   /** Set when this zone is added via the "Add Zone" form. */
   description?: string;
-  /** Data URL of a locally-picked map image, or the backend's uploaded map URL once saved. */
+  /** Data URL of an uploaded map image. */
   mapImage?: string;
-  /** Free-text "Top Zone" description — only used by a zone added directly under a Floor. */
   topZone?: string;
-  /** Whether this sub-zone is itself a top zone — only used by a zone added under another Zone (a sub-zone). */
-  isTopZone?: 'active' | 'inactive';
   priority?: string;
-  /** Whether this zone is an exit point. */
-  exit?: 'active' | 'inactive';
-  /** Whether this zone is a muster/assembly point. */
+  exit?: string;
   assemblyPoint?: 'active' | 'inactive';
-  /** Minutes to reach the assembly point from this zone. */
-  timeTakenAssemblePoint?: number;
   status?: 'active' | 'inactive';
 }
 
@@ -57,27 +50,17 @@ export interface Building {
   status?: 'active' | 'inactive';
 }
 
-export interface OuterZone {
-  kind: 'outerZone';
-  id: string;
-  name: string;
-  coords: Coords;
-  buildings: Building[];
-  description?: string;
-  status?: 'active' | 'inactive';
-}
-
 export interface State {
   kind: 'state';
   id: string;
   name: string;
-  /** Drives the "Outdoor Map" field: whether this state holds zones, outer zones, or both directly. */
+  /** Drives the "Outdoor Map" field: whether this state holds zones, buildings, or both directly. */
   type: AreaType;
   coords: Coords;
   /** Only populated when type is 'outdoor' or 'indoor_outdoor'. */
   zones: Zone[];
-  /** Only populated when type is 'indoor' or 'indoor_outdoor'. Buildings nest under one of these, not directly under the state. */
-  outerZones: OuterZone[];
+  /** Only populated when type is 'indoor' or 'indoor_outdoor'. */
+  buildings: Building[];
   description?: string;
   status?: 'active' | 'inactive';
 }
@@ -107,7 +90,7 @@ export interface Project {
   areas: Area[];
 }
 
-export type HierarchyNode = Project | Area | State | OuterZone | Building | Floor | Zone;
+export type HierarchyNode = Project | Area | State | Building | Floor | Zone;
 
 export const AREA_TYPE_LABELS: Record<AreaType, string> = {
   indoor: 'Indoor',
@@ -138,9 +121,7 @@ export function childrenOf(node: HierarchyNode): HierarchyNode[] {
     case 'area':
       return node.states;
     case 'state':
-      return [...node.zones, ...node.outerZones];
-    case 'outerZone':
-      return node.buildings;
+      return [...node.zones, ...node.buildings];
     case 'building':
       return node.floors;
     case 'floor':
